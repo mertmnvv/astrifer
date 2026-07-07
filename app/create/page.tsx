@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { CreateForm } from "./CreateForm";
 import { FALLBACK_TEMPLATES, type TemplateOption } from "@/lib/templates";
 import { isSupabaseConfigured } from "@/lib/supabase/isConfigured";
+import { Logo } from "@/components/Logo";
 
 export const metadata: Metadata = {
   title: "Haritanı Oluştur — Astrifer",
@@ -44,8 +45,8 @@ export default async function CreatePage() {
   return (
     <main className="min-h-screen px-4 py-10 sm:px-8 sm:py-16">
       <div className="mx-auto max-w-6xl">
-        <header className="mb-8 text-center sm:mb-12">
-          <p className="font-mono text-xs uppercase tracking-[0.3em] text-brass">Astrifer</p>
+        <header className="mb-8 flex flex-col items-center text-center sm:mb-12">
+          <Logo size={120} />
           <h1 className="mt-3 font-display text-3xl italic text-text sm:text-5xl">
             O anın gökyüzünü çiz.
           </h1>

@@ -1,0 +1,109 @@
+"use client";
+
+import { useEffect, useRef } from "react";
+
+export interface PickedPhoto {
+  id: string;
+  file: File;
+  caption: string;
+  previewUrl: string;
+}
+
+export interface PhotoPickerProps {
+  photos: PickedPhoto[];
+  onChange: (photos: PickedPhoto[]) => void;
+  max?: number;
+}
+
+/**
+ * Local-only photo picker: no upload happens here yet (Supabase Storage
+ * pipeline isn't wired up), just in-browser previews via object URLs. The
+ * configurator only carries the photo *count* forward to checkout.
+ */
+export function PhotoPicker({ photos, onChange, max = 4 }: PhotoPickerProps) {
+  const inputRef = useRef<HTMLInputElement | null>(null);
+
+  useEffect(() => {
+    return () => {
+      photos.forEach((photo) => URL.revokeObjectURL(photo.previewUrl));
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  const handleFiles = (fileList: FileList | null) => {
+    if (!fileList) return;
+    const room = max - photos.length;
+    const incoming = Array.from(fileList).slice(0, Math.max(0, room));
+    const added: PickedPhoto[] = incoming.map((file) => ({
+      id: `${file.name}-${file.lastModified}-${Math.random().toString(36).slice(2)}`,
+      file,
+      caption: "",
+      previewUrl: URL.createObjectURL(file),
+    }));
+    onChange([...photos, ...added]);
+    if (inputRef.current) inputRef.current.value = "";
+  };
+
+  const removePhoto = (id: string) => {
+    const target = photos.find((photo) => photo.id === id);
+    if (target) URL.revokeObjectURL(target.previewUrl);
+    onChange(photos.filter((photo) => photo.id !== id));
+  };
+
+  const updateCaption = (id: string, caption: string) => {
+    onChange(photos.map((photo) => (photo.id === id ? { ...photo, caption } : photo)));
+  };
+
+  return (
+    <div>
+      <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+        {photos.map((photo) => (
+          <div key={photo.id} className="relative">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src={photo.previewUrl}
+              alt=""
+              className="aspect-square w-full rounded-md object-cover"
+            />
+            <button
+              type="button"
+              onClick={() => removePhoto(photo.id)}
+              aria-label="Fotoğrafı kaldır"
+              className="absolute -right-1.5 -top-1.5 flex h-5 w-5 items-center justify-center rounded-full bg-void text-xs text-brass ring-1 ring-brass-dim focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brass"
+            >
+              ×
+            </button>
+            <input
+              type="text"
+              value={photo.caption}
+              onChange={(event) => updateCaption(photo.id, event.target.value)}
+              placeholder="Kısa not (ops.)"
+              maxLength={40}
+              aria-label="Fotoğraf notu"
+              className="mt-1 w-full rounded border border-brass-dim/40 bg-panel-navy px-2 py-1 text-[11px] text-text placeholder:text-haze/50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brass"
+            />
+          </div>
+        ))}
+        {photos.length < max && (
+          <label className="flex aspect-square cursor-pointer flex-col items-center justify-center gap-1 rounded-md border border-dashed border-brass-dim/50 text-haze transition-colors hover:border-brass-dim focus-within:outline focus-within:outline-2 focus-within:outline-offset-2 focus-within:outline-brass">
+            <span aria-hidden className="text-2xl leading-none text-brass-dim">
+              +
+            </span>
+            <span className="text-[10px] uppercase tracking-widest">Ekle</span>
+            <input
+              ref={inputRef}
+              type="file"
+              accept="image/*"
+              multiple
+              onChange={(event) => handleFiles(event.target.files)}
+              className="sr-only"
+            />
+          </label>
+        )}
+      </div>
+      <p className="mt-2 text-[11px] text-haze/70">
+        En fazla {max} fotoğraf — {photos.length}/{max}
+      </p>
+    </div>
+  );
+}

@@ -6,6 +6,7 @@ import { StarChart } from "@/components/astrolab/StarChart";
 import { computeSky } from "@/lib/astronomy/computeSky";
 import { PlaceCombobox } from "@/components/ui/PlaceCombobox";
 import { RadioCardGroup } from "@/components/ui/RadioCardGroup";
+import { PhotoPicker, type PickedPhoto } from "@/components/ui/PhotoPicker";
 import type { PlaceResult } from "@/lib/geocode/cities";
 import { zonedTimeToUtc } from "@/lib/geocode/timezone";
 import type { TemplateOption } from "@/lib/templates";
@@ -36,6 +37,7 @@ export function CreateForm({ templates }: CreateFormProps) {
   const [title, setTitle] = useState("");
   const [message, setMessage] = useState("");
   const [templateSlug, setTemplateSlug] = useState(templates[0]?.slug ?? "");
+  const [photos, setPhotos] = useState<PickedPhoto[]>([]);
   const [touchedSubmit, setTouchedSubmit] = useState(false);
 
   useEffect(() => {
@@ -79,6 +81,7 @@ export function CreateForm({ templates }: CreateFormProps) {
       lon: place.longitude.toString(),
       date: eventDateUtc.toISOString(),
     });
+    if (photos.length > 0) params.set("photos", photos.length.toString());
     router.push(`/checkout?${params.toString()}`);
   };
 
@@ -145,6 +148,13 @@ export function CreateForm({ templates }: CreateFormProps) {
             onChange={(event) => setMessage(event.target.value)}
             className="w-full resize-none rounded-md border border-brass-dim/60 bg-panel-navy px-3 py-2.5 text-sm text-text focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brass"
           />
+        </div>
+
+        <div>
+          <p className="mb-1.5 font-mono text-xs uppercase tracking-widest text-haze">
+            Fotoğraflar (opsiyonel)
+          </p>
+          <PhotoPicker photos={photos} onChange={setPhotos} />
         </div>
 
         <div>

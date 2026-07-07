@@ -1,11 +1,10 @@
 import Link from "next/link";
+import { Logo } from "@/components/Logo";
 
 export default function HomePage() {
   return (
     <main className="flex min-h-screen flex-col items-center justify-center gap-6 px-6 text-center">
-      <p className="font-mono text-xs uppercase tracking-[0.3em] text-brass">
-        Astrifer
-      </p>
+      <Logo size={140} />
       <h1 className="max-w-2xl font-display text-4xl italic text-text sm:text-5xl">
         Gökyüzü o an, sonsuza dek sizin.
       </h1>

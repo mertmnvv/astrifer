@@ -1,5 +1,11 @@
 import { isSupabaseConfigured } from "@/lib/supabase/isConfigured";
 
+export interface StarMapPhoto {
+  /** Absent until a real upload pipeline exists — renders a placeholder slot instead of an <img>. */
+  url?: string;
+  caption?: string;
+}
+
 export interface StarMapRecord {
   slug: string;
   title: string;
@@ -10,6 +16,8 @@ export interface StarMapRecord {
   longitude: number;
   locationName: string;
   musicUrl: string | null;
+  /** Up to 4, optional. Empty for real records until Storage upload is wired up. */
+  photos: StarMapPhoto[];
 }
 
 /**
@@ -27,6 +35,12 @@ export const DEMO_STAR_MAP: StarMapRecord = {
   longitude: 28.9784,
   locationName: "İstanbul",
   musicUrl: null,
+  photos: [
+    { caption: "İlk “Merhaba”" },
+    { caption: "O Gece" },
+    { caption: "Yüzük" },
+    { caption: "Ailece" },
+  ],
 };
 
 function rowToRecord(row: {
@@ -50,6 +64,9 @@ function rowToRecord(row: {
     longitude: row.longitude,
     locationName: row.location_name,
     musicUrl: row.music_url,
+    // photo_urls isn't in the schema yet (upload pipeline not wired up) —
+    // see the plan note in supabase/migrations for when that lands.
+    photos: [],
   };
 }
 

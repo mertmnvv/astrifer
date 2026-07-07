@@ -1,20 +1,9 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef } from "react";
 import type { ComputeSkyResult } from "@/lib/astronomy/computeSky";
 import { drawStarChart } from "./drawStarChart";
-
-function usePrefersReducedMotion(): boolean {
-  const [reduced, setReduced] = useState(false);
-  useEffect(() => {
-    const query = window.matchMedia("(prefers-reduced-motion: reduce)");
-    setReduced(query.matches);
-    const listener = (event: MediaQueryListEvent) => setReduced(event.matches);
-    query.addEventListener("change", listener);
-    return () => query.removeEventListener("change", listener);
-  }, []);
-  return reduced;
-}
+import { usePrefersReducedMotion } from "@/lib/hooks/usePrefersReducedMotion";
 
 export interface StarChartProps {
   sky: ComputeSkyResult | null;

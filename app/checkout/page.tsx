@@ -21,6 +21,14 @@ export default function CheckoutPage({
   const frame = get("frame");
   const priceParam = get("price");
   const price = priceParam ? Number(priceParam) : undefined;
+  const photosParam = get("photos");
+  const photoCount = photosParam ? Number(photosParam) : undefined;
+
+  const productLabel: Record<string, string> = {
+    framed_poster: "Çerçeveli Poster",
+    poster: "Poster",
+    journal: "Deri Defter",
+  };
 
   const hasSummary = Boolean(title || product);
 
@@ -63,7 +71,7 @@ export default function CheckoutPage({
           {product && (
             <div className="flex justify-between gap-4">
               <dt className="text-haze">Ürün</dt>
-              <dd className="text-text">{product === "framed_poster" ? "Çerçeveli Poster" : "Poster"}</dd>
+              <dd className="text-text">{productLabel[product] ?? product}</dd>
             </div>
           )}
           {size && (
@@ -82,6 +90,12 @@ export default function CheckoutPage({
             <div className="flex justify-between gap-4">
               <dt className="text-haze">Tutar</dt>
               <dd className="text-text">{formatTRY(price)}</dd>
+            </div>
+          )}
+          {photoCount !== undefined && !Number.isNaN(photoCount) && (
+            <div className="flex justify-between gap-4">
+              <dt className="text-haze">Fotoğraflar</dt>
+              <dd className="text-text">{photoCount} adet seçildi</dd>
             </div>
           )}
           {message && (
