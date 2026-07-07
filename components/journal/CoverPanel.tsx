@@ -8,9 +8,14 @@ export interface CoverPanelProps {
   title?: string;
   subtitle?: string;
   className?: string;
+  /** Fills its container's actual width/height instead of forcing a square aspect ratio — used by the fullscreen open gate. */
+  fullscreen?: boolean;
+  /** Tiny decorative use (e.g. a checkout thumbnail) — shrinks the logo and omits title/subtitle text, which wouldn't fit legibly anyway. */
+  compact?: boolean;
+  children?: React.ReactNode;
 }
 
-export function CoverPanel({ title, subtitle, className }: CoverPanelProps) {
+export function CoverPanel({ title, subtitle, className, fullscreen, compact, children }: CoverPanelProps) {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const containerRef = useRef<HTMLDivElement | null>(null);
 
@@ -26,14 +31,15 @@ export function CoverPanel({ title, subtitle, className }: CoverPanelProps) {
     // guaranteed first callback) clears the canvas bitmap, so redraw each
     // time — same lesson learned from the astrolab StarChart component.
     const draw = () => {
-      const size = container.clientWidth;
+      const width = container.clientWidth;
+      const height = container.clientHeight;
       const dpr = window.devicePixelRatio || 1;
-      canvas.width = size * dpr;
-      canvas.height = size * dpr;
-      canvas.style.width = `${size}px`;
-      canvas.style.height = `${size}px`;
+      canvas.width = width * dpr;
+      canvas.height = height * dpr;
+      canvas.style.width = `${width}px`;
+      canvas.style.height = `${height}px`;
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-      drawLeatherTexture(ctx, size);
+      drawLeatherTexture(ctx, width, height);
     };
 
     draw();
@@ -45,17 +51,26 @@ export function CoverPanel({ title, subtitle, className }: CoverPanelProps) {
   return (
     <div
       ref={containerRef}
-      className={`relative aspect-square overflow-hidden rounded-md shadow-2xl shadow-black/60 ${className ?? ""}`}
+      className={`relative overflow-hidden rounded-md shadow-2xl shadow-black/60 ${
+        fullscreen ? "h-full w-full" : "aspect-square"
+      } ${className ?? ""}`}
     >
       <canvas ref={canvasRef} className="absolute inset-0 h-full w-full" />
-      <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 px-6 text-center">
-        <Logo size={150} />
-        {title && (
-          <p className="mt-1 font-display text-lg italic text-parchment sm:text-xl">{title}</p>
+      <div
+        className={`absolute inset-0 flex flex-col items-center justify-center text-center ${
+          compact ? "gap-0 px-1" : "gap-3 px-6"
+        }`}
+      >
+        <Logo size={fullscreen ? 190 : compact ? 32 : 150} />
+        {!compact && title && (
+          <p className={`mt-1 font-display italic text-parchment ${fullscreen ? "text-2xl sm:text-3xl" : "text-lg sm:text-xl"}`}>
+            {title}
+          </p>
         )}
-        {subtitle && (
+        {!compact && subtitle && (
           <p className="font-mono text-[10px] uppercase tracking-[0.25em] text-brass/80">{subtitle}</p>
         )}
+        {children}
       </div>
     </div>
   );

@@ -3,8 +3,9 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import QRCode from "qrcode";
 import { StarChart } from "@/components/astrolab/StarChart";
-import { CoverPanel } from "@/components/journal/CoverPanel";
 import { MemoriesGallery } from "@/components/journal/MemoriesGallery";
+import { PageGate } from "@/components/journal/PageGate";
+import { VoiceNote } from "@/components/journal/VoiceNote";
 import { MusicToggle } from "@/components/ui/MusicToggle";
 import { RevealOnScroll } from "@/components/ui/RevealOnScroll";
 import { ScrollCue } from "@/components/ui/ScrollCue";
@@ -79,26 +80,30 @@ export default async function SharedStarMapPage({
   const skyLog = buildSkyNarrative(sky);
 
   return (
-    <main className="flex min-h-screen flex-col items-center px-4 py-12 sm:px-8 sm:py-16">
-      {/* Kapak — her zaman görünür, scroll-reveal'a bağlı değil; sadece sayfa açılışında beliriyor */}
-      <div className="w-full max-w-sm animate-cover-in motion-reduce:animate-none">
-        <CoverPanel
-          title={starMap.title}
-          subtitle={`${dateLabel} · ${starMap.locationName}`}
-        />
-      </div>
-      <ScrollCue />
+    <PageGate
+      title={starMap.title}
+      subtitle={`${dateLabel} · ${starMap.locationName}`}
+      musicUrl={starMap.musicUrl}
+    >
+      <main className="flex min-h-screen flex-col items-center px-4 py-12 sm:px-8 sm:py-16">
+        {/* Büyük yıldız haritası — sayfanın asıl kahramanı */}
+        <div className="flex w-full max-w-2xl flex-col items-center text-center">
+          <div className="aspect-square w-full">
+            <StarChart sky={sky} label={previewLabel} className="h-full w-full" />
+          </div>
+          <h1 className="mt-6 font-display text-3xl italic text-text sm:text-4xl">{starMap.title}</h1>
+          <p className="mt-2 font-mono text-xs uppercase tracking-widest text-haze">
+            {dateLabel} · {starMap.locationName}
+          </p>
+        </div>
+        <ScrollCue />
 
-      {/* Başlık + Yıldız Haritası */}
-      <RevealOnScroll className="mt-16 w-full max-w-4xl">
-        <div className="grid gap-10 rounded-lg bg-panel-navy/60 p-6 sm:grid-cols-2 sm:p-10">
-          <div className="flex flex-col justify-center text-center sm:text-left">
-            <p className="font-mono text-[10px] uppercase tracking-[0.3em] text-brass-dim">O An</p>
-            <h1 className="mt-2 font-display text-3xl italic text-text sm:text-4xl">{starMap.title}</h1>
-            <div className="mx-auto mt-4 h-px w-8 bg-brass-dim/60 sm:mx-0" />
+        {/* O Günün Önemi */}
+        <RevealOnScroll className="mt-16 w-full max-w-xl">
+          <div className="rounded-lg bg-panel-navy/60 p-6 text-center sm:p-10">
+            <p className="font-mono text-[10px] uppercase tracking-[0.3em] text-brass-dim">O Günün Önemi</p>
+            <div className="mx-auto mt-4 h-px w-8 bg-brass-dim/60" />
             <p className="mt-4 font-mono text-[11px] uppercase tracking-widest text-haze">
-              {dateLabel}
-              <br />
               {formatCoordinates(starMap.latitude, starMap.longitude)} · {starMap.locationName.toUpperCase()}
             </p>
             {starMap.message && (
@@ -106,13 +111,8 @@ export default async function SharedStarMapPage({
                 “{starMap.message}”
               </p>
             )}
-          </div>
-          <div className="flex flex-col items-center">
-            <div className="aspect-square w-full max-w-xs">
-              <StarChart sky={sky} label={previewLabel} className="h-full w-full" />
-            </div>
             {skyLog && (
-              <div className="mt-4 max-w-xs text-center">
+              <div className="mt-6 border-t border-brass-dim/20 pt-6">
                 <p className="font-mono text-[9px] uppercase tracking-[0.25em] text-brass-dim">
                   Gökyüzü Kaydı
                 </p>
@@ -120,52 +120,59 @@ export default async function SharedStarMapPage({
               </div>
             )}
           </div>
-        </div>
-      </RevealOnScroll>
+        </RevealOnScroll>
 
-      {/* Anılarımız — panel + her fotoğraf kendi gecikmesiyle beliriyor */}
-      {starMap.photos.length > 0 && (
-        <div className="mt-16 w-full max-w-2xl">
-          <MemoriesGallery title={starMap.title} photos={starMap.photos} />
-        </div>
-      )}
-
-      {/* QR / Footer */}
-      <RevealOnScroll className="mt-16 w-full max-w-sm">
-        <div className="relative rounded-md bg-parchment px-8 py-9 shadow-2xl shadow-black/50">
-          <div className="absolute inset-x-0 top-0 h-[3px] bg-gradient-to-r from-brass-dim via-brass to-brass-dim" />
-          <div className="absolute inset-x-0 bottom-0 h-[3px] bg-gradient-to-r from-brass-dim via-brass to-brass-dim" />
-          <div className="flex flex-col items-center gap-3">
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
-              src={qrDataUrl}
-              alt={`${shareUrl} adresine yönlenen QR kod`}
-              width={96}
-              height={96}
-              className="animate-qr-glow motion-reduce:animate-none border border-ink/70"
-            />
-            <p className="text-center font-mono text-[10px] uppercase tracking-widest text-leather-lt">
-              Okut ve gökyüzü
-              <br />
-              yeniden canlansın
-            </p>
-            <p className="font-display text-sm italic text-leather-lt">
-              {shareUrl.replace(/^https?:\/\//, "")}
-            </p>
-            {starMap.musicUrl && <MusicToggle src={starMap.musicUrl} />}
+        {/* Anılarımız — panel + her fotoğraf kendi gecikmesiyle beliriyor */}
+        {starMap.photos.length > 0 && (
+          <div className="mt-16 w-full max-w-2xl">
+            <MemoriesGallery title={starMap.title} photos={starMap.photos} />
           </div>
-        </div>
-      </RevealOnScroll>
+        )}
 
-      <div className="mt-16 flex flex-col items-center gap-3 text-center">
-        <p className="text-sm text-haze">Sen de o anın gökyüzünü sonsuza dek sakla.</p>
-        <Link
-          href="/create"
-          className="rounded-full bg-brass px-6 py-3 font-mono text-xs uppercase tracking-widest text-void transition-opacity hover:opacity-90 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-text"
-        >
-          Kendi Haritanı Oluştur
-        </Link>
-      </div>
-    </main>
+        {/* Sesli Mesaj */}
+        {starMap.voiceNoteUrl && (
+          <RevealOnScroll className="mt-16 w-full max-w-sm">
+            <VoiceNote url={starMap.voiceNoteUrl} />
+          </RevealOnScroll>
+        )}
+
+        {/* QR / Footer */}
+        <RevealOnScroll className="mt-16 w-full max-w-sm">
+          <div className="relative rounded-md bg-parchment px-8 py-9 shadow-2xl shadow-black/50">
+            <div className="absolute inset-x-0 top-0 h-[3px] bg-gradient-to-r from-brass-dim via-brass to-brass-dim" />
+            <div className="absolute inset-x-0 bottom-0 h-[3px] bg-gradient-to-r from-brass-dim via-brass to-brass-dim" />
+            <div className="flex flex-col items-center gap-3">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src={qrDataUrl}
+                alt={`${shareUrl} adresine yönlenen QR kod`}
+                width={96}
+                height={96}
+                className="animate-qr-glow motion-reduce:animate-none border border-ink/70"
+              />
+              <p className="text-center font-mono text-[10px] uppercase tracking-widest text-leather-lt">
+                Okut ve gökyüzü
+                <br />
+                yeniden canlansın
+              </p>
+              <p className="font-display text-sm italic text-leather-lt">
+                {shareUrl.replace(/^https?:\/\//, "")}
+              </p>
+              <MusicToggle />
+            </div>
+          </div>
+        </RevealOnScroll>
+
+        <div className="mt-16 flex flex-col items-center gap-3 text-center">
+          <p className="text-sm text-haze">Sen de o anın gökyüzünü sonsuza dek sakla.</p>
+          <Link
+            href="/create"
+            className="rounded-full bg-brass px-6 py-3 font-mono text-xs uppercase tracking-widest text-void transition-opacity hover:opacity-90 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-text"
+          >
+            Kendi Haritanı Oluştur
+          </Link>
+        </div>
+      </main>
+    </PageGate>
   );
 }

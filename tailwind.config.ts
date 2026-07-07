@@ -44,12 +44,17 @@ const config: Config = {
           "0%, 100%": { transform: "translateY(0)" },
           "50%": { transform: "translateY(6px)" },
         },
+        "voice-bar": {
+          "0%, 100%": { transform: "scaleY(0.4)" },
+          "50%": { transform: "scaleY(1)" },
+        },
       },
       animation: {
         twinkle: "twinkle 4s ease-in-out infinite",
         "cover-in": "cover-in 900ms ease-out both",
         "qr-glow": "qr-glow 3.2s ease-in-out infinite",
         "bounce-y": "bounce-y 1.6s ease-in-out infinite",
+        "voice-bar": "voice-bar 0.9s ease-in-out infinite",
       },
     },
   },

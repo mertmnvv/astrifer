@@ -24,6 +24,9 @@ export function priceFor(size: PosterSize, frame: FrameOption): number {
 /** Deri defter: tek sabit ürün, boyut/çerçeve varyantı yok. Altın renkli kalem dahildir. */
 export const JOURNAL_PRICE = 1450;
 
+/** Dijital paylaşım sayfasının (/s/[slug]) taban ücreti. */
+export const DIGITAL_PRICE = 149;
+
 export function formatTRY(amount: number): string {
   return new Intl.NumberFormat("tr-TR", { style: "currency", currency: "TRY", maximumFractionDigits: 0 }).format(
     amount,

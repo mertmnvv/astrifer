@@ -76,7 +76,7 @@ export default function JournalProductPage() {
               <div className="flex flex-col items-center gap-2 rounded-lg border border-brass-dim/40 bg-panel-navy p-4">
                 <p className="font-mono text-[10px] uppercase tracking-widest text-haze">Yıldız haritası sayfası</p>
                 <div className="aspect-square w-full max-w-[12rem]">
-                  <StarChart sky={sky} label="Örnek gökyüzü" className="h-full w-full" />
+                  <StarChart sky={sky} label="Örnek gökyüzü" className="h-full w-full" showLabels={false} />
                 </div>
               </div>
               <div className="flex flex-col items-center gap-2 rounded-lg border border-brass-dim/40 bg-panel-navy p-4">

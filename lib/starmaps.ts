@@ -18,6 +18,8 @@ export interface StarMapRecord {
   musicUrl: string | null;
   /** Up to 4, optional. Empty for real records until Storage upload is wired up. */
   photos: StarMapPhoto[];
+  /** Optional voice message. Absent for real records until Storage upload is wired up. */
+  voiceNoteUrl: string | null;
 }
 
 /**
@@ -41,6 +43,10 @@ export const DEMO_STAR_MAP: StarMapRecord = {
     { caption: "Yüzük" },
     { caption: "Ailece" },
   ],
+  // Left empty deliberately: we won't fabricate a fake/non-functional audio
+  // file for the demo. Real behavior — section hidden until a real
+  // recording exists — is exercised the same way it will be in production.
+  voiceNoteUrl: null,
 };
 
 function rowToRecord(row: {
@@ -64,9 +70,10 @@ function rowToRecord(row: {
     longitude: row.longitude,
     locationName: row.location_name,
     musicUrl: row.music_url,
-    // photo_urls isn't in the schema yet (upload pipeline not wired up) —
-    // see the plan note in supabase/migrations for when that lands.
+    // photo_urls / voice_note_url aren't in the schema yet (upload pipeline
+    // not wired up) — see the plan note in supabase/migrations for when that lands.
     photos: [],
+    voiceNoteUrl: null,
   };
 }
 

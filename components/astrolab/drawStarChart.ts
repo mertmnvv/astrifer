@@ -10,9 +10,20 @@ export interface DrawStarChartOptions {
   reducedMotion: boolean;
   /** Only objects at or above this altitude (degrees) are drawn. Defaults to -2 (true horizon, with a small buffer). */
   minAltitude?: number;
+  /** Draw name labels next to bright stars/Sun/Moon/planets. Defaults to true; disable for small decorative previews where text would just be noise. */
+  showLabels?: boolean;
 }
 
 const DEG2RAD = Math.PI / 180;
+
+// Slow whole-field rotation around the zenith, evoking the sky's real
+// diurnal drift relative to a fixed horizon — a decorative pace (one turn
+// every ~10 minutes), not the true (imperceptibly slow) sidereal rate. The
+// positions themselves stay exact; only this animation is stylized.
+const DRIFT_DEG_PER_SEC = 0.6;
+
+/** Named stars/bodies at or brighter than this magnitude get a label. */
+const LABEL_MAG_THRESHOLD = 1.6;
 
 // Cheap deterministic string hash (djb2) — used only to desynchronize the
 // cosmetic twinkle animation per star, never to derive star positions.
@@ -158,6 +169,24 @@ function drawStar(
   ctx.fill();
 }
 
+/** Skips labels too close to the bezel edge, where text would get clipped by the disk. */
+function drawLabel(
+  ctx: CanvasRenderingContext2D,
+  point: { x: number; y: number; rNorm: number },
+  text: string,
+  scale: number,
+) {
+  if (point.rNorm > 0.92) return;
+  ctx.save();
+  ctx.globalAlpha = 0.72;
+  ctx.fillStyle = THEME.ink;
+  ctx.font = `400 ${9 * scale}px var(--font-mono, monospace)`;
+  ctx.textAlign = "left";
+  ctx.textBaseline = "middle";
+  ctx.fillText(text, point.x + 5 * scale, point.y);
+  ctx.restore();
+}
+
 function drawPlanet(ctx: CanvasRenderingContext2D, point: { x: number; y: number }, mag: number, scale: number) {
   const r = Math.max(2.2, 3.8 - mag * 0.3) * scale;
   ctx.save();
@@ -250,6 +279,8 @@ export function drawStarChart(
 ): void {
   const { size, time, reducedMotion } = options;
   const minAltitude = options.minAltitude ?? -2;
+  const showLabels = options.showLabels ?? true;
+  const driftDeg = reducedMotion ? 0 : (time * DRIFT_DEG_PER_SEC) % 360;
   const scale = size / 640;
   const cx = size / 2;
   const cy = size / 2;
@@ -275,19 +306,25 @@ export function drawStarChart(
 
   for (const star of sky.stars) {
     if (star.altitude < minAltitude) continue;
-    const point = project(star.azimuth, star.altitude, cx, cy, diskR);
+    const point = project(star.azimuth + driftDeg, star.altitude, cx, cy, diskR);
     drawStar(ctx, point, star.mag, scale, time, reducedMotion, hash(star.name));
+    if (showLabels && star.mag < LABEL_MAG_THRESHOLD) {
+      drawLabel(ctx, point, star.name, scale);
+    }
   }
 
   for (const body of sky.bodies) {
     if (body.altitude < minAltitude) continue;
-    const point = project(body.azimuth, body.altitude, cx, cy, diskR);
+    const point = project(body.azimuth + driftDeg, body.altitude, cx, cy, diskR);
     if (body.kind === "sun") {
       drawSun(ctx, point, scale);
     } else if (body.kind === "moon") {
       drawMoon(ctx, point, body.illumination, sky.moonAge, scale);
     } else {
       drawPlanet(ctx, point, body.mag, scale);
+    }
+    if (showLabels) {
+      drawLabel(ctx, point, body.name, scale);
     }
   }
 

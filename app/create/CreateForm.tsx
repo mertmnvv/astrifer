@@ -7,6 +7,7 @@ import { computeSky } from "@/lib/astronomy/computeSky";
 import { PlaceCombobox } from "@/components/ui/PlaceCombobox";
 import { RadioCardGroup } from "@/components/ui/RadioCardGroup";
 import { PhotoPicker, type PickedPhoto } from "@/components/ui/PhotoPicker";
+import { VoiceRecorder, type VoiceRecorderValue } from "@/components/ui/VoiceRecorder";
 import type { PlaceResult } from "@/lib/geocode/cities";
 import { zonedTimeToUtc } from "@/lib/geocode/timezone";
 import type { TemplateOption } from "@/lib/templates";
@@ -38,6 +39,7 @@ export function CreateForm({ templates }: CreateFormProps) {
   const [message, setMessage] = useState("");
   const [templateSlug, setTemplateSlug] = useState(templates[0]?.slug ?? "");
   const [photos, setPhotos] = useState<PickedPhoto[]>([]);
+  const [voiceNote, setVoiceNote] = useState<VoiceRecorderValue | null>(null);
   const [touchedSubmit, setTouchedSubmit] = useState(false);
 
   useEffect(() => {
@@ -82,6 +84,7 @@ export function CreateForm({ templates }: CreateFormProps) {
       date: eventDateUtc.toISOString(),
     });
     if (photos.length > 0) params.set("photos", photos.length.toString());
+    if (voiceNote) params.set("voice", "1");
     router.push(`/checkout?${params.toString()}`);
   };
 
@@ -155,6 +158,13 @@ export function CreateForm({ templates }: CreateFormProps) {
             Fotoğraflar (opsiyonel)
           </p>
           <PhotoPicker photos={photos} onChange={setPhotos} />
+        </div>
+
+        <div>
+          <p className="mb-1.5 font-mono text-xs uppercase tracking-widest text-haze">
+            Sesli Mesaj (opsiyonel)
+          </p>
+          <VoiceRecorder value={voiceNote} onChange={setVoiceNote} />
         </div>
 
         <div>

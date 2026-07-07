@@ -1,5 +1,19 @@
 import Link from "next/link";
-import { formatTRY } from "@/lib/pricing";
+import { CoverPanel } from "@/components/journal/CoverPanel";
+import { DIGITAL_PRICE, JOURNAL_PRICE, formatTRY } from "@/lib/pricing";
+
+function toSearchParams(searchParams: { [key: string]: string | string[] | undefined }): URLSearchParams {
+  const params = new URLSearchParams();
+  for (const [key, value] of Object.entries(searchParams)) {
+    if (value === undefined) continue;
+    if (Array.isArray(value)) {
+      value.forEach((entry) => params.append(key, entry));
+    } else {
+      params.set(key, value);
+    }
+  }
+  return params;
+}
 
 export default function CheckoutPage({
   searchParams,
@@ -20,17 +34,32 @@ export default function CheckoutPage({
   const size = get("size");
   const frame = get("frame");
   const priceParam = get("price");
-  const price = priceParam ? Number(priceParam) : undefined;
   const photosParam = get("photos");
   const photoCount = photosParam ? Number(photosParam) : undefined;
+  const hasVoiceNote = get("voice") === "1";
+  const journalAdded = get("addOn") === "journal";
 
   const productLabel: Record<string, string> = {
     framed_poster: "Çerçeveli Poster",
     poster: "Poster",
     journal: "Deri Defter",
+    digital: "Dijital Sayfa",
   };
 
+  // /create hands off with no `product` param at all — that's the base
+  // digital-page order, which never had a price attached until now.
+  const isDigitalOrder = !product && Boolean(title);
+  const effectiveProduct = product ?? (isDigitalOrder ? "digital" : undefined);
+  const basePrice = priceParam ? Number(priceParam) : isDigitalOrder ? DIGITAL_PRICE : undefined;
+  const grandTotal = (basePrice ?? 0) + (journalAdded ? JOURNAL_PRICE : 0);
+
+  const addOnOnParams = toSearchParams(searchParams);
+  addOnOnParams.set("addOn", "journal");
+  const addOnOffParams = toSearchParams(searchParams);
+  addOnOffParams.delete("addOn");
+
   const hasSummary = Boolean(title || product);
+  const showJournalUpsell = effectiveProduct !== "journal";
 
   return (
     <main className="flex min-h-screen flex-col items-center justify-center gap-6 px-6 py-16 text-center">
@@ -68,10 +97,10 @@ export default function CheckoutPage({
               <dd className="text-text">{date}</dd>
             </div>
           )}
-          {product && (
+          {effectiveProduct && (
             <div className="flex justify-between gap-4">
               <dt className="text-haze">Ürün</dt>
-              <dd className="text-text">{productLabel[product] ?? product}</dd>
+              <dd className="text-text">{productLabel[effectiveProduct] ?? effectiveProduct}</dd>
             </div>
           )}
           {size && (
@@ -86,16 +115,22 @@ export default function CheckoutPage({
               <dd className="text-text">{frame}</dd>
             </div>
           )}
-          {price !== undefined && !Number.isNaN(price) && (
+          {basePrice !== undefined && !Number.isNaN(basePrice) && (
             <div className="flex justify-between gap-4">
               <dt className="text-haze">Tutar</dt>
-              <dd className="text-text">{formatTRY(price)}</dd>
+              <dd className="text-text">{formatTRY(basePrice)}</dd>
             </div>
           )}
           {photoCount !== undefined && !Number.isNaN(photoCount) && (
             <div className="flex justify-between gap-4">
               <dt className="text-haze">Fotoğraflar</dt>
               <dd className="text-text">{photoCount} adet seçildi</dd>
+            </div>
+          )}
+          {hasVoiceNote && (
+            <div className="flex justify-between gap-4">
+              <dt className="text-haze">Sesli mesaj</dt>
+              <dd className="text-text">Eklendi</dd>
             </div>
           )}
           {message && (
@@ -106,6 +141,36 @@ export default function CheckoutPage({
           )}
         </dl>
       )}
+
+      {showJournalUpsell && (
+        <div className="flex w-full max-w-sm items-center gap-4 rounded-lg border border-brass-dim/40 bg-panel-navy p-4 text-left">
+          <div className="w-16 shrink-0">
+            <CoverPanel compact />
+          </div>
+          <div className="flex-1">
+            <p className="font-mono text-[10px] uppercase tracking-widest text-brass">Ekstra: Deri Defter</p>
+            <p className="mt-0.5 text-xs text-haze">Kapağında haritan, içinde 30 boş sayfa.</p>
+            <p className="mt-1 font-display text-lg italic text-text">{formatTRY(JOURNAL_PRICE)}</p>
+          </div>
+          <Link
+            href={`?${(journalAdded ? addOnOffParams : addOnOnParams).toString()}`}
+            className={`shrink-0 rounded-full border px-3 py-2 font-mono text-[10px] uppercase tracking-widest transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brass ${
+              journalAdded
+                ? "border-brass bg-brass-dim/20 text-brass"
+                : "border-brass-dim text-haze hover:border-brass hover:text-brass"
+            }`}
+          >
+            {journalAdded ? "✓ Eklendi" : "+ Ekle"}
+          </Link>
+        </div>
+      )}
+
+      {grandTotal > 0 && (journalAdded || basePrice !== undefined) && (
+        <p className="font-mono text-xs uppercase tracking-widest text-haze">
+          Toplam: <span className="text-brass">{formatTRY(grandTotal)}</span>
+        </p>
+      )}
+
       <Link
         href="/create"
         className="rounded-full border border-brass-dim px-6 py-3 font-mono text-xs uppercase tracking-widest text-brass transition-colors hover:bg-brass hover:text-void focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brass"

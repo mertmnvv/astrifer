@@ -10,9 +10,11 @@ export interface StarChartProps {
   className?: string;
   /** Accessible label describing what the chart depicts, e.g. a place/date summary. */
   label: string;
+  /** Name labels next to bright stars/Sun/Moon/planets. Defaults to true; pass false for small decorative previews. */
+  showLabels?: boolean;
 }
 
-export function StarChart({ sky, className, label }: StarChartProps) {
+export function StarChart({ sky, className, label, showLabels }: StarChartProps) {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const containerRef = useRef<HTMLDivElement | null>(null);
   const reducedMotion = usePrefersReducedMotion();
@@ -43,6 +45,7 @@ export function StarChart({ sky, className, label }: StarChartProps) {
         size: cssSize,
         time: timestampMs / 1000,
         reducedMotion,
+        showLabels,
       });
     };
 
@@ -71,7 +74,7 @@ export function StarChart({ sky, className, label }: StarChartProps) {
       cancelAnimationFrame(frame);
       observer.disconnect();
     };
-  }, [sky, reducedMotion]);
+  }, [sky, reducedMotion, showLabels]);
 
   return (
     <div ref={containerRef} className={className} role="img" aria-label={label}>

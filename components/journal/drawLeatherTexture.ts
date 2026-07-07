@@ -15,26 +15,28 @@ function mulberry32(seed: number): () => number {
 
 /**
  * Draws a static leather texture (radial gradient base, fine speckle,
- * vignette, dashed brass inset border) onto a square canvas region.
- * Framework-agnostic like drawStarChart — no continuous animation needed
- * since the texture itself never changes.
+ * vignette, dashed brass inset border) onto a canvas region of arbitrary
+ * (not necessarily square) width/height. Framework-agnostic like
+ * drawStarChart — no continuous animation needed since the texture itself
+ * never changes.
  */
-export function drawLeatherTexture(ctx: CanvasRenderingContext2D, size: number): void {
+export function drawLeatherTexture(ctx: CanvasRenderingContext2D, width: number, height: number): void {
   const rnd = mulberry32(42);
+  const diag = Math.sqrt(width * width + height * height);
 
-  ctx.clearRect(0, 0, size, size);
+  ctx.clearRect(0, 0, width, height);
 
-  const base = ctx.createRadialGradient(size * 0.5, size * 0.35, 0, size * 0.5, size * 0.5, size * 0.75);
+  const base = ctx.createRadialGradient(width * 0.5, height * 0.35, 0, width * 0.5, height * 0.5, diag * 0.55);
   base.addColorStop(0, THEME.leatherLt);
   base.addColorStop(0.55, THEME.leather);
   base.addColorStop(1, THEME.leatherDk);
   ctx.fillStyle = base;
-  ctx.fillRect(0, 0, size, size);
+  ctx.fillRect(0, 0, width, height);
 
-  const speckleCount = Math.round(size * size * 0.012);
+  const speckleCount = Math.round(width * height * 0.012);
   for (let i = 0; i < speckleCount; i++) {
-    const x = rnd() * size;
-    const y = rnd() * size;
+    const x = rnd() * width;
+    const y = rnd() * height;
     ctx.globalAlpha = 0.02 + rnd() * 0.05;
     ctx.fillStyle = rnd() > 0.5 ? "#000000" : "#7a5a3c";
     ctx.beginPath();
@@ -44,22 +46,22 @@ export function drawLeatherTexture(ctx: CanvasRenderingContext2D, size: number):
   ctx.globalAlpha = 1;
 
   const vignette = ctx.createRadialGradient(
-    size * 0.5,
-    size * 0.5,
-    size * 0.35,
-    size * 0.5,
-    size * 0.5,
-    size * 0.72,
+    width * 0.5,
+    height * 0.5,
+    diag * 0.25,
+    width * 0.5,
+    height * 0.5,
+    diag * 0.53,
   );
   vignette.addColorStop(0, "rgba(0,0,0,0)");
   vignette.addColorStop(1, "rgba(0,0,0,0.45)");
   ctx.fillStyle = vignette;
-  ctx.fillRect(0, 0, size, size);
+  ctx.fillRect(0, 0, width, height);
 
-  const margin = Math.max(6, size * 0.035);
+  const margin = Math.max(6, Math.min(width, height) * 0.035);
   ctx.strokeStyle = "rgba(201,168,106,0.28)";
   ctx.lineWidth = 1;
   ctx.setLineDash([3, 4]);
-  ctx.strokeRect(margin, margin, size - margin * 2, size - margin * 2);
+  ctx.strokeRect(margin, margin, width - margin * 2, height - margin * 2);
   ctx.setLineDash([]);
 }
