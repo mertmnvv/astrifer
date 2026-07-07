@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { StarChart } from "@/components/astrolab/StarChart";
 import { computeSky } from "@/lib/astronomy/computeSky";
 import { PlaceCombobox } from "@/components/ui/PlaceCombobox";
-import { TemplatePicker } from "@/components/ui/TemplatePicker";
+import { RadioCardGroup } from "@/components/ui/RadioCardGroup";
 import type { PlaceResult } from "@/lib/geocode/cities";
 import { zonedTimeToUtc } from "@/lib/geocode/timezone";
 import type { TemplateOption } from "@/lib/templates";
@@ -149,7 +149,17 @@ export function CreateForm({ templates }: CreateFormProps) {
 
         <div>
           <p className="mb-1.5 font-mono text-xs uppercase tracking-widest text-haze">Şablon</p>
-          <TemplatePicker templates={templates} value={templateSlug} onChange={setTemplateSlug} name="template" />
+          <RadioCardGroup
+            name="template"
+            ariaLabel="Şablon"
+            value={templateSlug}
+            onChange={setTemplateSlug}
+            options={templates.map((template) => ({
+              value: template.slug,
+              label: template.name,
+              description: template.description,
+            }))}
+          />
         </div>
 
         {touchedSubmit && !isValid && (

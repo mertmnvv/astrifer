@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { formatTRY } from "@/lib/pricing";
 
 export default function CheckoutPage({
   searchParams,
@@ -15,6 +16,13 @@ export default function CheckoutPage({
   const date = get("date");
   const template = get("template");
   const message = get("message");
+  const product = get("product");
+  const size = get("size");
+  const frame = get("frame");
+  const priceParam = get("price");
+  const price = priceParam ? Number(priceParam) : undefined;
+
+  const hasSummary = Boolean(title || product);
 
   return (
     <main className="flex min-h-screen flex-col items-center justify-center gap-6 px-6 py-16 text-center">
@@ -26,24 +34,56 @@ export default function CheckoutPage({
         Konfigüratörden gelen bilgiler doğru şekilde taşındı — iyzico entegrasyonu
         ayrı bir görevde eklenecek.
       </p>
-      {title && (
+      {hasSummary && (
         <dl className="w-full max-w-sm space-y-2 rounded-lg border border-brass-dim/40 bg-panel-navy p-5 text-left text-sm">
-          <div className="flex justify-between gap-4">
-            <dt className="text-haze">İsim / Başlık</dt>
-            <dd className="text-text">{title}</dd>
-          </div>
-          <div className="flex justify-between gap-4">
-            <dt className="text-haze">Şablon</dt>
-            <dd className="text-text">{template}</dd>
-          </div>
-          <div className="flex justify-between gap-4">
-            <dt className="text-haze">Konum</dt>
-            <dd className="text-text">{location}</dd>
-          </div>
-          <div className="flex justify-between gap-4">
-            <dt className="text-haze">Tarih (UTC)</dt>
-            <dd className="text-text">{date}</dd>
-          </div>
+          {title && (
+            <div className="flex justify-between gap-4">
+              <dt className="text-haze">İsim / Başlık</dt>
+              <dd className="text-text">{title}</dd>
+            </div>
+          )}
+          {template && (
+            <div className="flex justify-between gap-4">
+              <dt className="text-haze">Şablon</dt>
+              <dd className="text-text">{template}</dd>
+            </div>
+          )}
+          {location && (
+            <div className="flex justify-between gap-4">
+              <dt className="text-haze">Konum</dt>
+              <dd className="text-text">{location}</dd>
+            </div>
+          )}
+          {date && (
+            <div className="flex justify-between gap-4">
+              <dt className="text-haze">Tarih (UTC)</dt>
+              <dd className="text-text">{date}</dd>
+            </div>
+          )}
+          {product && (
+            <div className="flex justify-between gap-4">
+              <dt className="text-haze">Ürün</dt>
+              <dd className="text-text">{product === "framed_poster" ? "Çerçeveli Poster" : "Poster"}</dd>
+            </div>
+          )}
+          {size && (
+            <div className="flex justify-between gap-4">
+              <dt className="text-haze">Boyut</dt>
+              <dd className="text-text">{size}</dd>
+            </div>
+          )}
+          {frame && frame !== "none" && (
+            <div className="flex justify-between gap-4">
+              <dt className="text-haze">Çerçeve</dt>
+              <dd className="text-text">{frame}</dd>
+            </div>
+          )}
+          {price !== undefined && !Number.isNaN(price) && (
+            <div className="flex justify-between gap-4">
+              <dt className="text-haze">Tutar</dt>
+              <dd className="text-text">{formatTRY(price)}</dd>
+            </div>
+          )}
           {message && (
             <div>
               <dt className="text-haze">Mesaj</dt>

@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { CreateForm } from "./CreateForm";
 import { FALLBACK_TEMPLATES, type TemplateOption } from "@/lib/templates";
+import { isSupabaseConfigured } from "@/lib/supabase/isConfigured";
 
 export const metadata: Metadata = {
   title: "Haritanı Oluştur — Astrifer",
@@ -8,7 +9,7 @@ export const metadata: Metadata = {
 };
 
 async function loadTemplates(): Promise<TemplateOption[]> {
-  if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) {
+  if (!isSupabaseConfigured()) {
     return FALLBACK_TEMPLATES;
   }
 
