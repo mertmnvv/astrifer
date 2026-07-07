@@ -1,7 +1,7 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
 import { usePrefersReducedMotion } from "@/lib/hooks/usePrefersReducedMotion";
+import { useInViewOnce } from "@/lib/hooks/useInViewOnce";
 
 export interface RevealOnScrollProps {
   children: React.ReactNode;
@@ -10,29 +10,9 @@ export interface RevealOnScrollProps {
 
 /** Fades/slides a section in as it enters the viewport; skipped entirely under prefers-reduced-motion. */
 export function RevealOnScroll({ children, className }: RevealOnScrollProps) {
-  const ref = useRef<HTMLDivElement | null>(null);
-  const [visible, setVisible] = useState(false);
   const reducedMotion = usePrefersReducedMotion();
-
-  useEffect(() => {
-    if (reducedMotion) return;
-    const node = ref.current;
-    if (!node) return;
-
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting) {
-          setVisible(true);
-          observer.disconnect();
-        }
-      },
-      { threshold: 0.15 },
-    );
-    observer.observe(node);
-    return () => observer.disconnect();
-  }, [reducedMotion]);
-
-  const revealed = reducedMotion || visible;
+  const { ref, inView } = useInViewOnce<HTMLDivElement>();
+  const revealed = reducedMotion || inView;
 
   return (
     <div

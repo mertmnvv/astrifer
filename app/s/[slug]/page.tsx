@@ -4,16 +4,15 @@ import { notFound } from "next/navigation";
 import QRCode from "qrcode";
 import { StarChart } from "@/components/astrolab/StarChart";
 import { CoverPanel } from "@/components/journal/CoverPanel";
-import { PhotoSlot } from "@/components/journal/PhotoSlot";
+import { MemoriesGallery } from "@/components/journal/MemoriesGallery";
 import { MusicToggle } from "@/components/ui/MusicToggle";
 import { RevealOnScroll } from "@/components/ui/RevealOnScroll";
+import { ScrollCue } from "@/components/ui/ScrollCue";
 import { computeSky } from "@/lib/astronomy/computeSky";
 import { buildSkyNarrative } from "@/lib/astronomy/skyNarrative";
 import { getStarMapBySlug } from "@/lib/starmaps";
 
 export const revalidate = 3600;
-
-const PHOTO_ROTATIONS = [-2.5, 2, 1.5, -2];
 
 function siteUrl(): string {
   return process.env.NEXT_PUBLIC_SITE_URL ?? "https://astrifer.com";
@@ -81,13 +80,14 @@ export default async function SharedStarMapPage({
 
   return (
     <main className="flex min-h-screen flex-col items-center px-4 py-12 sm:px-8 sm:py-16">
-      {/* Kapak — her zaman görünür, scroll-reveal'a bağlı değil */}
-      <div className="w-full max-w-sm">
+      {/* Kapak — her zaman görünür, scroll-reveal'a bağlı değil; sadece sayfa açılışında beliriyor */}
+      <div className="w-full max-w-sm animate-cover-in motion-reduce:animate-none">
         <CoverPanel
           title={starMap.title}
           subtitle={`${dateLabel} · ${starMap.locationName}`}
         />
       </div>
+      <ScrollCue />
 
       {/* Başlık + Yıldız Haritası */}
       <RevealOnScroll className="mt-16 w-full max-w-4xl">
@@ -123,21 +123,11 @@ export default async function SharedStarMapPage({
         </div>
       </RevealOnScroll>
 
-      {/* Anılarımız */}
+      {/* Anılarımız — panel + her fotoğraf kendi gecikmesiyle beliriyor */}
       {starMap.photos.length > 0 && (
-        <RevealOnScroll className="mt-16 w-full max-w-2xl">
-          <div className="relative rounded-md bg-parchment px-6 py-10 shadow-2xl shadow-black/50 sm:px-10">
-            <p className="text-center font-mono text-[10px] uppercase tracking-[0.26em] text-leather-lt opacity-85">
-              Birlikte Anılarımız
-            </p>
-            <h2 className="mt-1 text-center font-display text-xl italic text-ink">{starMap.title}</h2>
-            <div className="mt-6 grid grid-cols-2 gap-4">
-              {starMap.photos.map((photo, index) => (
-                <PhotoSlot key={index} photo={photo} rotateDeg={PHOTO_ROTATIONS[index % PHOTO_ROTATIONS.length]} />
-              ))}
-            </div>
-          </div>
-        </RevealOnScroll>
+        <div className="mt-16 w-full max-w-2xl">
+          <MemoriesGallery title={starMap.title} photos={starMap.photos} />
+        </div>
       )}
 
       {/* QR / Footer */}
@@ -152,7 +142,7 @@ export default async function SharedStarMapPage({
               alt={`${shareUrl} adresine yönlenen QR kod`}
               width={96}
               height={96}
-              className="border border-ink/70"
+              className="animate-qr-glow motion-reduce:animate-none border border-ink/70"
             />
             <p className="text-center font-mono text-[10px] uppercase tracking-widest text-leather-lt">
               Okut ve gökyüzü

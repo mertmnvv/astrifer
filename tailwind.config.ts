@@ -32,9 +32,24 @@ const config: Config = {
           "0%, 100%": { opacity: "0.35" },
           "50%": { opacity: "1" },
         },
+        "cover-in": {
+          "0%": { opacity: "0", transform: "scale(0.96) translateY(10px)" },
+          "100%": { opacity: "1", transform: "scale(1) translateY(0)" },
+        },
+        "qr-glow": {
+          "0%, 100%": { boxShadow: "0 0 0 rgba(201,168,106,0)" },
+          "50%": { boxShadow: "0 0 22px rgba(201,168,106,0.45)" },
+        },
+        "bounce-y": {
+          "0%, 100%": { transform: "translateY(0)" },
+          "50%": { transform: "translateY(6px)" },
+        },
       },
       animation: {
         twinkle: "twinkle 4s ease-in-out infinite",
+        "cover-in": "cover-in 900ms ease-out both",
+        "qr-glow": "qr-glow 3.2s ease-in-out infinite",
+        "bounce-y": "bounce-y 1.6s ease-in-out infinite",
       },
     },
   },
