@@ -1,7 +1,8 @@
 import type { Metadata } from "next";
 import { CreateForm } from "./CreateForm";
 import { FALLBACK_TEMPLATES, type TemplateOption } from "@/lib/templates";
-import { isSupabaseConfigured } from "@/lib/supabase/isConfigured";
+import { isFirebaseConfigured } from "@/lib/firebase/isConfigured";
+import type { TemplateDoc } from "@/types/firestore";
 import { Logo } from "@/components/Logo";
 
 export const metadata: Metadata = {
@@ -10,30 +11,32 @@ export const metadata: Metadata = {
 };
 
 async function loadTemplates(): Promise<TemplateOption[]> {
-  if (!isSupabaseConfigured()) {
+  if (!isFirebaseConfigured()) {
     return FALLBACK_TEMPLATES;
   }
 
   try {
-    const { createClient } = await import("@/lib/supabase/server");
-    const supabase = createClient();
-    const { data, error } = await supabase
-      .from("templates")
-      .select("slug, name, category, description, default_message")
-      .eq("is_active", true)
-      .order("sort_order");
+    const { getDb } = await import("@/lib/firebase/admin");
+    const snapshot = await getDb()
+      .collection("templates")
+      .where("isActive", "==", true)
+      .orderBy("sortOrder")
+      .get();
 
-    if (error || !data || data.length === 0) {
+    if (snapshot.empty) {
       return FALLBACK_TEMPLATES;
     }
 
-    return data.map((row) => ({
-      slug: row.slug,
-      name: row.name,
-      category: row.category,
-      description: row.description ?? "",
-      defaultMessage: row.default_message ?? "",
-    }));
+    return snapshot.docs.map((doc) => {
+      const data = doc.data() as TemplateDoc;
+      return {
+        slug: data.slug,
+        name: data.name,
+        category: data.category,
+        description: data.description ?? "",
+        defaultMessage: data.defaultMessage ?? "",
+      };
+    });
   } catch {
     return FALLBACK_TEMPLATES;
   }

@@ -1,4 +1,4 @@
-import type { TemplateCategory } from "@/types/supabase";
+import type { TemplateCategory } from "@/types/firestore";
 
 export interface TemplateOption {
   slug: string;
@@ -9,9 +9,9 @@ export interface TemplateOption {
 }
 
 /**
- * Mirrors supabase/seed.sql. Used whenever the Supabase `templates` table
- * can't be reached (no project configured yet, or a transient error) so
- * /create still renders a full template picker.
+ * Mirrors scripts/seed-firestore.mjs. Used whenever the Firestore
+ * `templates` collection can't be reached (no project configured yet, or a
+ * transient error) so /create still renders a full template picker.
  */
 export const FALLBACK_TEMPLATES: TemplateOption[] = [
   {

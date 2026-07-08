@@ -1,5 +1,6 @@
-import { isSupabaseConfigured } from "@/lib/supabase/isConfigured";
+import { isFirebaseConfigured } from "@/lib/firebase/isConfigured";
 import { DEFAULT_SKY_PALETTE } from "@/components/astrolab/palettes";
+import type { StarMapDoc } from "@/types/firestore";
 
 export interface StarMapPhoto {
   /** Absent until a real upload pipeline exists — renders a placeholder slot instead of an <img>. */
@@ -26,8 +27,8 @@ export interface StarMapRecord {
 }
 
 /**
- * Shown for any slug when Supabase isn't configured yet, so /s/[slug] is
- * demoable in local dev without a live project. Once Supabase is wired up,
+ * Shown for any slug when Firebase isn't configured yet, so /s/[slug] is
+ * demoable in local dev without a live project. Once Firebase is wired up,
  * an unmatched slug falls through to notFound() instead — see getStarMapBySlug.
  */
 export const DEMO_STAR_MAP: StarMapRecord = {
@@ -53,53 +54,37 @@ export const DEMO_STAR_MAP: StarMapRecord = {
   palette: DEFAULT_SKY_PALETTE.id,
 };
 
-function rowToRecord(row: {
-  slug: string;
-  title: string;
-  message: string | null;
-  event_date: string;
-  timezone: string;
-  latitude: number;
-  longitude: number;
-  location_name: string;
-  music_url: string | null;
-}): StarMapRecord {
+function docToRecord(slug: string, doc: StarMapDoc): StarMapRecord {
   return {
-    slug: row.slug,
-    title: row.title,
-    message: row.message,
-    eventDateUtc: new Date(row.event_date),
-    timezone: row.timezone,
-    latitude: row.latitude,
-    longitude: row.longitude,
-    locationName: row.location_name,
-    musicUrl: row.music_url,
-    // photo_urls / voice_note_url / palette aren't in the schema yet
-    // (upload pipeline not wired up) — see the plan note in
-    // supabase/migrations for when that lands.
-    photos: [],
-    voiceNoteUrl: null,
-    palette: DEFAULT_SKY_PALETTE.id,
+    slug,
+    title: doc.title,
+    message: doc.message,
+    eventDateUtc: doc.eventDate.toDate(),
+    timezone: doc.timezone,
+    latitude: doc.latitude,
+    longitude: doc.longitude,
+    locationName: doc.locationName,
+    musicUrl: doc.musicUrl,
+    photos: (doc.photoUrls ?? []).map((url) => ({ url })),
+    voiceNoteUrl: doc.voiceNoteUrl,
+    palette: doc.palette ?? DEFAULT_SKY_PALETTE.id,
   };
 }
 
 export async function getStarMapBySlug(slug: string): Promise<StarMapRecord | null> {
-  if (!isSupabaseConfigured()) {
+  if (!isFirebaseConfigured()) {
     return { ...DEMO_STAR_MAP, slug };
   }
 
   try {
-    const { createClient } = await import("@/lib/supabase/server");
-    const supabase = createClient();
-    const { data, error } = await supabase
-      .from("star_maps")
-      .select("slug, title, message, event_date, timezone, latitude, longitude, location_name, music_url")
-      .eq("slug", slug)
-      .eq("is_public", true)
-      .maybeSingle();
+    const { getDb } = await import("@/lib/firebase/admin");
+    const snapshot = await getDb().collection("starMaps").doc(slug).get();
+    if (!snapshot.exists) return null;
 
-    if (error || !data) return null;
-    return rowToRecord(data);
+    const doc = snapshot.data() as StarMapDoc;
+    if (!doc.isPublic) return null;
+
+    return docToRecord(slug, doc);
   } catch {
     return null;
   }

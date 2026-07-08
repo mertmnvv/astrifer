@@ -1,0 +1,22 @@
+rules_version = '2';
+
+// Astrifer Storage security rules — the equivalent of the old two-bucket
+// Supabase Storage setup (starmaps-public / starmaps-print), modeled here as
+// two path prefixes in Firebase's single default bucket.
+service firebase.storage {
+  match /b/{bucket}/o {
+    // Screen-res renders: readable by anyone once a link is shared, but only
+    // the Admin SDK (server-side) ever writes here.
+    match /starmaps-public/{allPaths=**} {
+      allow read: if true;
+      allow write: if false;
+    }
+
+    // 300dpi print-ready assets: no client policy of any kind. The only way
+    // to read one is server-side code with the Admin SDK minting a
+    // short-lived signed URL on demand — never persist that URL.
+    match /starmaps-print/{allPaths=**} {
+      allow read, write: if false;
+    }
+  }
+}

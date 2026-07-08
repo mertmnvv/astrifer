@@ -1,0 +1,30 @@
+rules_version = '2';
+
+// Astrifer Firestore security rules — the equivalent of the old Supabase RLS
+// policies in supabase/migrations/0001_init.sql (removed). None of this is
+// exercised by client code today: the app only ever reads through the
+// Admin SDK from Server Components (lib/firebase/admin.ts), which bypasses
+// these rules entirely. They exist as the intended access model for if/when
+// a browser client is ever added, same as the RLS policies did before any
+// live Supabase project existed.
+service cloud.firestore {
+  match /databases/{database}/documents {
+    match /templates/{slug} {
+      allow read: if resource.data.isActive == true;
+      allow write: if false;
+    }
+
+    match /starMaps/{slug} {
+      allow read: if resource.data.isPublic == true;
+      allow write: if false;
+    }
+
+    // No auth/user system exists yet — every order is created and read via
+    // server-side code using the Admin SDK (checkout needs to validate price
+    // server-side before iyzico is ever called), so this denies all direct
+    // client access rather than modeling an owner check nothing enforces.
+    match /orders/{orderId} {
+      allow read, write: if false;
+    }
+  }
+}

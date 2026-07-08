@@ -16,7 +16,7 @@ export interface PhotoPickerProps {
 }
 
 /**
- * Local-only photo picker: no upload happens here yet (Supabase Storage
+ * Local-only photo picker: no upload happens here yet (Firebase Storage
  * pipeline isn't wired up), just in-browser previews via object URLs. The
  * configurator only carries the photo *count* forward to checkout.
  */
