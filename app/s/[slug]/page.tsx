@@ -3,6 +3,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import QRCode from "qrcode";
 import { StarChart } from "@/components/astrolab/StarChart";
+import { getSkyPalette } from "@/components/astrolab/palettes";
 import { MemoriesGallery } from "@/components/journal/MemoriesGallery";
 import { PageGate } from "@/components/journal/PageGate";
 import { VoiceNote } from "@/components/journal/VoiceNote";
@@ -78,6 +79,7 @@ export default async function SharedStarMapPage({
   const dateLabel = formatEventDate(starMap.eventDateUtc, starMap.timezone);
   const previewLabel = `${starMap.locationName} üzerinde ${dateLabel} anının gökyüzü`;
   const skyLog = buildSkyNarrative(sky);
+  const palette = getSkyPalette(starMap.palette);
 
   return (
     <PageGate
@@ -89,7 +91,7 @@ export default async function SharedStarMapPage({
         {/* Büyük yıldız haritası — sayfanın asıl kahramanı */}
         <div className="flex w-full max-w-2xl flex-col items-center text-center">
           <div className="aspect-square w-full">
-            <StarChart sky={sky} label={previewLabel} className="h-full w-full" />
+            <StarChart sky={sky} label={previewLabel} className="h-full w-full" palette={palette} />
           </div>
           <h1 className="mt-6 font-display text-3xl italic text-text sm:text-4xl">{starMap.title}</h1>
           <p className="mt-2 font-mono text-xs uppercase tracking-widest text-haze">

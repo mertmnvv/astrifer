@@ -72,22 +72,26 @@ export default function JournalProductPage() {
               </p>
             </div>
 
-            <div className="grid gap-6 sm:grid-cols-2">
-              <div className="flex flex-col items-center gap-2 rounded-lg border border-brass-dim/40 bg-panel-navy p-4">
-                <p className="font-mono text-[10px] uppercase tracking-widest text-haze">Yıldız haritası sayfası</p>
-                <div className="aspect-square w-full max-w-[12rem]">
-                  <StarChart sky={sky} label="Örnek gökyüzü" className="h-full w-full" showLabels={false} />
-                </div>
+            <div className="flex flex-col items-center gap-2 rounded-lg border border-brass-dim/40 bg-panel-navy p-4">
+              <p className="font-mono text-[10px] uppercase tracking-widest text-haze">
+                Yıldız haritası — iki sayfa birlikte tek gökyüzü
+              </p>
+              <div className="relative aspect-[2/1] w-full overflow-hidden rounded-md shadow-xl shadow-black/50">
+                <StarChart sky={sky} label="Örnek gökyüzü" className="h-full w-full" showLabels={false} />
+                {/* Ciltin ortadaki gölgesi — iki sayfanın birleşip tek gökyüzü oluşturduğu izlenimi */}
+                <div className="pointer-events-none absolute inset-y-0 left-1/2 w-12 -translate-x-1/2 bg-gradient-to-r from-black/35 via-transparent to-black/35" />
+                <div className="pointer-events-none absolute inset-y-0 left-1/2 w-px -translate-x-1/2 bg-black/60" />
               </div>
-              <div className="flex flex-col items-center gap-2 rounded-lg border border-brass-dim/40 bg-panel-navy p-4">
-                <p className="font-mono text-[10px] uppercase tracking-widest text-haze">Anılar sayfası</p>
-                <div className="grid grid-cols-2 gap-3 p-2">
-                  {DEMO_STAR_MAP.photos.slice(0, 4).map((photo, index) => (
-                    <div key={photo.caption} className="w-20">
-                      <PhotoSlot photo={photo} rotateDeg={PHOTO_ROTATIONS[index % PHOTO_ROTATIONS.length]} />
-                    </div>
-                  ))}
-                </div>
+            </div>
+
+            <div className="flex flex-col items-center gap-2 rounded-lg border border-brass-dim/40 bg-panel-navy p-4">
+              <p className="font-mono text-[10px] uppercase tracking-widest text-haze">Anılar sayfası</p>
+              <div className="grid grid-cols-4 gap-3 p-2">
+                {DEMO_STAR_MAP.photos.slice(0, 4).map((photo, index) => (
+                  <div key={photo.caption} className="w-20">
+                    <PhotoSlot photo={photo} rotateDeg={PHOTO_ROTATIONS[index % PHOTO_ROTATIONS.length]} />
+                  </div>
+                ))}
               </div>
             </div>
 

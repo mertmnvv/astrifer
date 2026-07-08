@@ -1,5 +1,5 @@
 export type PosterSize = "30x30" | "40x40" | "50x50" | "70x70";
-export type FrameOption = "none" | "black" | "oak" | "brass";
+export type FrameOption = "none" | "black" | "oak";
 
 export const POSTER_SIZES: { value: PosterSize; label: string; basePrice: number }[] = [
   { value: "30x30", label: "30 × 30 cm", basePrice: 349 },
@@ -12,7 +12,6 @@ export const FRAME_OPTIONS: { value: FrameOption; label: string; description: st
   { value: "none", label: "Çerçevesiz", description: "180g mat, sadece poster.", surcharge: 0 },
   { value: "black", label: "Siyah Ahşap", description: "Mat siyah ahşap çerçeve.", surcharge: 250 },
   { value: "oak", label: "Doğal Ahşap", description: "Ham meşe dokulu çerçeve.", surcharge: 350 },
-  { value: "brass", label: "Pirinç Kaplama", description: "Astrolabın bezeliyle aynı pirinç tonu.", surcharge: 450 },
 ];
 
 export function priceFor(size: PosterSize, frame: FrameOption): number {

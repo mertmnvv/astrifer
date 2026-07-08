@@ -8,6 +8,8 @@ import { PlaceCombobox } from "@/components/ui/PlaceCombobox";
 import { RadioCardGroup } from "@/components/ui/RadioCardGroup";
 import { PhotoPicker, type PickedPhoto } from "@/components/ui/PhotoPicker";
 import { VoiceRecorder, type VoiceRecorderValue } from "@/components/ui/VoiceRecorder";
+import { SkyPaletteSwatchPicker } from "@/components/ui/SkyPaletteSwatchPicker";
+import { SKY_PALETTES, DEFAULT_SKY_PALETTE, getSkyPalette } from "@/components/astrolab/palettes";
 import type { PlaceResult } from "@/lib/geocode/cities";
 import { zonedTimeToUtc } from "@/lib/geocode/timezone";
 import type { TemplateOption } from "@/lib/templates";
@@ -40,6 +42,7 @@ export function CreateForm({ templates }: CreateFormProps) {
   const [templateSlug, setTemplateSlug] = useState(templates[0]?.slug ?? "");
   const [photos, setPhotos] = useState<PickedPhoto[]>([]);
   const [voiceNote, setVoiceNote] = useState<VoiceRecorderValue | null>(null);
+  const [paletteId, setPaletteId] = useState(DEFAULT_SKY_PALETTE.id);
   const [touchedSubmit, setTouchedSubmit] = useState(false);
 
   useEffect(() => {
@@ -85,6 +88,7 @@ export function CreateForm({ templates }: CreateFormProps) {
     });
     if (photos.length > 0) params.set("photos", photos.length.toString());
     if (voiceNote) params.set("voice", "1");
+    params.set("palette", paletteId);
     router.push(`/checkout?${params.toString()}`);
   };
 
@@ -168,6 +172,11 @@ export function CreateForm({ templates }: CreateFormProps) {
         </div>
 
         <div>
+          <p className="mb-1.5 font-mono text-xs uppercase tracking-widest text-haze">Gökyüzü Teması</p>
+          <SkyPaletteSwatchPicker name="palette" palettes={SKY_PALETTES} value={paletteId} onChange={setPaletteId} />
+        </div>
+
+        <div>
           <p className="mb-1.5 font-mono text-xs uppercase tracking-widest text-haze">Şablon</p>
           <RadioCardGroup
             name="template"
@@ -198,7 +207,7 @@ export function CreateForm({ templates }: CreateFormProps) {
 
       <div className="order-1 flex flex-col items-center gap-3 lg:order-2 lg:sticky lg:top-10 lg:self-start">
         <div className="aspect-square w-full max-w-[32rem]">
-          <StarChart sky={sky} label={previewLabel} className="h-full w-full" />
+          <StarChart sky={sky} label={previewLabel} className="h-full w-full" palette={getSkyPalette(paletteId)} />
         </div>
         <p className="max-w-sm text-center text-xs text-haze">{previewLabel}</p>
       </div>

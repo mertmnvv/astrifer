@@ -25,7 +25,7 @@ export default function PosterProductPage() {
             Duvarında sonsuza dek dursun.
           </h1>
           <p className="mx-auto mt-3 max-w-xl text-sm text-haze sm:text-base">
-            300 DPI baskı kalitesinde, astrolab bezeliyle çerçevelenmiş yıldız
+            300 DPI baskı kalitesinde, gerçek gökyüzünü yansıtan yıldız
             haritan — poster olarak ya da hazır çerçevede.
           </p>
         </header>

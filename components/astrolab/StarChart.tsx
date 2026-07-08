@@ -3,6 +3,7 @@
 import { useEffect, useRef } from "react";
 import type { ComputeSkyResult } from "@/lib/astronomy/computeSky";
 import { drawStarChart } from "./drawStarChart";
+import type { SkyPalette } from "./palettes";
 import { usePrefersReducedMotion } from "@/lib/hooks/usePrefersReducedMotion";
 
 export interface StarChartProps {
@@ -12,9 +13,11 @@ export interface StarChartProps {
   label: string;
   /** Name labels next to bright stars/Sun/Moon/planets. Defaults to true; pass false for small decorative previews. */
   showLabels?: boolean;
+  /** Color scheme. Defaults to "Gece Mavisi" (see components/astrolab/palettes.ts). */
+  palette?: SkyPalette;
 }
 
-export function StarChart({ sky, className, label, showLabels }: StarChartProps) {
+export function StarChart({ sky, className, label, showLabels, palette }: StarChartProps) {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const containerRef = useRef<HTMLDivElement | null>(null);
   const reducedMotion = usePrefersReducedMotion();
@@ -28,24 +31,28 @@ export function StarChart({ sky, className, label, showLabels }: StarChartProps)
     if (!ctx) return;
 
     let frame = 0;
-    let cssSize = 0;
+    let cssWidth = 0;
+    let cssHeight = 0;
 
     const resize = () => {
-      cssSize = container.clientWidth;
+      cssWidth = container.clientWidth;
+      cssHeight = container.clientHeight;
       const dpr = window.devicePixelRatio || 1;
-      canvas.width = cssSize * dpr;
-      canvas.height = cssSize * dpr;
-      canvas.style.width = `${cssSize}px`;
-      canvas.style.height = `${cssSize}px`;
+      canvas.width = cssWidth * dpr;
+      canvas.height = cssHeight * dpr;
+      canvas.style.width = `${cssWidth}px`;
+      canvas.style.height = `${cssHeight}px`;
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
     };
 
     const draw = (timestampMs: number) => {
       drawStarChart(ctx, sky, {
-        size: cssSize,
+        width: cssWidth,
+        height: cssHeight,
         time: timestampMs / 1000,
         reducedMotion,
         showLabels,
+        palette,
       });
     };
 
@@ -74,7 +81,7 @@ export function StarChart({ sky, className, label, showLabels }: StarChartProps)
       cancelAnimationFrame(frame);
       observer.disconnect();
     };
-  }, [sky, reducedMotion, showLabels]);
+  }, [sky, reducedMotion, showLabels, palette]);
 
   return (
     <div ref={containerRef} className={className} role="img" aria-label={label}>

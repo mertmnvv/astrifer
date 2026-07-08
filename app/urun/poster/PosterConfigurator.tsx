@@ -16,7 +16,7 @@ export interface PosterConfiguratorProps {
 export function PosterConfigurator({ sky, previewLabel }: PosterConfiguratorProps) {
   const router = useRouter();
   const [size, setSize] = useState<PosterSize>("50x50");
-  const [frame, setFrame] = useState<FrameOption>("brass");
+  const [frame, setFrame] = useState<FrameOption>("black");
 
   const price = useMemo(() => priceFor(size, frame), [size, frame]);
   const sizeLabel = POSTER_SIZES.find((option) => option.value === size)?.label ?? size;

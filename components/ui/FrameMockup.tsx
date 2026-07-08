@@ -5,7 +5,6 @@ const FRAME_STYLES: Record<FrameOption, { background: string; padding: string } 
   none: null,
   black: { background: "linear-gradient(155deg, #2b2b2f, #121214 60%, #050506)", padding: "3%" },
   oak: { background: "linear-gradient(155deg, #a9764f, #7a5133 55%, #5c3b23)", padding: "3%" },
-  brass: { background: "linear-gradient(155deg, #e3c98a, #c9a86a 55%, #8a7644)", padding: "3%" },
 };
 
 export interface FrameMockupProps {
