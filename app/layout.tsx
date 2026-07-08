@@ -24,6 +24,7 @@ const bodyFont = Inter({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL ?? "https://astrifer.com"),
   title: "Astrifer — Kişiye Özel Yıldız Haritası",
   description:
     "Doğduğunuz, tanıştığınız ya da hayatınızı değiştiren o anın gökyüzünü, gerçek astronomik verilerle kişiye özel bir yıldız haritasına dönüştürün.",

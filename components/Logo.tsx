@@ -39,12 +39,18 @@ export function Logo({ size = 160, className }: LogoProps) {
         y="59"
         textAnchor="middle"
         fill={BRASS}
-        style={{ fontFamily: "var(--font-display), serif", fontStyle: "italic", fontWeight: 600 }}
+        style={{
+          fontFamily: "var(--font-display), serif",
+          fontStyle: "italic",
+          fontWeight: 600,
+          letterSpacing: "0.4px",
+        }}
         fontSize="34"
       >
         Astrifer
       </text>
-      <g transform="rotate(-5 130 52) translate(238 30)" stroke={BRASS} strokeWidth="0.9" strokeLinecap="round">
+      {/* Sparkle sits exactly on the orbit ellipse's boundary (t=-20°), like a lit point on the path. */}
+      <g transform="rotate(-5 130 52) translate(235.25 43.79)" stroke={BRASS} strokeWidth="0.9" strokeLinecap="round">
         <line x1="-4.5" y1="0" x2="4.5" y2="0" />
         <line x1="0" y1="-4.5" x2="0" y2="4.5" />
         <circle cx="0" cy="0" r="1.1" fill={BRASS} stroke="none" />

@@ -2,6 +2,7 @@
 
 import { useEffect, useRef } from "react";
 import { Logo } from "@/components/Logo";
+import { LogoMark } from "@/components/LogoMark";
 import { drawLeatherTexture } from "./drawLeatherTexture";
 
 export interface CoverPanelProps {
@@ -61,7 +62,7 @@ export function CoverPanel({ title, subtitle, className, fullscreen, compact, ch
           compact ? "gap-0 px-1" : "gap-3 px-6"
         }`}
       >
-        <Logo size={fullscreen ? 190 : compact ? 32 : 150} />
+        {compact ? <LogoMark size={28} /> : <Logo size={fullscreen ? 190 : 150} />}
         {!compact && title && (
           <p className={`mt-1 font-display italic text-parchment ${fullscreen ? "text-2xl sm:text-3xl" : "text-lg sm:text-xl"}`}>
             {title}
