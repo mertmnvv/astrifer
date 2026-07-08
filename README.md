@@ -19,6 +19,7 @@ app/                    route'lar (App Router)
   create/               ürün konfigüratörü (/create)
   s/[slug]/             paylaşılan yıldız haritası sayfası (iskelet)
   urun/poster/          fiziksel ürün satış sayfası (iskelet)
+  admin/                sipariş/şablon yönetim paneli (/admin) — bkz. aşağıda
   api/geocode/          yer arama proxy'si (Nominatim + tz-lookup)
 components/
   astrolab/             framework-agnostic canvas çizim katmanı (drawStarChart)
@@ -64,6 +65,27 @@ Firebase Console → Project Settings → Service Accounts → "Generate new
 private key" ile indirilen JSON'dan gelir. Vercel'de `FIREBASE_PRIVATE_KEY`'i
 tek satırda `\n` kaçışlarıyla girin — `lib/firebase/admin.ts` bunları kendisi
 gerçek satır sonlarına çevirir.
+
+## Admin paneli (/admin)
+
+Siparişleri (`orders`) ve şablonları (`templates`) yönetmek için tek şifreli
+bir panel. Kullanıcı hesabı sistemi yok — `ADMIN_PASSWORD` ile giriş yapılır,
+imzalı bir session cookie'si (`lib/adminAuth.ts`, `middleware.ts`) 7 gün
+geçerli kalır.
+
+```bash
+# .env.local
+ADMIN_PASSWORD=güçlü-bir-şifre
+ADMIN_SESSION_SECRET=rastgele-uzun-bir-değer   # openssl rand -hex 32
+```
+
+- `/admin` — özet: toplam sipariş, ciro, duruma göre dağılım
+- `/admin/orders` — sipariş listesi; durum güncelleme (pending → paid → fulfilled → shipped) ve kargo takip numarası girme
+- `/admin/templates` — şablonları aktif/pasif yapma, yeni şablon ekleme
+
+Panel her sayfada Admin SDK üzerinden okuma/yazma yapar (client-side Firestore
+erişimi yok), bu yüzden `firestore.rules`'taki `allow write: if false`
+kuralları etkilenmez.
 
 ## Güvenlik notu: 300dpi baskı varlığı
 
