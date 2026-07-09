@@ -1,8 +1,10 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { motion } from "framer-motion";
 import { CoverPanel } from "./CoverPanel";
 import { MusicProvider, useMusic } from "./MusicContext";
+import { usePrefersReducedMotion } from "@/lib/hooks/usePrefersReducedMotion";
 
 function OpenButton({ onOpen }: { onOpen: () => void }) {
   const music = useMusic();
@@ -40,6 +42,7 @@ export interface PageGateProps {
 export function PageGate({ title, subtitle, musicUrl, children }: PageGateProps) {
   const [opened, setOpened] = useState(false);
   const contentRef = useRef<HTMLDivElement | null>(null);
+  const reducedMotion = usePrefersReducedMotion();
 
   // Set/clear the `inert` DOM attribute imperatively: React's JSX prop for
   // it doesn't reliably reach the DOM through SSR + hydration in this React
@@ -57,13 +60,24 @@ export function PageGate({ title, subtitle, musicUrl, children }: PageGateProps)
   return (
     <MusicProvider src={musicUrl}>
       <div
-        className={`fixed inset-0 z-50 transition-opacity duration-700 ${
-          opened ? "pointer-events-none opacity-0" : "opacity-100"
-        }`}
+        className={`fixed inset-0 z-50 ${opened ? "pointer-events-none" : ""}`}
+        style={{ perspective: reducedMotion ? undefined : "2200px" }}
       >
-        <CoverPanel fullscreen title={title} subtitle={subtitle}>
-          <OpenButton onOpen={() => setOpened(true)} />
-        </CoverPanel>
+        <motion.div
+          className="absolute inset-0"
+          style={{ transformOrigin: "left center", backfaceVisibility: "hidden" }}
+          initial={false}
+          animate={
+            reducedMotion
+              ? { opacity: opened ? 0 : 1 }
+              : { rotateY: opened ? -115 : 0, boxShadow: opened ? "0 0 0 rgba(0,0,0,0)" : "40px 0 60px rgba(0,0,0,0.5)" }
+          }
+          transition={{ duration: 1.15, ease: [0.65, 0, 0.35, 1] }}
+        >
+          <CoverPanel fullscreen title={title} subtitle={subtitle}>
+            <OpenButton onOpen={() => setOpened(true)} />
+          </CoverPanel>
+        </motion.div>
       </div>
       <div ref={contentRef} aria-hidden={!opened}>
         {children}

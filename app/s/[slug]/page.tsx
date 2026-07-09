@@ -10,6 +10,7 @@ import { VoiceNote } from "@/components/journal/VoiceNote";
 import { MusicToggle } from "@/components/ui/MusicToggle";
 import { RevealOnScroll } from "@/components/ui/RevealOnScroll";
 import { ScrollCue } from "@/components/ui/ScrollCue";
+import { Starfield } from "@/components/ui/Starfield";
 import { computeSky } from "@/lib/astronomy/computeSky";
 import { buildSkyNarrative } from "@/lib/astronomy/skyNarrative";
 import { getStarMapBySlug } from "@/lib/starmaps";
@@ -87,7 +88,8 @@ export default async function SharedStarMapPage({
       subtitle={`${dateLabel} · ${starMap.locationName}`}
       musicUrl={starMap.musicUrl}
     >
-      <main className="flex min-h-screen flex-col items-center px-4 py-12 sm:px-8 sm:py-16">
+      <Starfield />
+      <main className="relative flex min-h-screen flex-col items-center px-4 py-12 sm:px-8 sm:py-16">
         {/* Büyük yıldız haritası — sayfanın asıl kahramanı */}
         <div className="flex w-full max-w-2xl flex-col items-center text-center">
           <div className="aspect-square w-full">
@@ -101,7 +103,7 @@ export default async function SharedStarMapPage({
         <ScrollCue />
 
         {/* O Günün Önemi */}
-        <RevealOnScroll className="mt-16 w-full max-w-xl">
+        <RevealOnScroll durationMs={1000} className="mt-16 w-full max-w-xl">
           <div className="rounded-lg bg-panel-navy/60 p-6 text-center sm:p-10">
             <p className="font-mono text-[10px] uppercase tracking-[0.3em] text-brass-dim">O Günün Önemi</p>
             <div className="mx-auto mt-4 h-px w-8 bg-brass-dim/60" />
@@ -133,13 +135,13 @@ export default async function SharedStarMapPage({
 
         {/* Sesli Mesaj */}
         {starMap.voiceNoteUrl && (
-          <RevealOnScroll className="mt-16 w-full max-w-sm">
+          <RevealOnScroll durationMs={1000} className="mt-16 w-full max-w-sm">
             <VoiceNote url={starMap.voiceNoteUrl} />
           </RevealOnScroll>
         )}
 
         {/* QR / Footer */}
-        <RevealOnScroll className="mt-16 w-full max-w-sm">
+        <RevealOnScroll durationMs={1000} className="mt-16 w-full max-w-sm">
           <div className="relative rounded-md bg-parchment px-8 py-9 shadow-2xl shadow-black/50">
             <div className="absolute inset-x-0 top-0 h-[3px] bg-gradient-to-r from-brass-dim via-brass to-brass-dim" />
             <div className="absolute inset-x-0 bottom-0 h-[3px] bg-gradient-to-r from-brass-dim via-brass to-brass-dim" />

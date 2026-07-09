@@ -8,10 +8,12 @@ export interface RevealOnScrollProps {
   className?: string;
   /** Extra transition-delay in ms, for staggering a row/grid of siblings. */
   delayMs?: number;
+  /** Transition duration in ms; defaults to 700 for the usual brisk fade, higher for a slower unfold. */
+  durationMs?: number;
 }
 
 /** Fades/slides a section in as it enters the viewport; skipped entirely under prefers-reduced-motion. */
-export function RevealOnScroll({ children, className, delayMs = 0 }: RevealOnScrollProps) {
+export function RevealOnScroll({ children, className, delayMs = 0, durationMs = 700 }: RevealOnScrollProps) {
   const reducedMotion = usePrefersReducedMotion();
   const { ref, inView } = useInViewOnce<HTMLDivElement>();
   const revealed = reducedMotion || inView;
@@ -19,8 +21,11 @@ export function RevealOnScroll({ children, className, delayMs = 0 }: RevealOnScr
   return (
     <div
       ref={ref}
-      style={delayMs ? { transitionDelay: `${delayMs}ms` } : undefined}
-      className={`transition-all duration-700 ease-out ${
+      style={{
+        transitionDelay: delayMs ? `${delayMs}ms` : undefined,
+        transitionDuration: `${durationMs}ms`,
+      }}
+      className={`transition-all ease-out ${
         revealed ? "translate-y-0 opacity-100" : "translate-y-6 opacity-0"
       } ${className ?? ""}`}
     >
