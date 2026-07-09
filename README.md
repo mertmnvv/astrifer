@@ -8,7 +8,9 @@ fiziksel poster/çerçeve olarak satılır.
 
 - Next.js 14 (App Router), TypeScript, Tailwind CSS
 - Astronomik hesaplama: [`astronomy-engine`](https://github.com/cosinekitty/astronomy) — gerçek efemeris
-- Firebase (Firestore + Storage), Admin SDK üzerinden sunucu tarafı erişim
+- Firebase (Firestore), Admin SDK üzerinden sunucu tarafı erişim
+- Cloudinary — fotoğraf/sesli mesaj yüklemeleri (Firebase Storage'ın Blaze planı
+  gerektirmesi nedeniyle ücretsiz alternatif olarak seçildi)
 - Ödeme: iyzico (planlanan)
 - 300 DPI baskı render: Puppeteer, ayrı bir worker servisi olarak (planlanan)
 
@@ -21,6 +23,7 @@ app/                    route'lar (App Router)
   urun/poster/          fiziksel ürün satış sayfası (iskelet)
   admin/                sipariş/şablon yönetim paneli (/admin) — bkz. aşağıda
   api/geocode/          yer arama proxy'si (Nominatim + tz-lookup)
+  api/upload/sign/      Cloudinary imzalı upload için kısa ömürlü imza üretir
 components/
   astrolab/             framework-agnostic canvas çizim katmanı (drawStarChart)
                          + React sarmalayıcı (StarChart)
@@ -29,6 +32,7 @@ lib/
   astronomy/            computeSky.ts — saf astronomi hesaplaması, render'dan bağımsız
   geocode/               yerleşik şehir listesi, saat dilimi dönüşümü
   firebase/              Admin SDK istemcisi (lib/firebase/admin.ts) + isFirebaseConfigured()
+  cloudinary/            imzalı upload config + client helper (uploadFile.ts)
   templates.ts           Firestore erişilemediğinde kullanılan yedek şablon listesi
 scripts/
   seed-firestore.mjs     varsayılan şablonları Firestore'a yazan tek seferlik script
@@ -65,6 +69,23 @@ Firebase Console → Project Settings → Service Accounts → "Generate new
 private key" ile indirilen JSON'dan gelir. Vercel'de `FIREBASE_PRIVATE_KEY`'i
 tek satırda `\n` kaçışlarıyla girin — `lib/firebase/admin.ts` bunları kendisi
 gerçek satır sonlarına çevirir.
+
+## Fotoğraf/sesli mesaj yüklemeleri (Cloudinary)
+
+`/create` konfigüratöründeki fotoğraf ve sesli mesaj alanları, dosyayı
+doğrudan tarayıcıdan Cloudinary'ye yükler — sunucu sadece kısa ömürlü bir
+imza üretir (`app/api/upload/sign`), dosyanın kendisi hiçbir zaman bizim
+sunucumuzdan geçmez. `CLOUDINARY_CLOUD_NAME` / `CLOUDINARY_API_KEY` /
+`CLOUDINARY_API_SECRET` boşsa bu route 503 döner ve PhotoPicker/VoiceRecorder
+yükleme başarısız olarak işaretlenir — konfigüratörün geri kalanı yine de
+çalışır durumda kalır.
+
+Kurulum: [cloudinary.com](https://cloudinary.com) üzerinde ücretsiz bir hesap
+aç, Console ana sayfasındaki "Product Environment Credentials" bölümünden
+Cloud Name / API Key / API Secret'ı `.env.local`'a kopyala. Ekstra bir
+upload preset veya bucket oluşturmak gerekmiyor — izin verilen klasörler
+`app/api/upload/sign/route.ts`'teki `ALLOWED_FOLDERS` listesinde sabit
+kodlanmış.
 
 ## Admin paneli (/admin)
 

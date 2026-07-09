@@ -70,7 +70,10 @@ export function CreateForm({ templates }: CreateFormProps) {
     ? `${place.name} üzerinde ${date} ${time} anının gökyüzü`
     : "Konum seçilince gökyüzü önizlemesi burada görünecek";
 
-  const isValid = Boolean(place && date && time && title.trim() && templateSlug);
+  const requiredFieldsValid = Boolean(place && date && time && title.trim() && templateSlug);
+  const uploadsPending = photos.some((photo) => photo.status === "uploading") || voiceNote?.status === "uploading";
+  const uploadsFailed = photos.some((photo) => photo.status === "error") || voiceNote?.status === "error";
+  const isValid = requiredFieldsValid && !uploadsPending && !uploadsFailed;
 
   const handleSubmit = (event: React.FormEvent) => {
     event.preventDefault();
@@ -86,8 +89,9 @@ export function CreateForm({ templates }: CreateFormProps) {
       lon: place.longitude.toString(),
       date: eventDateUtc.toISOString(),
     });
-    if (photos.length > 0) params.set("photos", photos.length.toString());
-    if (voiceNote) params.set("voice", "1");
+    const photoUrls = photos.filter((photo) => photo.status === "done" && photo.url).map((photo) => photo.url as string);
+    if (photoUrls.length > 0) params.set("photos", photoUrls.join(","));
+    if (voiceNote?.status === "done" && voiceNote.remoteUrl) params.set("voice", voiceNote.remoteUrl);
     params.set("palette", paletteId);
     router.push(`/checkout?${params.toString()}`);
   };
@@ -191,17 +195,23 @@ export function CreateForm({ templates }: CreateFormProps) {
           />
         </div>
 
-        {touchedSubmit && !isValid && (
+        {touchedSubmit && !requiredFieldsValid && (
           <p role="alert" className="text-sm text-red-300">
             Devam etmek için tarih, saat, konum ve isim alanlarını doldurun.
+          </p>
+        )}
+        {touchedSubmit && requiredFieldsValid && uploadsFailed && (
+          <p role="alert" className="text-sm text-red-300">
+            Bazı yüklemeler başarısız oldu — devam etmeden önce kaldırın ya da tekrar deneyin.
           </p>
         )}
 
         <button
           type="submit"
+          disabled={uploadsPending}
           className="w-full rounded-full bg-brass px-6 py-3 font-mono text-xs uppercase tracking-widest text-void transition-opacity hover:opacity-90 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-text disabled:opacity-40"
         >
-          Devam Et
+          {uploadsPending ? "Yükleniyor…" : "Devam Et"}
         </button>
       </div>
 

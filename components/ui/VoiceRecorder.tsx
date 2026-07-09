@@ -1,21 +1,26 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, type Dispatch, type SetStateAction } from "react";
+import { uploadToCloudinary } from "@/lib/cloudinary/uploadFile";
 
 export interface VoiceRecorderValue {
   url: string;
   source: "upload" | "recording";
+  status: "uploading" | "done" | "error";
+  remoteUrl?: string;
 }
 
 export interface VoiceRecorderProps {
   value: VoiceRecorderValue | null;
-  onChange: (value: VoiceRecorderValue | null) => void;
+  onChange: Dispatch<SetStateAction<VoiceRecorderValue | null>>;
 }
 
 /**
- * Local-only voice note capture: upload an existing audio file, or record
- * one live via the microphone. Like PhotoPicker, nothing is uploaded
- * anywhere yet — just an in-browser preview via object URLs.
+ * Voice note capture: upload an existing audio file, or record one live via
+ * the microphone. Playback always uses the local object URL (instant, no
+ * network round-trip); the blob is uploaded to Cloudinary in the background
+ * and `remoteUrl`/`status` fill in once that resolves (see PhotoPicker for
+ * the same pattern).
  */
 export function VoiceRecorder({ value, onChange }: VoiceRecorderProps) {
   const fileInputRef = useRef<HTMLInputElement | null>(null);
@@ -36,16 +41,27 @@ export function VoiceRecorder({ value, onChange }: VoiceRecorderProps) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const replaceValue = (url: string, source: VoiceRecorderValue["source"]) => {
+  const uploadBlob = (blob: Blob | File, source: VoiceRecorderValue["source"]) => {
+    uploadToCloudinary(blob, "astrifer/starmaps/voice")
+      .then((remoteUrl) => {
+        onChange((prev) => (prev && prev.source === source ? { ...prev, status: "done", remoteUrl } : prev));
+      })
+      .catch(() => {
+        onChange((prev) => (prev && prev.source === source ? { ...prev, status: "error" } : prev));
+      });
+  };
+
+  const replaceValue = (url: string, source: VoiceRecorderValue["source"], blob: Blob | File) => {
     if (value?.url) URL.revokeObjectURL(value.url);
-    onChange({ url, source });
+    onChange({ url, source, status: "uploading" });
+    uploadBlob(blob, source);
   };
 
   const handleFile = (files: FileList | null) => {
     const file = files?.[0];
     if (!file) return;
     setError(null);
-    replaceValue(URL.createObjectURL(file), "upload");
+    replaceValue(URL.createObjectURL(file), "upload", file);
     if (fileInputRef.current) fileInputRef.current.value = "";
   };
 
@@ -60,7 +76,7 @@ export function VoiceRecorder({ value, onChange }: VoiceRecorderProps) {
       };
       recorder.onstop = () => {
         const blob = new Blob(chunksRef.current, { type: recorder.mimeType || "audio/webm" });
-        replaceValue(URL.createObjectURL(blob), "recording");
+        replaceValue(URL.createObjectURL(blob), "recording", blob);
         stream.getTracks().forEach((track) => track.stop());
       };
       mediaRecorderRef.current = recorder;
@@ -81,19 +97,36 @@ export function VoiceRecorder({ value, onChange }: VoiceRecorderProps) {
     onChange(null);
   };
 
+  const retryUpload = async () => {
+    if (!value) return;
+    const blob = await fetch(value.url).then((res) => res.blob());
+    onChange((prev) => (prev ? { ...prev, status: "uploading" } : prev));
+    uploadBlob(blob, value.source);
+  };
+
   if (value) {
     return (
-      <div className="flex items-center gap-3 rounded-md border border-brass-dim/40 bg-panel-navy px-3 py-2.5">
-        {/* eslint-disable-next-line jsx-a11y/media-has-caption */}
-        <audio controls src={value.url} className="h-8 flex-1" />
-        <button
-          type="button"
-          onClick={remove}
-          aria-label="Ses kaydını kaldır"
-          className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-void text-xs text-brass ring-1 ring-brass-dim focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brass"
-        >
-          ×
-        </button>
+      <div className="rounded-md border border-brass-dim/40 bg-panel-navy px-3 py-2.5">
+        <div className="flex items-center gap-3">
+          {/* eslint-disable-next-line jsx-a11y/media-has-caption */}
+          <audio controls src={value.url} className="h-8 flex-1" />
+          <button
+            type="button"
+            onClick={remove}
+            aria-label="Ses kaydını kaldır"
+            className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-void text-xs text-brass ring-1 ring-brass-dim focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brass"
+          >
+            ×
+          </button>
+        </div>
+        {value.status === "uploading" && (
+          <p className="mt-1.5 font-mono text-[10px] uppercase tracking-widest text-brass-dim">Yükleniyor…</p>
+        )}
+        {value.status === "error" && (
+          <button type="button" onClick={() => void retryUpload()} className="mt-1.5 font-mono text-[10px] uppercase tracking-widest text-red-300 underline">
+            Yüklenemedi — tekrar dene
+          </button>
+        )}
       </div>
     );
   }

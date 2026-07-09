@@ -35,8 +35,8 @@ export default function CheckoutPage({
   const frame = get("frame");
   const priceParam = get("price");
   const photosParam = get("photos");
-  const photoCount = photosParam ? Number(photosParam) : undefined;
-  const hasVoiceNote = get("voice") === "1";
+  const photoUrls = photosParam ? photosParam.split(",").filter(Boolean) : [];
+  const voiceUrl = get("voice");
   const journalAdded = get("addOn") === "journal";
 
   const productLabel: Record<string, string> = {
@@ -121,13 +121,13 @@ export default function CheckoutPage({
               <dd className="text-text">{formatTRY(basePrice)}</dd>
             </div>
           )}
-          {photoCount !== undefined && !Number.isNaN(photoCount) && (
+          {photoUrls.length > 0 && (
             <div className="flex justify-between gap-4">
               <dt className="text-haze">Fotoğraflar</dt>
-              <dd className="text-text">{photoCount} adet seçildi</dd>
+              <dd className="text-text">{photoUrls.length} adet yüklendi</dd>
             </div>
           )}
-          {hasVoiceNote && (
+          {voiceUrl && (
             <div className="flex justify-between gap-4">
               <dt className="text-haze">Sesli mesaj</dt>
               <dd className="text-text">Eklendi</dd>
