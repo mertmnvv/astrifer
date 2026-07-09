@@ -1,24 +1,31 @@
-import Link from "next/link";
-import { Logo } from "@/components/Logo";
+import { computeSky } from "@/lib/astronomy/computeSky";
+import { DEMO_STAR_MAP } from "@/lib/starmaps";
+import { SiteHeader } from "@/components/layout/SiteHeader";
+import { SiteFooter } from "@/components/layout/SiteFooter";
+import { Hero } from "@/components/home/Hero";
+import { ConceptSection } from "@/components/home/ConceptSection";
+import { HowItWorks } from "@/components/home/HowItWorks";
+import { ProductsTeaser } from "@/components/home/ProductsTeaser";
+import { FinalCta } from "@/components/home/FinalCta";
 
 export default function HomePage() {
+  const sky = computeSky({
+    date: DEMO_STAR_MAP.eventDateUtc,
+    latitude: DEMO_STAR_MAP.latitude,
+    longitude: DEMO_STAR_MAP.longitude,
+  });
+
   return (
-    <main className="flex min-h-screen flex-col items-center justify-center gap-6 px-6 text-center">
-      <Logo size={140} />
-      <h1 className="max-w-2xl font-display text-4xl italic text-text sm:text-5xl">
-        Gökyüzü o an, sonsuza dek sizin.
-      </h1>
-      <p className="max-w-md text-sm text-haze">
-        Bu sayfa henüz yer tutucu — ana tanıtım sayfası ayrı bir görevde
-        inşa edilecek. Konfigüratörü denemek için aşağıdaki bağlantıyı
-        kullanın.
-      </p>
-      <Link
-        href="/create"
-        className="rounded-full border border-brass-dim px-6 py-3 font-mono text-xs uppercase tracking-widest text-brass transition-colors hover:bg-brass hover:text-void focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brass"
-      >
-        Haritanı Oluştur
-      </Link>
-    </main>
+    <>
+      <SiteHeader />
+      <main>
+        <Hero sky={sky} />
+        <ConceptSection />
+        <HowItWorks />
+        <ProductsTeaser />
+        <FinalCta />
+      </main>
+      <SiteFooter />
+    </>
   );
 }

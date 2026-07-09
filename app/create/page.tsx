@@ -3,7 +3,9 @@ import { CreateForm } from "./CreateForm";
 import { FALLBACK_TEMPLATES, type TemplateOption } from "@/lib/templates";
 import { isFirebaseConfigured } from "@/lib/firebase/isConfigured";
 import type { TemplateDoc } from "@/types/firestore";
-import { Logo } from "@/components/Logo";
+import { SiteHeader } from "@/components/layout/SiteHeader";
+import { SiteFooter } from "@/components/layout/SiteFooter";
+import { RevealOnScroll } from "@/components/ui/RevealOnScroll";
 
 export const metadata: Metadata = {
   title: "Haritanı Oluştur — Astrifer",
@@ -46,20 +48,28 @@ export default async function CreatePage() {
   const templates = await loadTemplates();
 
   return (
-    <main className="min-h-screen px-4 py-10 sm:px-8 sm:py-16">
-      <div className="mx-auto max-w-6xl">
-        <header className="mb-8 flex flex-col items-center text-center sm:mb-12">
-          <Logo size={120} />
-          <h1 className="mt-3 font-display text-3xl italic text-text sm:text-5xl">
-            O anın gökyüzünü çiz.
-          </h1>
-          <p className="mx-auto mt-3 max-w-xl text-sm text-haze sm:text-base">
-            Tarihi, saati ve konumu gir — gerçek astronomik verilerle o
-            an gökyüzünde neler olduğunu anında gör.
-          </p>
-        </header>
-        <CreateForm templates={templates} />
-      </div>
-    </main>
+    <>
+      <SiteHeader />
+      <main className="min-h-screen px-4 pb-16 pt-28 sm:px-8 sm:pb-24 sm:pt-36">
+        <div className="mx-auto max-w-6xl">
+          <RevealOnScroll className="mb-10 flex flex-col items-center text-center sm:mb-14">
+            <p className="font-mono text-[10px] uppercase tracking-[0.35em] text-brass">
+              Zaman Kapsülü
+            </p>
+            <h1 className="mt-4 font-display text-3xl italic leading-tight text-text sm:text-5xl">
+              O anın gökyüzünü çiz.
+            </h1>
+            <p className="mx-auto mt-4 max-w-xl text-sm leading-relaxed text-haze sm:text-base">
+              Tarihi, saati ve konumu gir — gerçek astronomik verilerle o an
+              gökyüzünde neler olduğunu anında gör.
+            </p>
+          </RevealOnScroll>
+          <RevealOnScroll delayMs={120}>
+            <CreateForm templates={templates} />
+          </RevealOnScroll>
+        </div>
+      </main>
+      <SiteFooter />
+    </>
   );
 }

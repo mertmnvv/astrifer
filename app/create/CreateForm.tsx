@@ -94,7 +94,7 @@ export function CreateForm({ templates }: CreateFormProps) {
 
   return (
     <form onSubmit={handleSubmit} className="grid gap-8 lg:grid-cols-[minmax(0,26rem)_1fr]" noValidate>
-      <div className="order-2 flex flex-col gap-6 lg:order-1">
+      <div className="order-2 flex flex-col gap-6 rounded-lg border border-brass-dim/15 bg-panel-navy/30 p-6 sm:p-8 lg:order-1">
         <fieldset className="grid grid-cols-2 gap-4">
           <legend className="sr-only">Tarih ve saat</legend>
           <div>
@@ -205,11 +205,12 @@ export function CreateForm({ templates }: CreateFormProps) {
         </button>
       </div>
 
-      <div className="order-1 flex flex-col items-center gap-3 lg:order-2 lg:sticky lg:top-10 lg:self-start">
+      <div className="order-1 flex flex-col items-center gap-3 lg:order-2 lg:sticky lg:top-28 lg:self-start">
+        <p className="font-mono text-[10px] uppercase tracking-[0.35em] text-brass-dim">Önizleme</p>
         <div className="aspect-square w-full max-w-[32rem]">
           <StarChart sky={sky} label={previewLabel} className="h-full w-full" palette={getSkyPalette(paletteId)} />
         </div>
-        <p className="max-w-sm text-center text-xs text-haze">{previewLabel}</p>
+        <p className="max-w-sm text-center text-xs leading-relaxed text-haze">{previewLabel}</p>
       </div>
     </form>
   );
