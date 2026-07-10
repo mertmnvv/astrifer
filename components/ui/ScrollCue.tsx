@@ -24,9 +24,9 @@ export function ScrollCue() {
         height="20"
         viewBox="0 0 24 24"
         fill="none"
-        stroke="#8a7644"
+        stroke="currentColor"
         strokeWidth="1.5"
-        className="animate-bounce-y motion-reduce:animate-none"
+        className="animate-bounce-y text-dim motion-reduce:animate-none"
       >
         <path d="M4 9l8 8 8-8" strokeLinecap="round" strokeLinejoin="round" />
       </svg>

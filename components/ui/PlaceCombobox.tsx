@@ -10,8 +10,6 @@ export interface PlaceComboboxProps {
   value: PlaceResult | null;
   onChange: (place: PlaceResult) => void;
   required?: boolean;
-  /** Visual register: "dark" (default, night/void panels) or "light" (parchment panels). */
-  tone?: "dark" | "light";
 }
 
 function dedupe(places: PlaceResult[]): PlaceResult[] {
@@ -26,9 +24,8 @@ function dedupe(places: PlaceResult[]): PlaceResult[] {
   return out;
 }
 
-export function PlaceCombobox({ label, placeholder, value, onChange, required, tone = "dark" }: PlaceComboboxProps) {
+export function PlaceCombobox({ label, placeholder, value, onChange, required }: PlaceComboboxProps) {
   const inputId = useId();
-  const isLight = tone === "light";
   const listboxId = useId();
   const [query, setQuery] = useState(value?.name ?? "");
   const [apiResults, setApiResults] = useState<PlaceResult[]>([]);
@@ -95,10 +92,7 @@ export function PlaceCombobox({ label, placeholder, value, onChange, required, t
 
   return (
     <div ref={containerRef} className="relative">
-      <label
-        htmlFor={inputId}
-        className={`mb-1.5 block font-mono text-xs uppercase tracking-widest ${isLight ? "text-leather-lt" : "text-haze"}`}
-      >
+      <label htmlFor={inputId} className="mb-1.5 block font-mono text-xs uppercase tracking-widest text-muted">
         {label}
       </label>
       <input
@@ -120,14 +114,10 @@ export function PlaceCombobox({ label, placeholder, value, onChange, required, t
         }}
         onFocus={() => setOpen(true)}
         onKeyDown={onKeyDown}
-        className={`w-full rounded-md border px-3 py-2.5 text-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brass ${
-          isLight
-            ? "border-ink/25 bg-parchment-dim text-ink placeholder:text-ink/40"
-            : "border-brass-dim/60 bg-panel-navy text-text placeholder:text-haze/60"
-        }`}
+        className="w-full rounded-md border border-text/[0.14] bg-text/[0.04] px-3 py-2.5 text-sm text-text placeholder:text-subtle focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-amber"
       />
       {value && query === value.name ? (
-        <p className={`mt-1 font-mono text-[11px] ${isLight ? "text-ink/60" : "text-haze/80"}`}>
+        <p className="mt-1 font-mono text-[11px] text-subtle">
           {value.latitude.toFixed(2)}°, {value.longitude.toFixed(2)}° · {value.timezone}
         </p>
       ) : null}
@@ -135,9 +125,7 @@ export function PlaceCombobox({ label, placeholder, value, onChange, required, t
         <ul
           id={listboxId}
           role="listbox"
-          className={`absolute z-20 mt-1 max-h-64 w-full overflow-auto rounded-md border shadow-xl ${
-            isLight ? "border-ink/25 bg-parchment-dim" : "border-brass-dim/60 bg-panel-navy"
-          }`}
+          className="absolute z-20 mt-1 max-h-64 w-full overflow-auto rounded-md border border-text/[0.14] bg-panel shadow-xl"
         >
           {results.map((place, index) => (
             <li
@@ -150,20 +138,10 @@ export function PlaceCombobox({ label, placeholder, value, onChange, required, t
                 selectPlace(place);
               }}
               onMouseEnter={() => setActiveIndex(index)}
-              className={`cursor-pointer px-3 py-2 text-sm ${
-                index === activeIndex
-                  ? isLight
-                    ? "bg-brass-dim/20 text-ink"
-                    : "bg-brass-dim/30 text-text"
-                  : isLight
-                    ? "text-ink/70"
-                    : "text-haze"
-              }`}
+              className={`cursor-pointer px-3 py-2 text-sm ${index === activeIndex ? "bg-amber/20 text-text" : "text-muted"}`}
             >
               {place.name}
-              <span className={isLight ? "text-ink/50" : "text-haze/70"}>
-                {place.country ? `, ${place.country}` : ""}
-              </span>
+              <span className="text-subtle">{place.country ? `, ${place.country}` : ""}</span>
             </li>
           ))}
         </ul>

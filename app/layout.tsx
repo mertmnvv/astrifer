@@ -1,25 +1,34 @@
 import type { Metadata } from "next";
-import { Cormorant_Garamond, Space_Mono, Inter } from "next/font/google";
+import { Instrument_Serif, JetBrains_Mono, Hanken_Grotesk, Spectral } from "next/font/google";
 import "./globals.css";
 
-const displayFont = Cormorant_Garamond({
+const displayFont = Instrument_Serif({
   subsets: ["latin"],
-  weight: ["400", "500", "600", "700"],
+  weight: "400",
   style: ["normal", "italic"],
   variable: "--font-display",
   display: "swap",
 });
 
-const monoFont = Space_Mono({
+const monoFont = JetBrains_Mono({
   subsets: ["latin"],
-  weight: ["400", "700"],
+  weight: ["400", "500"],
   variable: "--font-mono",
   display: "swap",
 });
 
-const bodyFont = Inter({
+const bodyFont = Hanken_Grotesk({
   subsets: ["latin"],
+  weight: ["300", "400", "500", "600"],
   variable: "--font-body",
+  display: "swap",
+});
+
+const logoFont = Spectral({
+  subsets: ["latin"],
+  weight: "500",
+  style: ["normal", "italic"],
+  variable: "--font-logo",
   display: "swap",
 });
 
@@ -38,7 +47,7 @@ export default function RootLayout({
   return (
     <html
       lang="tr"
-      className={`${displayFont.variable} ${monoFont.variable} ${bodyFont.variable}`}
+      className={`${displayFont.variable} ${monoFont.variable} ${bodyFont.variable} ${logoFont.variable}`}
       suppressHydrationWarning
     >
       <body className="bg-void text-text font-body antialiased">

@@ -22,12 +22,12 @@ const CONCEPT_ITEMS = [
 
 export function ConceptSection() {
   return (
-    <section className="bg-leather px-4 py-28 sm:px-8">
+    <section className="px-4 py-28 sm:px-8">
       <div className="mx-auto grid max-w-5xl gap-12 lg:grid-cols-[minmax(0,20rem)_1fr] lg:gap-16">
         <RevealOnScroll>
-          <SectionHeading eyebrow="Ne İnşa Ediyoruz" title="Bir zaman kapsülü, dijital olarak." align="left" tone="parchment" />
-          <div className="mt-8 flex items-center gap-3 text-brass" aria-hidden>
-            <span className="h-px w-10 bg-brass-dim/50" />
+          <SectionHeading eyebrow="Ne İnşa Ediyoruz" title="Bir zaman kapsülü, dijital olarak." align="left" />
+          <div className="mt-8 flex items-center gap-3 text-amber" aria-hidden>
+            <span className="h-px w-10 bg-amber/50" />
             <span className="text-lg">✦</span>
           </div>
         </RevealOnScroll>
@@ -39,7 +39,6 @@ export function ConceptSection() {
                 number={`0${index + 1}`}
                 title={concept.title}
                 description={concept.description}
-                tone="parchment"
                 isLast={index === CONCEPT_ITEMS.length - 1}
               />
             </RevealOnScroll>

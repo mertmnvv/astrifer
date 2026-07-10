@@ -59,7 +59,7 @@ export function drawLeatherTexture(ctx: CanvasRenderingContext2D, width: number,
   ctx.fillRect(0, 0, width, height);
 
   const margin = Math.max(6, Math.min(width, height) * 0.035);
-  ctx.strokeStyle = "rgba(201,168,106,0.28)";
+  ctx.strokeStyle = "rgba(230,184,119,0.28)";
   ctx.lineWidth = 1;
   ctx.setLineDash([3, 4]);
   ctx.strokeRect(margin, margin, width - margin * 2, height - margin * 2);

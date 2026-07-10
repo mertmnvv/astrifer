@@ -46,7 +46,7 @@ async function getStats(): Promise<Stats> {
 export default async function AdminDashboardPage() {
   if (!isFirebaseConfigured()) {
     return (
-      <p className="text-sm text-haze">
+      <p className="text-sm text-subtle">
         Firebase yapılandırılmamış — istatistikleri görmek için <code>.env.local</code> içindeki Admin SDK
         değişkenlerini doldur.
       </p>
@@ -57,25 +57,25 @@ export default async function AdminDashboardPage() {
 
   return (
     <div className="space-y-8">
-      <h1 className="font-display text-2xl italic text-text">Özet</h1>
+      <h1 className="font-display text-2xl italic text-bright">Özet</h1>
 
       <div className="grid gap-4 sm:grid-cols-2">
-        <div className="rounded-lg border border-brass-dim/40 bg-panel-navy p-6">
-          <p className="font-mono text-[10px] uppercase tracking-widest text-haze">Toplam sipariş</p>
+        <div className="rounded-2xl border border-text/10 bg-text/[0.035] p-6">
+          <p className="font-mono text-[10px] uppercase tracking-widest text-dim">Toplam sipariş</p>
           <p className="mt-2 font-display text-3xl italic text-text">{stats.totalOrders}</p>
         </div>
-        <div className="rounded-lg border border-brass-dim/40 bg-panel-navy p-6">
-          <p className="font-mono text-[10px] uppercase tracking-widest text-haze">Ciro (ödenen)</p>
-          <p className="mt-2 font-display text-3xl italic text-brass">{formatTRY(stats.revenue)}</p>
+        <div className="rounded-2xl border border-text/10 bg-text/[0.035] p-6">
+          <p className="font-mono text-[10px] uppercase tracking-widest text-dim">Ciro (ödenen)</p>
+          <p className="mt-2 font-display text-3xl italic text-amber">{formatTRY(stats.revenue)}</p>
         </div>
       </div>
 
-      <div className="rounded-lg border border-brass-dim/40 bg-panel-navy p-6">
-        <p className="mb-4 font-mono text-[10px] uppercase tracking-widest text-haze">Duruma göre dağılım</p>
+      <div className="rounded-2xl border border-text/10 bg-text/[0.035] p-6">
+        <p className="mb-4 font-mono text-[10px] uppercase tracking-widest text-dim">Duruma göre dağılım</p>
         <dl className="grid grid-cols-2 gap-4 sm:grid-cols-3">
           {(Object.keys(STATUS_LABELS) as OrderStatus[]).map((status) => (
             <div key={status}>
-              <dt className="text-xs text-haze">{STATUS_LABELS[status]}</dt>
+              <dt className="text-xs text-subtle">{STATUS_LABELS[status]}</dt>
               <dd className="font-display text-xl italic text-text">{stats.countsByStatus[status]}</dd>
             </div>
           ))}

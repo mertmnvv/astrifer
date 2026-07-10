@@ -13,8 +13,6 @@ export interface VoiceRecorderValue {
 export interface VoiceRecorderProps {
   value: VoiceRecorderValue | null;
   onChange: Dispatch<SetStateAction<VoiceRecorderValue | null>>;
-  /** Visual register: "dark" (default, night/void panels) or "light" (parchment panels). */
-  tone?: "dark" | "light";
 }
 
 /**
@@ -24,8 +22,7 @@ export interface VoiceRecorderProps {
  * and `remoteUrl`/`status` fill in once that resolves (see PhotoPicker for
  * the same pattern).
  */
-export function VoiceRecorder({ value, onChange, tone = "dark" }: VoiceRecorderProps) {
-  const isLight = tone === "light";
+export function VoiceRecorder({ value, onChange }: VoiceRecorderProps) {
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const chunksRef = useRef<Blob[]>([]);
@@ -109,11 +106,7 @@ export function VoiceRecorder({ value, onChange, tone = "dark" }: VoiceRecorderP
 
   if (value) {
     return (
-      <div
-        className={`rounded-md border px-3 py-2.5 ${
-          isLight ? "border-ink/25 bg-parchment-dim" : "border-brass-dim/40 bg-panel-navy"
-        }`}
-      >
+      <div className="rounded-md border border-amber/50 bg-amber/10 px-3 py-2.5">
         <div className="flex items-center gap-3">
           {/* eslint-disable-next-line jsx-a11y/media-has-caption */}
           <audio controls src={value.url} className="h-8 flex-1" />
@@ -121,15 +114,13 @@ export function VoiceRecorder({ value, onChange, tone = "dark" }: VoiceRecorderP
             type="button"
             onClick={remove}
             aria-label="Ses kaydını kaldır"
-            className={`flex h-6 w-6 shrink-0 items-center justify-center rounded-full text-xs text-brass ring-1 ring-brass-dim focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brass ${
-              isLight ? "bg-ink" : "bg-void"
-            }`}
+            className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-void text-xs text-amber ring-1 ring-amber/50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-amber"
           >
             ×
           </button>
         </div>
         {value.status === "uploading" && (
-          <p className="mt-1.5 font-mono text-[10px] uppercase tracking-widest text-brass-dim">Yükleniyor…</p>
+          <p className="mt-1.5 font-mono text-[10px] uppercase tracking-widest text-dim">Yükleniyor…</p>
         )}
         {value.status === "error" && (
           <button type="button" onClick={() => void retryUpload()} className="mt-1.5 font-mono text-[10px] uppercase tracking-widest text-red-300 underline">
@@ -143,13 +134,7 @@ export function VoiceRecorder({ value, onChange, tone = "dark" }: VoiceRecorderP
   return (
     <div>
       <div className="flex flex-wrap items-center gap-3">
-        <label
-          className={`cursor-pointer rounded-md border border-dashed px-3 py-2 text-xs transition-colors focus-within:outline focus-within:outline-2 focus-within:outline-offset-2 focus-within:outline-brass ${
-            isLight
-              ? "border-ink/30 text-ink/60 hover:border-ink/50"
-              : "border-brass-dim/50 text-haze hover:border-brass-dim"
-          }`}
-        >
+        <label className="cursor-pointer rounded-md border border-dashed border-text/20 bg-text/[0.03] px-3 py-2 text-xs text-muted transition-colors hover:border-text/30 focus-within:outline focus-within:outline-2 focus-within:outline-offset-2 focus-within:outline-amber">
           Dosya Yükle
           <input
             ref={fileInputRef}
@@ -164,12 +149,8 @@ export function VoiceRecorder({ value, onChange, tone = "dark" }: VoiceRecorderP
             type="button"
             onClick={recording ? stopRecording : startRecording}
             aria-pressed={recording}
-            className={`rounded-md border px-3 py-2 font-mono text-[11px] uppercase tracking-widest transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brass ${
-              recording
-                ? "border-red-400/60 text-red-300"
-                : isLight
-                  ? "border-ink/30 text-ink/60 hover:border-ink/50"
-                  : "border-brass-dim/50 text-haze hover:border-brass-dim"
+            className={`rounded-md border px-3 py-2 font-mono text-[11px] uppercase tracking-widest transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-amber ${
+              recording ? "border-red-400/60 text-red-300" : "border-text/20 bg-text/[0.03] text-muted hover:border-text/30"
             }`}
           >
             {recording ? "● Durdur" : "Mikrofonla Kaydet"}

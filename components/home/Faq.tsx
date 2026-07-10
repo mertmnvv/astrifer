@@ -37,7 +37,7 @@ export function Faq() {
   };
 
   return (
-    <section className="bg-parchment px-4 py-24 sm:px-8">
+    <section className="px-4 py-24 sm:px-8">
       <div className="mx-auto max-w-2xl">
         <RevealOnScroll>
           <SectionHeading eyebrow="Destek" title="Sıkça Sorulan Sorular" />
@@ -48,17 +48,17 @@ export function Faq() {
             const isOpen = openIndex === index;
             return (
               <RevealOnScroll key={index} delayMs={index * 80}>
-                <div className={`border-b border-ink/12 ${index === 0 ? "border-t" : ""}`}>
+                <div className={`border-b border-text/10 ${index === 0 ? "border-t" : ""}`}>
                   <button
                     onClick={() => toggleItem(index)}
                     aria-expanded={isOpen}
-                    className="flex w-full items-center gap-4 py-5 text-left transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brass"
+                    className="flex w-full items-center gap-4 py-5 text-left transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-amber"
                   >
-                    <span className="font-mono text-xs font-bold tracking-wider text-brass">
+                    <span className="font-mono text-xs font-bold tracking-wider text-amber">
                       {`Q0${index + 1}`}
                     </span>
-                    <span className="flex-1 font-display text-lg italic text-ink">{item.question}</span>
-                    <span className="ml-4 shrink-0 text-brass">
+                    <span className="flex-1 font-display text-lg italic text-text">{item.question}</span>
+                    <span className="ml-4 shrink-0 text-amber">
                       <motion.svg
                         animate={{ rotate: isOpen ? 180 : 0 }}
                         transition={{ duration: 0.25, ease: "easeInOut" }}
@@ -81,7 +81,7 @@ export function Faq() {
                         exit={{ height: 0, opacity: 0 }}
                         transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
                       >
-                        <div className="pb-6 pl-[3.25rem] text-sm leading-relaxed text-ink/70">{item.answer}</div>
+                        <div className="pb-6 pl-[3.25rem] text-sm leading-relaxed text-subtle">{item.answer}</div>
                       </motion.div>
                     )}
                   </AnimatePresence>

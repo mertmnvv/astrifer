@@ -42,7 +42,7 @@ export function PosterConfigurator({ sky, previewLabel }: PosterConfiguratorProp
             </div>
           </FrameMockup>
         </div>
-        <p className="text-center text-xs text-haze">
+        <p className="text-center text-xs text-subtle">
           {sizeLabel} · {frameLabel} — örnek gökyüzü ile önizleme
         </p>
 
@@ -54,8 +54,8 @@ export function PosterConfigurator({ sky, previewLabel }: PosterConfiguratorProp
               onClick={() => setFrame(option.value)}
               aria-pressed={frame === option.value}
               aria-label={`${option.label} çerçeveyi seç`}
-              className={`h-14 w-14 overflow-hidden rounded-md transition-shadow focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brass ${
-                frame === option.value ? "ring-2 ring-brass" : "ring-1 ring-brass-dim/40"
+              className={`h-14 w-14 overflow-hidden rounded-md transition-shadow focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-amber ${
+                frame === option.value ? "ring-2 ring-amber" : "ring-1 ring-text/10"
               }`}
             >
               <FrameMockup frame={option.value} className="h-full w-full">
@@ -68,7 +68,7 @@ export function PosterConfigurator({ sky, previewLabel }: PosterConfiguratorProp
 
       <div className="order-2 flex flex-col gap-6">
         <div>
-          <p className="mb-1.5 font-mono text-xs uppercase tracking-widest text-haze">Boyut</p>
+          <p className="mb-1.5 font-mono text-xs uppercase tracking-widest text-dim">Boyut</p>
           <RadioCardGroup
             name="size"
             ariaLabel="Poster boyutu"
@@ -80,7 +80,7 @@ export function PosterConfigurator({ sky, previewLabel }: PosterConfiguratorProp
         </div>
 
         <div>
-          <p className="mb-1.5 font-mono text-xs uppercase tracking-widest text-haze">Çerçeve</p>
+          <p className="mb-1.5 font-mono text-xs uppercase tracking-widest text-dim">Çerçeve</p>
           <RadioCardGroup
             name="frame"
             ariaLabel="Çerçeve seçeneği"
@@ -95,12 +95,12 @@ export function PosterConfigurator({ sky, previewLabel }: PosterConfiguratorProp
           />
         </div>
 
-        <div className="rounded-lg border border-brass-dim/40 bg-panel-navy p-4">
+        <div className="rounded-2xl border border-text/10 bg-text/[0.035] p-4">
           <div className="flex items-baseline justify-between">
-            <span className="font-mono text-xs uppercase tracking-widest text-haze">Toplam</span>
-            <span className="font-display text-3xl italic text-brass">{formatTRY(price)}</span>
+            <span className="font-mono text-xs uppercase tracking-widest text-subtle">Toplam</span>
+            <span className="font-display text-3xl italic text-amber">{formatTRY(price)}</span>
           </div>
-          <p className="mt-1 text-[11px] text-haze/80">
+          <p className="mt-1 text-[11px] text-dim">
             300 DPI baskı, kargo dahil. Üretim süresi 3-5 iş günü.
           </p>
         </div>
@@ -108,7 +108,7 @@ export function PosterConfigurator({ sky, previewLabel }: PosterConfiguratorProp
         <button
           type="button"
           onClick={handleOrder}
-          className="w-full rounded-full bg-brass px-6 py-3 font-mono text-xs uppercase tracking-widest text-void transition-opacity hover:opacity-90 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-text"
+          className="w-full rounded-full bg-gradient-to-br from-amber-light to-amber-deep px-6 py-3 font-mono text-xs uppercase tracking-widest text-ink transition-opacity hover:opacity-90 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-amber"
         >
           Sipariş Ver
         </button>

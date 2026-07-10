@@ -14,17 +14,21 @@ export function PhotoSlot({ photo, rotateDeg }: PhotoSlotProps) {
       <span
         aria-hidden
         className="absolute -top-1.5 left-1/2 h-2.5 w-2.5 -translate-x-1/2 rounded-full shadow"
-        style={{ background: "radial-gradient(circle at 35% 30%, #e6cd94, #8a7644)" }}
+        style={{ background: "radial-gradient(circle at 35% 30%, #f2c67e, #e0a35c)" }}
       />
       <div
         className="flex aspect-square items-center justify-center overflow-hidden"
-        style={{ background: photo.url ? undefined : "linear-gradient(155deg, #1c2550, #0a0f26 65%)" }}
+        style={{
+          background: photo.url
+            ? undefined
+            : "repeating-linear-gradient(135deg, rgba(230,184,119,0.13), rgba(230,184,119,0.13) 7px, rgba(230,184,119,0.05) 7px, rgba(230,184,119,0.05) 14px)",
+        }}
       >
         {photo.url ? (
           // eslint-disable-next-line @next/next/no-img-element
           <img src={photo.url} alt={photo.caption ?? "Anı fotoğrafı"} className="h-full w-full object-cover" />
         ) : (
-          <svg viewBox="0 0 24 24" fill="none" stroke="#c9a86a" strokeWidth="1.3" className="w-8 opacity-60">
+          <svg viewBox="0 0 24 24" fill="none" stroke="#e6b877" strokeWidth="1.3" className="w-8 opacity-60">
             <path d="M4 16l4.5-6 3.5 4 2.5-3L20 16" strokeLinecap="round" strokeLinejoin="round" />
             <circle cx="8" cy="8" r="1.6" />
             <rect x="3" y="4" width="18" height="16" rx="1.4" />

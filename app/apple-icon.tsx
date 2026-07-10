@@ -3,13 +3,12 @@ import { ImageResponse } from "next/og";
 export const size = { width: 180, height: 180 };
 export const contentType = "image/png";
 
-const BRASS = "#ffdb00";
-const VOID = "#041a40";
+const AMBER = "#e6b877";
+const VOID = "#0b0810";
 
-// Same 100-unit orbit-ellipse + center star + lit-point motif as icon.tsx
-// and LogoMark.tsx, just scaled to a larger canvas with a bolder stroke so
-// the ring doesn't vanish at iOS home-screen sizes.
-const SCALE = size.width / 100;
+// Same crosshair motif as icon.tsx/LogoMark.tsx, scaled to a larger canvas.
+const SCALE = size.width / 24;
+const STROKE = 14;
 
 export default function AppleIcon() {
   return new ImageResponse(
@@ -26,36 +25,23 @@ export default function AppleIcon() {
         <div
           style={{
             position: "absolute",
-            left: 14 * SCALE,
-            top: 28 * SCALE,
-            width: 72 * SCALE,
-            height: 44 * SCALE,
-            border: `${6 * SCALE}px solid ${BRASS}`,
-            borderRadius: "50%",
-            opacity: 0.75,
-            transform: "rotate(-12deg)",
+            left: 12 * SCALE - STROKE / 2,
+            top: 2 * SCALE,
+            width: STROKE,
+            height: 20 * SCALE,
+            borderRadius: STROKE / 2,
+            background: AMBER,
           }}
         />
         <div
           style={{
             position: "absolute",
-            left: 44 * SCALE,
-            top: 44 * SCALE,
-            width: 12 * SCALE,
-            height: 12 * SCALE,
-            borderRadius: "50%",
-            background: BRASS,
-          }}
-        />
-        <div
-          style={{
-            position: "absolute",
-            left: 76 * SCALE,
-            top: 30 * SCALE,
-            width: 8 * SCALE,
-            height: 8 * SCALE,
-            borderRadius: "50%",
-            background: BRASS,
+            left: 2 * SCALE,
+            top: 12 * SCALE - STROKE / 2,
+            width: 20 * SCALE,
+            height: STROKE,
+            borderRadius: STROKE / 2,
+            background: AMBER,
           }}
         />
       </div>

@@ -2,7 +2,6 @@ import type { Metadata } from "next";
 import { computeSky } from "@/lib/astronomy/computeSky";
 import { DEMO_STAR_MAP } from "@/lib/starmaps";
 import { PosterConfigurator } from "./PosterConfigurator";
-import { Logo } from "@/components/Logo";
 
 export const metadata: Metadata = {
   title: "Poster & Çerçeve — Astrifer",
@@ -20,11 +19,11 @@ export default function PosterProductPage() {
     <main className="min-h-screen px-4 py-10 sm:px-8 sm:py-16">
       <div className="mx-auto max-w-6xl">
         <header className="mb-8 flex flex-col items-center text-center sm:mb-12">
-          <Logo size={120} />
-          <h1 className="mt-3 font-display text-3xl italic text-text sm:text-5xl">
+          <p className="font-mono text-[11px] uppercase tracking-[0.34em] text-amber">Poster &amp; Çerçeve</p>
+          <h1 className="mt-3.5 font-display text-3xl italic text-bright sm:text-5xl">
             Duvarında sonsuza dek dursun.
           </h1>
-          <p className="mx-auto mt-3 max-w-xl text-sm text-haze sm:text-base">
+          <p className="mx-auto mt-3 max-w-xl text-sm text-subtle sm:text-base">
             300 DPI baskı kalitesinde, gerçek gökyüzünü yansıtan yıldız
             haritan — poster olarak ya da hazır çerçevede.
           </p>

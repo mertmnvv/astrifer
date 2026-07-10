@@ -15,17 +15,10 @@ export interface SkyPaletteSwatchPickerProps {
   value: string;
   onChange: (id: string) => void;
   name: string;
-  /** Visual register: "dark" (default, night/void panels) or "light" (parchment panels). */
-  tone?: "dark" | "light";
 }
 
 /** CSS-gradient swatches (no canvas render needed) so users can preview all sky themes at a glance. */
-export function SkyPaletteSwatchPicker({ palettes, value, onChange, name, tone = "dark" }: SkyPaletteSwatchPickerProps) {
-  const isLight = tone === "light";
-  const unchecked = isLight
-    ? "border-ink/20 bg-parchment-dim hover:border-ink/40"
-    : "border-brass-dim/40 bg-panel-navy hover:border-brass-dim";
-
+export function SkyPaletteSwatchPicker({ palettes, value, onChange, name }: SkyPaletteSwatchPickerProps) {
   return (
     <div role="radiogroup" aria-label="Gökyüzü teması" className="grid grid-cols-2 gap-2.5 sm:grid-cols-4">
       {palettes.map((palette) => {
@@ -33,8 +26,8 @@ export function SkyPaletteSwatchPicker({ palettes, value, onChange, name, tone =
         return (
           <label
             key={palette.id}
-            className={`cursor-pointer rounded-lg border p-2 text-center transition-colors focus-within:outline focus-within:outline-2 focus-within:outline-offset-2 focus-within:outline-brass ${
-              checked ? "border-brass bg-brass-dim/20" : unchecked
+            className={`cursor-pointer rounded-lg border p-2 text-center transition-colors focus-within:outline focus-within:outline-2 focus-within:outline-offset-2 focus-within:outline-amber ${
+              checked ? "border-amber/60 bg-amber/10" : "border-text/10 bg-text/[0.03] hover:border-text/25"
             }`}
           >
             <input
@@ -65,7 +58,7 @@ export function SkyPaletteSwatchPicker({ palettes, value, onChange, name, tone =
                 />
               ))}
             </span>
-            <span className={`mt-1.5 block font-mono text-[9px] uppercase tracking-widest ${isLight ? "text-ink" : "text-text"}`}>
+            <span className="mt-1.5 block font-mono text-[9px] uppercase tracking-widest text-text">
               {palette.name}
             </span>
           </label>

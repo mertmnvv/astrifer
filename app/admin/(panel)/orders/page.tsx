@@ -33,7 +33,7 @@ function formatDate(timestamp: OrderDoc["createdAt"]): string {
 export default async function AdminOrdersPage() {
   if (!isFirebaseConfigured()) {
     return (
-      <p className="text-sm text-haze">
+      <p className="text-sm text-subtle">
         Firebase yapılandırılmamış — siparişleri görmek için <code>.env.local</code> içindeki Admin SDK
         değişkenlerini doldur.
       </p>
@@ -44,14 +44,14 @@ export default async function AdminOrdersPage() {
 
   return (
     <div className="space-y-6">
-      <h1 className="font-display text-2xl italic text-text">Siparişler</h1>
+      <h1 className="font-display text-2xl italic text-bright">Siparişler</h1>
 
       {orders.length === 0 ? (
-        <p className="text-sm text-haze">Henüz sipariş yok.</p>
+        <p className="text-sm text-subtle">Henüz sipariş yok.</p>
       ) : (
-        <div className="overflow-x-auto rounded-lg border border-brass-dim/40">
+        <div className="overflow-x-auto rounded-2xl border border-text/10">
           <table className="w-full min-w-[900px] text-left text-sm">
-            <thead className="bg-panel-navy font-mono text-[10px] uppercase tracking-widest text-haze">
+            <thead className="bg-panel font-mono text-[10px] uppercase tracking-widest text-dim">
               <tr>
                 <th className="px-4 py-3">Tarih</th>
                 <th className="px-4 py-3">Müşteri</th>
@@ -62,11 +62,11 @@ export default async function AdminOrdersPage() {
             </thead>
             <tbody>
               {orders.map((order) => (
-                <tr key={order.id} className="border-t border-brass-dim/20">
-                  <td className="px-4 py-3 align-top text-haze">{formatDate(order.createdAt)}</td>
+                <tr key={order.id} className="border-t border-text/10">
+                  <td className="px-4 py-3 align-top text-subtle">{formatDate(order.createdAt)}</td>
                   <td className="px-4 py-3 align-top">
                     <div className="text-text">{order.customerName ?? "—"}</div>
-                    <div className="text-xs text-haze">{order.customerEmail}</div>
+                    <div className="text-xs text-subtle">{order.customerEmail}</div>
                   </td>
                   <td className="px-4 py-3 align-top text-text">
                     {order.productType}
@@ -80,10 +80,10 @@ export default async function AdminOrdersPage() {
                       <select
                         name="status"
                         defaultValue={order.status}
-                        className="rounded-md border border-brass-dim/40 bg-void px-2 py-1 text-xs text-text"
+                        className="rounded-md border border-text/[0.14] bg-text/[0.04] px-2 py-1 text-xs text-text"
                       >
                         {STATUS_OPTIONS.map((status) => (
-                          <option key={status} value={status}>
+                          <option key={status} value={status} className="bg-panel text-text">
                             {STATUS_LABELS[status]}
                           </option>
                         ))}
@@ -93,11 +93,11 @@ export default async function AdminOrdersPage() {
                         name="trackingNumber"
                         defaultValue={order.trackingNumber ?? ""}
                         placeholder="Takip no"
-                        className="w-28 rounded-md border border-brass-dim/40 bg-void px-2 py-1 text-xs text-text"
+                        className="w-28 rounded-md border border-text/[0.14] bg-text/[0.04] px-2 py-1 text-xs text-text placeholder:text-subtle"
                       />
                       <button
                         type="submit"
-                        className="rounded-full border border-brass-dim px-3 py-1 font-mono text-[10px] uppercase tracking-widest text-brass transition-colors hover:bg-brass hover:text-void"
+                        className="rounded-full border border-amber/40 px-3 py-1 font-mono text-[10px] uppercase tracking-widest text-amber transition-colors hover:bg-amber hover:text-ink"
                       >
                         Kaydet
                       </button>

@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useRef } from "react";
-import { Logo } from "@/components/Logo";
 import { LogoMark } from "@/components/LogoMark";
 import { drawLeatherTexture } from "./drawLeatherTexture";
 
@@ -11,7 +10,7 @@ export interface CoverPanelProps {
   className?: string;
   /** Fills its container's actual width/height instead of forcing a square aspect ratio — used by the fullscreen open gate. */
   fullscreen?: boolean;
-  /** Tiny decorative use (e.g. a checkout thumbnail) — shrinks the logo and omits title/subtitle text, which wouldn't fit legibly anyway. */
+  /** Tiny decorative use (e.g. a checkout thumbnail) — shrinks the icon and omits title/subtitle text, which wouldn't fit legibly anyway. */
   compact?: boolean;
   children?: React.ReactNode;
 }
@@ -52,7 +51,7 @@ export function CoverPanel({ title, subtitle, className, fullscreen, compact, ch
   return (
     <div
       ref={containerRef}
-      className={`relative overflow-hidden rounded-md shadow-2xl shadow-black/60 ${
+      className={`relative overflow-hidden rounded-md border border-amber/25 shadow-2xl shadow-black/60 ${
         fullscreen ? "h-full w-full" : "aspect-square"
       } ${className ?? ""}`}
     >
@@ -62,14 +61,14 @@ export function CoverPanel({ title, subtitle, className, fullscreen, compact, ch
           compact ? "gap-0 px-1" : "gap-3 px-6"
         }`}
       >
-        {compact ? <LogoMark size={28} /> : <Logo size={fullscreen ? 190 : 150} />}
+        <LogoMark size={compact ? 28 : fullscreen ? 46 : 44} variant={compact ? "crosshair" : "compass"} />
         {!compact && title && (
-          <p className={`mt-1 font-display italic text-parchment ${fullscreen ? "text-2xl sm:text-3xl" : "text-lg sm:text-xl"}`}>
+          <p className={`mt-1 font-display italic text-bright ${fullscreen ? "text-2xl sm:text-3xl" : "text-lg sm:text-xl"}`}>
             {title}
           </p>
         )}
         {!compact && subtitle && (
-          <p className="font-mono text-[10px] uppercase tracking-[0.25em] text-brass/80">{subtitle}</p>
+          <p className="font-mono text-[10px] uppercase tracking-[0.25em] text-amber">{subtitle}</p>
         )}
         {children}
       </div>

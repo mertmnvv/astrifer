@@ -16,8 +16,6 @@ export interface PhotoPickerProps {
   photos: PickedPhoto[];
   onChange: Dispatch<SetStateAction<PickedPhoto[]>>;
   max?: number;
-  /** Visual register: "dark" (default, night/void panels) or "light" (parchment panels). */
-  tone?: "dark" | "light";
 }
 
 /**
@@ -27,9 +25,8 @@ export interface PhotoPickerProps {
  * resolves. The configurator waits for `status === "done"` on every photo
  * before letting checkout proceed.
  */
-export function PhotoPicker({ photos, onChange, max = 4, tone = "dark" }: PhotoPickerProps) {
+export function PhotoPicker({ photos, onChange, max = 4 }: PhotoPickerProps) {
   const inputRef = useRef<HTMLInputElement | null>(null);
-  const isLight = tone === "light";
 
   useEffect(() => {
     return () => {
@@ -94,7 +91,7 @@ export function PhotoPicker({ photos, onChange, max = 4, tone = "dark" }: PhotoP
             {photo.status === "uploading" && (
               <span
                 aria-hidden
-                className="absolute inset-0 flex items-center justify-center font-mono text-[9px] uppercase tracking-widest text-brass"
+                className="absolute inset-0 flex items-center justify-center font-mono text-[9px] uppercase tracking-widest text-amber"
               >
                 Yükleniyor…
               </span>
@@ -112,9 +109,7 @@ export function PhotoPicker({ photos, onChange, max = 4, tone = "dark" }: PhotoP
               type="button"
               onClick={() => removePhoto(photo.id)}
               aria-label="Fotoğrafı kaldır"
-              className={`absolute -right-1.5 -top-1.5 flex h-5 w-5 items-center justify-center rounded-full text-xs text-brass ring-1 ring-brass-dim focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brass ${
-                isLight ? "bg-ink" : "bg-void"
-              }`}
+              className="absolute -right-1.5 -top-1.5 flex h-5 w-5 items-center justify-center rounded-full bg-void text-xs text-amber ring-1 ring-amber/50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-amber"
             >
               ×
             </button>
@@ -125,23 +120,13 @@ export function PhotoPicker({ photos, onChange, max = 4, tone = "dark" }: PhotoP
               placeholder="Kısa not (ops.)"
               maxLength={40}
               aria-label="Fotoğraf notu"
-              className={`mt-1 w-full rounded border px-2 py-1 text-[11px] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brass ${
-                isLight
-                  ? "border-ink/25 bg-parchment-dim text-ink placeholder:text-ink/40"
-                  : "border-brass-dim/40 bg-panel-navy text-text placeholder:text-haze/50"
-              }`}
+              className="mt-1 w-full rounded border border-text/[0.14] bg-text/[0.04] px-2 py-1 text-[11px] text-text placeholder:text-subtle focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-amber"
             />
           </div>
         ))}
         {photos.length < max && (
-          <label
-            className={`flex aspect-square cursor-pointer flex-col items-center justify-center gap-1 rounded-md border border-dashed transition-colors focus-within:outline focus-within:outline-2 focus-within:outline-offset-2 focus-within:outline-brass ${
-              isLight
-                ? "border-ink/30 text-ink/60 hover:border-ink/50"
-                : "border-brass-dim/50 text-haze hover:border-brass-dim"
-            }`}
-          >
-            <span aria-hidden className="text-2xl leading-none text-brass-dim">
+          <label className="flex aspect-square cursor-pointer flex-col items-center justify-center gap-1 rounded-md border border-dashed border-text/20 bg-text/[0.03] text-muted transition-colors hover:border-text/30 focus-within:outline focus-within:outline-2 focus-within:outline-offset-2 focus-within:outline-amber">
+            <span aria-hidden className="text-2xl leading-none text-amber">
               +
             </span>
             <span className="text-[10px] uppercase tracking-widest">Ekle</span>
@@ -156,7 +141,7 @@ export function PhotoPicker({ photos, onChange, max = 4, tone = "dark" }: PhotoP
           </label>
         )}
       </div>
-      <p className={`mt-2 text-[11px] ${isLight ? "text-ink/50" : "text-haze/70"}`}>
+      <p className="mt-2 text-[11px] text-subtle">
         En fazla {max} fotoğraf — {photos.length}/{max}
       </p>
     </div>

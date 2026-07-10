@@ -1,6 +1,6 @@
 import { RevealOnScroll } from "@/components/ui/RevealOnScroll";
 import { SectionHeading } from "@/components/atlas/SectionHeading";
-import { LedgerEntry } from "@/components/atlas/LedgerEntry";
+import { AtlasPanel } from "@/components/atlas/AtlasPanel";
 
 const STEPS = [
   {
@@ -27,24 +27,23 @@ const STEPS = [
 
 export function HowItWorks() {
   return (
-    <section id="nasil-calisir" className="scroll-mt-20 bg-parchment px-4 py-24 sm:px-8">
+    <section id="nasil-calisir" className="scroll-mt-20 px-4 py-24 sm:px-8">
       <div className="mx-auto max-w-2xl">
         <RevealOnScroll>
           <SectionHeading eyebrow="Nasıl Çalışır" title="Dört adımda, kalıcı bir an." />
         </RevealOnScroll>
+      </div>
 
-        <div className="mt-16">
-          {STEPS.map((step, index) => (
-            <RevealOnScroll key={step.number} delayMs={index * 100}>
-              <LedgerEntry
-                number={step.number}
-                title={step.title}
-                description={step.description}
-                isLast={index === STEPS.length - 1}
-              />
-            </RevealOnScroll>
-          ))}
-        </div>
+      <div className="mx-auto mt-14 grid max-w-4xl gap-5 sm:grid-cols-2 lg:grid-cols-4">
+        {STEPS.map((step, index) => (
+          <RevealOnScroll key={step.number} delayMs={index * 100}>
+            <AtlasPanel padding="lg" className="h-full">
+              <span className="font-mono text-xs text-amber">{step.number}</span>
+              <h3 className="mt-3.5 font-display text-xl italic text-text">{step.title}</h3>
+              <p className="mt-2 text-sm leading-relaxed text-subtle">{step.description}</p>
+            </AtlasPanel>
+          </RevealOnScroll>
+        ))}
       </div>
     </section>
   );
