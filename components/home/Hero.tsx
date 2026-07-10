@@ -30,7 +30,13 @@ export function Hero({ sky }: HeroProps) {
   return (
     <section className="relative flex min-h-screen flex-col items-center justify-center overflow-hidden px-4 pt-20 text-center sm:px-8">
       <div className="absolute inset-0">
-        <StarChart sky={sky} label="Örnek bir zaman kapsülünün gökyüzü" palette={palette} showLabels={false} className="h-full w-full" />
+        <StarChart
+          sky={sky}
+          label="Örnek bir zaman kapsülünün gökyüzü"
+          palette={palette}
+          showLabels={false}
+          className="h-full w-full"
+        />
       </div>
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_38%,transparent_0%,rgba(5,6,13,0.62)_72%)]" />
       <div className="absolute inset-0 bg-gradient-to-b from-void/5 via-transparent to-void" />

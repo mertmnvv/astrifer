@@ -15,10 +15,17 @@ export interface SkyPaletteSwatchPickerProps {
   value: string;
   onChange: (id: string) => void;
   name: string;
+  /** Visual register: "dark" (default, night/void panels) or "light" (parchment panels). */
+  tone?: "dark" | "light";
 }
 
 /** CSS-gradient swatches (no canvas render needed) so users can preview all sky themes at a glance. */
-export function SkyPaletteSwatchPicker({ palettes, value, onChange, name }: SkyPaletteSwatchPickerProps) {
+export function SkyPaletteSwatchPicker({ palettes, value, onChange, name, tone = "dark" }: SkyPaletteSwatchPickerProps) {
+  const isLight = tone === "light";
+  const unchecked = isLight
+    ? "border-ink/20 bg-parchment-dim hover:border-ink/40"
+    : "border-brass-dim/40 bg-panel-navy hover:border-brass-dim";
+
   return (
     <div role="radiogroup" aria-label="Gökyüzü teması" className="grid grid-cols-2 gap-2.5 sm:grid-cols-4">
       {palettes.map((palette) => {
@@ -27,7 +34,7 @@ export function SkyPaletteSwatchPicker({ palettes, value, onChange, name }: SkyP
           <label
             key={palette.id}
             className={`cursor-pointer rounded-lg border p-2 text-center transition-colors focus-within:outline focus-within:outline-2 focus-within:outline-offset-2 focus-within:outline-brass ${
-              checked ? "border-brass bg-brass-dim/20" : "border-brass-dim/40 bg-panel-navy hover:border-brass-dim"
+              checked ? "border-brass bg-brass-dim/20" : unchecked
             }`}
           >
             <input
@@ -58,7 +65,7 @@ export function SkyPaletteSwatchPicker({ palettes, value, onChange, name }: SkyP
                 />
               ))}
             </span>
-            <span className="mt-1.5 block font-mono text-[9px] uppercase tracking-widest text-text">
+            <span className={`mt-1.5 block font-mono text-[9px] uppercase tracking-widest ${isLight ? "text-ink" : "text-text"}`}>
               {palette.name}
             </span>
           </label>

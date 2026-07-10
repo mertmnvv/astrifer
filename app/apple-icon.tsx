@@ -3,8 +3,8 @@ import { ImageResponse } from "next/og";
 export const size = { width: 180, height: 180 };
 export const contentType = "image/png";
 
-const BRASS = "#c9a86a";
-const VOID = "#05060d";
+const BRASS = "#ffdb00";
+const VOID = "#041a40";
 
 // Same 100-unit orbit-ellipse + center star + lit-point motif as icon.tsx
 // and LogoMark.tsx, just scaled to a larger canvas with a bolder stroke so

@@ -13,6 +13,8 @@ export interface VoiceRecorderValue {
 export interface VoiceRecorderProps {
   value: VoiceRecorderValue | null;
   onChange: Dispatch<SetStateAction<VoiceRecorderValue | null>>;
+  /** Visual register: "dark" (default, night/void panels) or "light" (parchment panels). */
+  tone?: "dark" | "light";
 }
 
 /**
@@ -22,7 +24,8 @@ export interface VoiceRecorderProps {
  * and `remoteUrl`/`status` fill in once that resolves (see PhotoPicker for
  * the same pattern).
  */
-export function VoiceRecorder({ value, onChange }: VoiceRecorderProps) {
+export function VoiceRecorder({ value, onChange, tone = "dark" }: VoiceRecorderProps) {
+  const isLight = tone === "light";
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const chunksRef = useRef<Blob[]>([]);
@@ -106,7 +109,11 @@ export function VoiceRecorder({ value, onChange }: VoiceRecorderProps) {
 
   if (value) {
     return (
-      <div className="rounded-md border border-brass-dim/40 bg-panel-navy px-3 py-2.5">
+      <div
+        className={`rounded-md border px-3 py-2.5 ${
+          isLight ? "border-ink/25 bg-parchment-dim" : "border-brass-dim/40 bg-panel-navy"
+        }`}
+      >
         <div className="flex items-center gap-3">
           {/* eslint-disable-next-line jsx-a11y/media-has-caption */}
           <audio controls src={value.url} className="h-8 flex-1" />
@@ -114,7 +121,9 @@ export function VoiceRecorder({ value, onChange }: VoiceRecorderProps) {
             type="button"
             onClick={remove}
             aria-label="Ses kaydını kaldır"
-            className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-void text-xs text-brass ring-1 ring-brass-dim focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brass"
+            className={`flex h-6 w-6 shrink-0 items-center justify-center rounded-full text-xs text-brass ring-1 ring-brass-dim focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brass ${
+              isLight ? "bg-ink" : "bg-void"
+            }`}
           >
             ×
           </button>
@@ -134,7 +143,13 @@ export function VoiceRecorder({ value, onChange }: VoiceRecorderProps) {
   return (
     <div>
       <div className="flex flex-wrap items-center gap-3">
-        <label className="cursor-pointer rounded-md border border-dashed border-brass-dim/50 px-3 py-2 text-xs text-haze transition-colors hover:border-brass-dim focus-within:outline focus-within:outline-2 focus-within:outline-offset-2 focus-within:outline-brass">
+        <label
+          className={`cursor-pointer rounded-md border border-dashed px-3 py-2 text-xs transition-colors focus-within:outline focus-within:outline-2 focus-within:outline-offset-2 focus-within:outline-brass ${
+            isLight
+              ? "border-ink/30 text-ink/60 hover:border-ink/50"
+              : "border-brass-dim/50 text-haze hover:border-brass-dim"
+          }`}
+        >
           Dosya Yükle
           <input
             ref={fileInputRef}
@@ -150,7 +165,11 @@ export function VoiceRecorder({ value, onChange }: VoiceRecorderProps) {
             onClick={recording ? stopRecording : startRecording}
             aria-pressed={recording}
             className={`rounded-md border px-3 py-2 font-mono text-[11px] uppercase tracking-widest transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brass ${
-              recording ? "border-red-400/60 text-red-300" : "border-brass-dim/50 text-haze hover:border-brass-dim"
+              recording
+                ? "border-red-400/60 text-red-300"
+                : isLight
+                  ? "border-ink/30 text-ink/60 hover:border-ink/50"
+                  : "border-brass-dim/50 text-haze hover:border-brass-dim"
             }`}
           >
             {recording ? "● Durdur" : "Mikrofonla Kaydet"}

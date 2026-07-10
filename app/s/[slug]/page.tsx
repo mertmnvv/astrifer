@@ -11,6 +11,8 @@ import { MusicToggle } from "@/components/ui/MusicToggle";
 import { RevealOnScroll } from "@/components/ui/RevealOnScroll";
 import { ScrollCue } from "@/components/ui/ScrollCue";
 import { Starfield } from "@/components/ui/Starfield";
+import { AtlasPanel } from "@/components/atlas/AtlasPanel";
+import { LedgerRule } from "@/components/atlas/LedgerRule";
 import { computeSky } from "@/lib/astronomy/computeSky";
 import { buildSkyNarrative } from "@/lib/astronomy/skyNarrative";
 import { getStarMapBySlug } from "@/lib/starmaps";
@@ -104,26 +106,27 @@ export default async function SharedStarMapPage({
 
         {/* O Günün Önemi */}
         <RevealOnScroll durationMs={1000} className="mt-16 w-full max-w-xl">
-          <div className="rounded-lg bg-panel-navy/60 p-6 text-center sm:p-10">
-            <p className="font-mono text-[10px] uppercase tracking-[0.3em] text-brass-dim">O Günün Önemi</p>
+          <AtlasPanel tone="parchment" textured padding="lg" className="text-center">
+            <p className="font-mono text-[10px] uppercase tracking-[0.3em] text-leather-lt">O Günün Önemi</p>
             <div className="mx-auto mt-4 h-px w-8 bg-brass-dim/60" />
-            <p className="mt-4 font-mono text-[11px] uppercase tracking-widest text-haze">
+            <p className="mt-4 font-mono text-[11px] uppercase tracking-widest text-ink/60">
               {formatCoordinates(starMap.latitude, starMap.longitude)} · {starMap.locationName.toUpperCase()}
             </p>
             {starMap.message && (
-              <p className="mt-6 font-display text-lg italic leading-relaxed text-text">
+              <p className="mt-6 font-display text-lg italic leading-relaxed text-ink">
                 “{starMap.message}”
               </p>
             )}
             {skyLog && (
-              <div className="mt-6 border-t border-brass-dim/20 pt-6">
-                <p className="font-mono text-[9px] uppercase tracking-[0.25em] text-brass-dim">
+              <div className="mt-6">
+                <LedgerRule tone="ink" />
+                <p className="mt-6 font-mono text-[9px] uppercase tracking-[0.25em] text-leather-lt">
                   Gökyüzü Kaydı
                 </p>
-                <p className="mt-1.5 font-display text-sm italic leading-relaxed text-haze">{skyLog}</p>
+                <p className="mt-1.5 font-display text-sm italic leading-relaxed text-ink/70">{skyLog}</p>
               </div>
             )}
-          </div>
+          </AtlasPanel>
         </RevealOnScroll>
 
         {/* Anılarımız — panel + her fotoğraf kendi gecikmesiyle beliriyor */}

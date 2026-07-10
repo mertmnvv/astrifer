@@ -10,6 +10,8 @@ export interface PlaceComboboxProps {
   value: PlaceResult | null;
   onChange: (place: PlaceResult) => void;
   required?: boolean;
+  /** Visual register: "dark" (default, night/void panels) or "light" (parchment panels). */
+  tone?: "dark" | "light";
 }
 
 function dedupe(places: PlaceResult[]): PlaceResult[] {
@@ -24,8 +26,9 @@ function dedupe(places: PlaceResult[]): PlaceResult[] {
   return out;
 }
 
-export function PlaceCombobox({ label, placeholder, value, onChange, required }: PlaceComboboxProps) {
+export function PlaceCombobox({ label, placeholder, value, onChange, required, tone = "dark" }: PlaceComboboxProps) {
   const inputId = useId();
+  const isLight = tone === "light";
   const listboxId = useId();
   const [query, setQuery] = useState(value?.name ?? "");
   const [apiResults, setApiResults] = useState<PlaceResult[]>([]);
@@ -92,7 +95,10 @@ export function PlaceCombobox({ label, placeholder, value, onChange, required }:
 
   return (
     <div ref={containerRef} className="relative">
-      <label htmlFor={inputId} className="mb-1.5 block font-mono text-xs uppercase tracking-widest text-haze">
+      <label
+        htmlFor={inputId}
+        className={`mb-1.5 block font-mono text-xs uppercase tracking-widest ${isLight ? "text-leather-lt" : "text-haze"}`}
+      >
         {label}
       </label>
       <input
@@ -114,10 +120,14 @@ export function PlaceCombobox({ label, placeholder, value, onChange, required }:
         }}
         onFocus={() => setOpen(true)}
         onKeyDown={onKeyDown}
-        className="w-full rounded-md border border-brass-dim/60 bg-panel-navy px-3 py-2.5 text-sm text-text placeholder:text-haze/60 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brass"
+        className={`w-full rounded-md border px-3 py-2.5 text-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brass ${
+          isLight
+            ? "border-ink/25 bg-parchment-dim text-ink placeholder:text-ink/40"
+            : "border-brass-dim/60 bg-panel-navy text-text placeholder:text-haze/60"
+        }`}
       />
       {value && query === value.name ? (
-        <p className="mt-1 font-mono text-[11px] text-haze/80">
+        <p className={`mt-1 font-mono text-[11px] ${isLight ? "text-ink/60" : "text-haze/80"}`}>
           {value.latitude.toFixed(2)}°, {value.longitude.toFixed(2)}° · {value.timezone}
         </p>
       ) : null}
@@ -125,7 +135,9 @@ export function PlaceCombobox({ label, placeholder, value, onChange, required }:
         <ul
           id={listboxId}
           role="listbox"
-          className="absolute z-20 mt-1 max-h-64 w-full overflow-auto rounded-md border border-brass-dim/60 bg-panel-navy shadow-xl"
+          className={`absolute z-20 mt-1 max-h-64 w-full overflow-auto rounded-md border shadow-xl ${
+            isLight ? "border-ink/25 bg-parchment-dim" : "border-brass-dim/60 bg-panel-navy"
+          }`}
         >
           {results.map((place, index) => (
             <li
@@ -139,11 +151,19 @@ export function PlaceCombobox({ label, placeholder, value, onChange, required }:
               }}
               onMouseEnter={() => setActiveIndex(index)}
               className={`cursor-pointer px-3 py-2 text-sm ${
-                index === activeIndex ? "bg-brass-dim/30 text-text" : "text-haze"
+                index === activeIndex
+                  ? isLight
+                    ? "bg-brass-dim/20 text-ink"
+                    : "bg-brass-dim/30 text-text"
+                  : isLight
+                    ? "text-ink/70"
+                    : "text-haze"
               }`}
             >
               {place.name}
-              <span className="text-haze/70">{place.country ? `, ${place.country}` : ""}</span>
+              <span className={isLight ? "text-ink/50" : "text-haze/70"}>
+                {place.country ? `, ${place.country}` : ""}
+              </span>
             </li>
           ))}
         </ul>

@@ -1,27 +1,47 @@
 import { RevealOnScroll } from "@/components/ui/RevealOnScroll";
+import { SectionHeading } from "@/components/atlas/SectionHeading";
+import { LedgerEntry } from "@/components/atlas/LedgerEntry";
 
 const STEPS = [
-  { number: "01", title: "Anı Seçin", description: "Doğum, ilk buluşma, evlilik teklifi... sizin için özel olan o an." },
-  { number: "02", title: "Gökyüzünü Hesaplıyoruz", description: "O gün, o saat, o konumdaki gerçek gökyüzünü astronomik verilerle çiziyoruz." },
-  { number: "03", title: "Kişiselleştirin", description: "Fotoğraf, sesli mesaj ve kendi satırlarınızı ekleyin." },
-  { number: "04", title: "Sonsuza Dek Sizin", description: "Kalıcı sayfanız ve adresiniz hazır — dilerseniz posterde ya da deri defterde." },
+  {
+    number: "01",
+    title: "Anı Seçin",
+    description: "Doğum, ilk buluşma, evlilik teklifi... Sizin için özel olan o benzersiz anı seçin.",
+  },
+  {
+    number: "02",
+    title: "Gökyüzünü Hesaplayalım",
+    description: "Girdiğiniz tarih, saat ve konumdaki gerçek gökyüzünü astronomik verilerle anında çizelim.",
+  },
+  {
+    number: "03",
+    title: "Kişiselleştirin",
+    description: "Zaman kapsülünüze fotoğraflar, sesli bir mesaj ve kendi kişisel satırlarınızı ekleyin.",
+  },
+  {
+    number: "04",
+    title: "Sonsuza Dek Saklayın",
+    description: "Kalıcı dijital sayfanız hazır — dilerseniz poster veya deri defter ürünüyle taçlandırın.",
+  },
 ];
 
 export function HowItWorks() {
   return (
-    <section id="nasil-calisir" className="scroll-mt-20 border-y border-brass-dim/15 bg-panel-navy/30 px-4 py-24 sm:px-8">
-      <div className="mx-auto max-w-5xl">
-        <RevealOnScroll className="mx-auto max-w-xl text-center">
-          <p className="font-mono text-[10px] uppercase tracking-[0.35em] text-brass-dim">Nasıl Çalışır</p>
-          <h2 className="mt-4 font-display text-3xl italic text-text sm:text-4xl">Dört adımda, kalıcı bir an.</h2>
+    <section id="nasil-calisir" className="scroll-mt-20 bg-parchment px-4 py-24 sm:px-8">
+      <div className="mx-auto max-w-2xl">
+        <RevealOnScroll>
+          <SectionHeading eyebrow="Nasıl Çalışır" title="Dört adımda, kalıcı bir an." />
         </RevealOnScroll>
 
-        <div className="mt-14 grid gap-x-8 gap-y-12 sm:grid-cols-2 lg:grid-cols-4">
+        <div className="mt-16">
           {STEPS.map((step, index) => (
             <RevealOnScroll key={step.number} delayMs={index * 100}>
-              <p className="font-mono text-2xl italic text-brass-dim">{step.number}</p>
-              <h3 className="mt-3 font-display text-lg italic text-text">{step.title}</h3>
-              <p className="mt-2 text-sm leading-relaxed text-haze">{step.description}</p>
+              <LedgerEntry
+                number={step.number}
+                title={step.title}
+                description={step.description}
+                isLast={index === STEPS.length - 1}
+              />
             </RevealOnScroll>
           ))}
         </div>

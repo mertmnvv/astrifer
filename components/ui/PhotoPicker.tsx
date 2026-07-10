@@ -5,7 +5,7 @@ import { uploadToCloudinary } from "@/lib/cloudinary/uploadFile";
 
 export interface PickedPhoto {
   id: string;
-  file: File;
+  file?: File;
   caption: string;
   previewUrl: string;
   status: "uploading" | "done" | "error";
@@ -16,6 +16,8 @@ export interface PhotoPickerProps {
   photos: PickedPhoto[];
   onChange: Dispatch<SetStateAction<PickedPhoto[]>>;
   max?: number;
+  /** Visual register: "dark" (default, night/void panels) or "light" (parchment panels). */
+  tone?: "dark" | "light";
 }
 
 /**
@@ -25,8 +27,9 @@ export interface PhotoPickerProps {
  * resolves. The configurator waits for `status === "done"` on every photo
  * before letting checkout proceed.
  */
-export function PhotoPicker({ photos, onChange, max = 4 }: PhotoPickerProps) {
+export function PhotoPicker({ photos, onChange, max = 4, tone = "dark" }: PhotoPickerProps) {
   const inputRef = useRef<HTMLInputElement | null>(null);
+  const isLight = tone === "light";
 
   useEffect(() => {
     return () => {
@@ -36,6 +39,7 @@ export function PhotoPicker({ photos, onChange, max = 4 }: PhotoPickerProps) {
   }, []);
 
   const uploadPhoto = (photo: PickedPhoto) => {
+    if (!photo.file) return;
     uploadToCloudinary(photo.file, "astrifer/starmaps/photos")
       .then((url) => {
         onChange((prev) => prev.map((p) => (p.id === photo.id ? { ...p, status: "done", url } : p)));
@@ -108,7 +112,9 @@ export function PhotoPicker({ photos, onChange, max = 4 }: PhotoPickerProps) {
               type="button"
               onClick={() => removePhoto(photo.id)}
               aria-label="Fotoğrafı kaldır"
-              className="absolute -right-1.5 -top-1.5 flex h-5 w-5 items-center justify-center rounded-full bg-void text-xs text-brass ring-1 ring-brass-dim focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brass"
+              className={`absolute -right-1.5 -top-1.5 flex h-5 w-5 items-center justify-center rounded-full text-xs text-brass ring-1 ring-brass-dim focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brass ${
+                isLight ? "bg-ink" : "bg-void"
+              }`}
             >
               ×
             </button>
@@ -119,12 +125,22 @@ export function PhotoPicker({ photos, onChange, max = 4 }: PhotoPickerProps) {
               placeholder="Kısa not (ops.)"
               maxLength={40}
               aria-label="Fotoğraf notu"
-              className="mt-1 w-full rounded border border-brass-dim/40 bg-panel-navy px-2 py-1 text-[11px] text-text placeholder:text-haze/50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brass"
+              className={`mt-1 w-full rounded border px-2 py-1 text-[11px] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brass ${
+                isLight
+                  ? "border-ink/25 bg-parchment-dim text-ink placeholder:text-ink/40"
+                  : "border-brass-dim/40 bg-panel-navy text-text placeholder:text-haze/50"
+              }`}
             />
           </div>
         ))}
         {photos.length < max && (
-          <label className="flex aspect-square cursor-pointer flex-col items-center justify-center gap-1 rounded-md border border-dashed border-brass-dim/50 text-haze transition-colors hover:border-brass-dim focus-within:outline focus-within:outline-2 focus-within:outline-offset-2 focus-within:outline-brass">
+          <label
+            className={`flex aspect-square cursor-pointer flex-col items-center justify-center gap-1 rounded-md border border-dashed transition-colors focus-within:outline focus-within:outline-2 focus-within:outline-offset-2 focus-within:outline-brass ${
+              isLight
+                ? "border-ink/30 text-ink/60 hover:border-ink/50"
+                : "border-brass-dim/50 text-haze hover:border-brass-dim"
+            }`}
+          >
             <span aria-hidden className="text-2xl leading-none text-brass-dim">
               +
             </span>
@@ -140,7 +156,7 @@ export function PhotoPicker({ photos, onChange, max = 4 }: PhotoPickerProps) {
           </label>
         )}
       </div>
-      <p className="mt-2 text-[11px] text-haze/70">
+      <p className={`mt-2 text-[11px] ${isLight ? "text-ink/50" : "text-haze/70"}`}>
         En fazla {max} fotoğraf — {photos.length}/{max}
       </p>
     </div>

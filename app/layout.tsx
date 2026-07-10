@@ -36,7 +36,11 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="tr" className={`${displayFont.variable} ${monoFont.variable} ${bodyFont.variable}`}>
+    <html
+      lang="tr"
+      className={`${displayFont.variable} ${monoFont.variable} ${bodyFont.variable}`}
+      suppressHydrationWarning
+    >
       <body className="bg-void text-text font-body antialiased">
         {children}
       </body>

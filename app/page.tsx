@@ -6,6 +6,8 @@ import { Hero } from "@/components/home/Hero";
 import { ConceptSection } from "@/components/home/ConceptSection";
 import { HowItWorks } from "@/components/home/HowItWorks";
 import { ProductsTeaser } from "@/components/home/ProductsTeaser";
+import { Testimonials } from "@/components/home/Testimonials";
+import { Faq } from "@/components/home/Faq";
 import { FinalCta } from "@/components/home/FinalCta";
 
 export default function HomePage() {
@@ -23,6 +25,8 @@ export default function HomePage() {
         <ConceptSection />
         <HowItWorks />
         <ProductsTeaser />
+        <Testimonials />
+        <Faq />
         <FinalCta />
       </main>
       <SiteFooter />

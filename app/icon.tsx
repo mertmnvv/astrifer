@@ -3,8 +3,8 @@ import { ImageResponse } from "next/og";
 export const size = { width: 32, height: 32 };
 export const contentType = "image/png";
 
-const BRASS = "#c9a86a";
-const VOID = "#05060d";
+const BRASS = "#ffdb00";
+const VOID = "#041a40";
 
 // Same orbit-ellipse + center star + lit point motif as LogoMark.tsx,
 // scaled from its 100-unit design to this icon's pixel size (satori/
