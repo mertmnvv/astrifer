@@ -1,9 +1,11 @@
 import { isFirebaseConfigured } from "@/lib/firebase/isConfigured";
 import { formatTRY } from "@/lib/pricing";
-import type { OrderDoc, OrderStatus } from "@/types/firestore";
-import { updateOrderAction } from "./actions";
+import type { OrderDoc, OrderStatus, ProductType } from "@/types/firestore";
+import { getPrintDownloadUrlAction, renderPrintFileAction, updateOrderAction } from "./actions";
 
 export const dynamic = "force-dynamic";
+
+const PRINTABLE_PRODUCTS: ProductType[] = ["poster", "framed_poster"];
 
 const STATUS_LABELS: Record<OrderStatus, string> = {
   pending: "Bekliyor",
@@ -50,7 +52,7 @@ export default async function AdminOrdersPage() {
         <p className="text-sm text-subtle">Henüz sipariş yok.</p>
       ) : (
         <div className="overflow-x-auto rounded-2xl border border-text/10">
-          <table className="w-full min-w-[900px] text-left text-sm">
+          <table className="w-full min-w-[1080px] text-left text-sm">
             <thead className="bg-panel font-mono text-[10px] uppercase tracking-widest text-dim">
               <tr>
                 <th className="px-4 py-3">Tarih</th>
@@ -58,6 +60,7 @@ export default async function AdminOrdersPage() {
                 <th className="px-4 py-3">Ürün</th>
                 <th className="px-4 py-3">Tutar</th>
                 <th className="px-4 py-3">Durum / Takip No</th>
+                <th className="px-4 py-3">Baskı Dosyası</th>
               </tr>
             </thead>
             <tbody>
@@ -102,6 +105,34 @@ export default async function AdminOrdersPage() {
                         Kaydet
                       </button>
                     </form>
+                  </td>
+                  <td className="px-4 py-3 align-top">
+                    {PRINTABLE_PRODUCTS.includes(order.productType) && order.size ? (
+                      <div className="flex flex-col items-start gap-1.5">
+                        <form action={renderPrintFileAction}>
+                          <input type="hidden" name="orderId" value={order.id} />
+                          <button
+                            type="submit"
+                            className="rounded-full border border-text/20 px-3 py-1 font-mono text-[10px] uppercase tracking-widest text-subtle transition-colors hover:border-amber/50 hover:text-amber"
+                          >
+                            {order.printFilePath ? "Yeniden Oluştur" : "Baskı Dosyası Oluştur"}
+                          </button>
+                        </form>
+                        {order.printFilePath && (
+                          <form action={getPrintDownloadUrlAction}>
+                            <input type="hidden" name="orderId" value={order.id} />
+                            <button
+                              type="submit"
+                              className="rounded-full border border-amber/40 px-3 py-1 font-mono text-[10px] uppercase tracking-widest text-amber transition-colors hover:bg-amber hover:text-ink"
+                            >
+                              İndirme Linki Al
+                            </button>
+                          </form>
+                        )}
+                      </div>
+                    ) : (
+                      <span className="text-xs text-dim">—</span>
+                    )}
                   </td>
                 </tr>
               ))}

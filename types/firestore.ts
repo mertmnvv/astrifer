@@ -58,6 +58,9 @@ export interface OrderDoc {
   iyzicoConversationId: string | null;
   shippingAddress: Record<string, unknown> | null;
   trackingNumber: string | null;
+  /** Storage path under `starmaps-print/`, set once an admin renders the print file. Never a direct URL — see lib/printRender.ts. */
+  printFilePath: string | null;
+  printFileRenderedAt: Timestamp | null;
   createdAt: Timestamp;
   updatedAt: Timestamp;
 }

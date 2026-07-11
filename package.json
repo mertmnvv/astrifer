@@ -10,12 +10,14 @@
     "seed:firebase": "node scripts/seed-firestore.mjs"
   },
   "dependencies": {
+    "@sparticuz/chromium": "^149.0.0",
     "astronomy-engine": "^2.1.19",
     "cloudinary": "^2.10.0",
     "clsx": "^2.1.1",
     "firebase-admin": "^14.1.0",
     "framer-motion": "^12.42.2",
     "next": "14.2.35",
+    "puppeteer-core": "^25.3.0",
     "react": "^18",
     "react-dom": "^18",
     "server-only": "^0.0.1",
