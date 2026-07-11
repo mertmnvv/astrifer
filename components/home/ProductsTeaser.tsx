@@ -50,7 +50,11 @@ const PRODUCTS: ProductItem[] = [
     features: [
       "El işçiliği hakiki deri ciltleme",
       "Özel gofre (sıcak baskı) kapak deseni",
-      "30 sayfa 120gr fildişi eskiz kağıdı",
+      "Altın yaldızlı sayfa kenarı",
+      "30 sayfa boş/çizgili fildişi kağıt",
+      "Birlikte Anılarımız fotoğraf sayfası (4 foto)",
+      "Gelecek Mektubu — ileri tarihe mühürlü mektup",
+      "Hediye altın renkli kalem",
       "Gömülü akıllı QR kod bağlantısı",
     ],
     href: "/urun/defter",

@@ -19,7 +19,9 @@ const CONTENTS = [
   "Birlikte Anılarımız — kendi fotoğraflarınla (en fazla 4)",
   "QR sayfası — dijital haritana anında bağlantı",
   "30 boş / çizgili sayfa — kendi sözleriniz için",
+  "Altın yaldızlı sayfa kenarı — antika atlas ciltlerinden ince altın/pirinç şerit",
   "Gelecek Mektubu — mühürlü cep, arka kapakta dikili",
+  "Altın renkli kalem — ayrı paketlenmiş hediye",
 ];
 
 const PHOTO_ROTATIONS = [-2.5, 2, 1.5, -2];
@@ -66,9 +68,6 @@ export default function JournalProductPage() {
                   </li>
                 ))}
               </ol>
-              <p className="mt-3 font-mono text-[11px] uppercase tracking-widest text-amber">
-                + Yanında altın renkli kalem gönderilir
-              </p>
             </div>
 
             <div className="flex flex-col items-center gap-2 rounded-2xl border border-text/10 bg-text/[0.035] p-4">
