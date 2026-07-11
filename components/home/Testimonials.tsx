@@ -3,34 +3,7 @@
 import { useEffect, useState } from "react";
 import { RevealOnScroll } from "@/components/ui/RevealOnScroll";
 import { usePrefersReducedMotion } from "@/lib/hooks/usePrefersReducedMotion";
-
-interface Testimonial {
-  quote: string;
-  author: string;
-  role: string;
-  product: string;
-}
-
-const TESTIMONIALS: Testimonial[] = [
-  {
-    quote: "Eşime evlilik teklif ettiğim gecenin gökyüzünü hediye ettim. Deri defterin kapak kalitesi ve üzerindeki yıldız haritası tek kelimeyle harikaydı.",
-    author: "Emre K.",
-    role: "Yıldönümü Hediyesi",
-    product: "Deri Defter",
-  },
-  {
-    quote: "Kızımın doğduğu anın gökyüzünü çerçeveli poster olarak salonumuza astık. Hem astronomik olarak doğru olması hem de tasarımı muazzam.",
-    author: "Selin A.",
-    role: "Doğum Günü Hediyesi",
-    product: "Çerçeveli Poster",
-  },
-  {
-    quote: "Dijital zaman kapsülü fikri harika! Yıldönümümüzde hem ses kaydı hem de fotoğraflarımızla eşimle paylaştım, çok duygusal bir an oldu.",
-    author: "Caner T.",
-    role: "Yıldönümü Anısı",
-    product: "Dijital Sayfa",
-  },
-];
+import { TESTIMONIALS } from "@/lib/testimonials";
 
 export function Testimonials() {
   const [index, setIndex] = useState(0);
@@ -38,12 +11,14 @@ export function Testimonials() {
   const reducedMotion = usePrefersReducedMotion();
 
   useEffect(() => {
-    if (reducedMotion || paused) return;
+    if (reducedMotion || paused || TESTIMONIALS.length === 0) return;
     const interval = setInterval(() => {
       setIndex((current) => (current + 1) % TESTIMONIALS.length);
     }, 6000);
     return () => clearInterval(interval);
   }, [reducedMotion, paused]);
+
+  if (TESTIMONIALS.length === 0) return null;
 
   const active = TESTIMONIALS[index];
 
@@ -70,19 +45,19 @@ export function Testimonials() {
           </p>
 
           <div className="mt-6">
-            <p className="font-mono text-xs uppercase tracking-wider text-amber">{active.author}</p>
+            <p className="font-mono text-xs uppercase tracking-wider text-amber">{active.name}</p>
             <p className="mt-0.5 font-mono text-[10px] text-dim">
-              {active.role} · {active.product}
+              {active.occasion} · {active.product}
             </p>
           </div>
 
           <div className="mt-6 flex items-center justify-center gap-2">
             {TESTIMONIALS.map((testimonial, dotIndex) => (
               <button
-                key={testimonial.author}
+                key={testimonial.name}
                 type="button"
                 onClick={() => setIndex(dotIndex)}
-                aria-label={`${testimonial.author} yorumunu göster`}
+                aria-label={`${testimonial.name} yorumunu göster`}
                 aria-current={dotIndex === index}
                 className={`h-1.5 w-1.5 rounded-full transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-amber ${
                   dotIndex === index ? "bg-amber" : "bg-amber/30 hover:bg-amber/60"
