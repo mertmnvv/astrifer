@@ -38,9 +38,20 @@ export default async function CreatePreviewPage({
     longitude: Number(lon),
     locationName: location,
     musicUrl: null,
-    photos: photoUrls.map((url) => ({ url })),
     voiceNoteUrl: get("voice") ?? null,
     palette: get("palette") ?? DEFAULT_SKY_PALETTE.id,
+    // No real doc exists yet at preview time — synthesize the one entry
+    // that /create's setup photos will become once submitted.
+    createdAt: eventDateUtc,
+    entries: [
+      {
+        id: "preview",
+        date: eventDateUtc,
+        photos: photoUrls.map((url) => ({ url })),
+        note: null,
+        isInitial: true,
+      },
+    ],
   };
 
   return <StarMapView starMap={starMap} isPreview />;

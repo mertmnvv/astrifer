@@ -16,6 +16,7 @@ import { zonedTimeToUtc } from "@/lib/geocode/timezone";
 import { DIGITAL_PRICE, formatTRY } from "@/lib/pricing";
 import { slugify } from "@/lib/slug";
 import type { TemplateOption } from "@/lib/templates";
+import { createStarMapAction } from "./actions";
 
 const SITE_HOST = (process.env.NEXT_PUBLIC_SITE_URL ?? "https://astrifer.com").replace(/^https?:\/\//, "");
 
@@ -78,6 +79,8 @@ export function CreateForm({ templates }: CreateFormProps) {
   const [voiceNote, setVoiceNote] = useState<VoiceRecorderValue | null>(null);
   const [paletteId, setPaletteId] = useState(DEFAULT_SKY_PALETTE.id);
   const [touchedSubmit, setTouchedSubmit] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitError, setSubmitError] = useState<string | null>(null);
 
   useEffect(() => {
     if (message.trim().length > 0) return;
@@ -155,14 +158,40 @@ export function CreateForm({ templates }: CreateFormProps) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [place, eventDateUtc, title, message, photos, voiceNote, paletteId, previewSlug]);
 
-  const handleSubmit = (event: React.FormEvent) => {
+  const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
     setTouchedSubmit(true);
     if (!isValid || !place || !eventDateUtc) return;
 
-    const params = buildShareParams(place, eventDateUtc);
-    params.set("template", templateSlug);
-    router.push(`/checkout?${params.toString()}`);
+    setSubmitError(null);
+    setIsSubmitting(true);
+    try {
+      const photoUrls = photos
+        .filter((photo) => photo.status === "done" && photo.url)
+        .map((photo) => photo.url as string);
+
+      const { slug, ownerToken } = await createStarMapAction({
+        title,
+        message,
+        locationName: place.name,
+        latitude: place.latitude,
+        longitude: place.longitude,
+        timezone: place.timezone,
+        eventDateIso: eventDateUtc.toISOString(),
+        templateSlug,
+        paletteId,
+        photoUrls,
+        voiceNoteUrl: voiceNote?.status === "done" ? (voiceNote.remoteUrl ?? null) : null,
+      });
+
+      const params = buildShareParams(place, eventDateUtc);
+      params.set("template", templateSlug);
+      const next = `/checkout?${params.toString()}`;
+      router.push(`/s/${slug}/claim?token=${encodeURIComponent(ownerToken)}&next=${encodeURIComponent(next)}`);
+    } catch {
+      setIsSubmitting(false);
+      setSubmitError("Sayfa oluşturulamadı — lütfen tekrar deneyin.");
+    }
   };
 
   return (
@@ -290,6 +319,11 @@ export function CreateForm({ templates }: CreateFormProps) {
             Bazı yüklemeler başarısız oldu — devam etmeden önce kaldırın ya da tekrar deneyin.
           </p>
         )}
+        {submitError && (
+          <p role="alert" className="text-sm text-red-300">
+            {submitError}
+          </p>
+        )}
       </div>
 
       {/* LIVE PREVIEW */}
@@ -350,10 +384,10 @@ export function CreateForm({ templates }: CreateFormProps) {
 
         <button
           type="submit"
-          disabled={uploadsPending}
+          disabled={uploadsPending || isSubmitting}
           className="w-full rounded-full bg-gradient-to-br from-amber-light to-amber-deep px-6 py-3.5 font-mono text-xs uppercase tracking-widest text-ink shadow-[0_12px_40px_-14px_rgba(230,163,92,0.6)] transition-opacity hover:opacity-90 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-amber disabled:opacity-40"
         >
-          {uploadsPending ? "Yükleniyor…" : "Sepete Ekle"}
+          {isSubmitting ? "Oluşturuluyor…" : uploadsPending ? "Yükleniyor…" : "Sepete Ekle"}
         </button>
       </div>
     </form>

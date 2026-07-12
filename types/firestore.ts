@@ -32,8 +32,6 @@ export interface StarMapDoc {
   longitude: number;
   locationName: string;
   musicUrl: string | null;
-  /** Storage paths under `starmaps-public/`, once the upload pipeline exists. */
-  photoUrls: string[] | null;
   voiceNoteUrl: string | null;
   /** Sky color scheme id — see components/astrolab/palettes.ts. */
   palette: string | null;
@@ -41,6 +39,21 @@ export interface StarMapDoc {
   viewCount: number;
   createdAt: Timestamp;
   updatedAt: Timestamp;
+}
+
+/**
+ * Collection `starMaps/{slug}/entries`, doc id = auto. The growing photo
+ * timeline — the entry written alongside the page itself (`isInitial: true`)
+ * and every later addition share this same shape. `date` is the moment the
+ * entry depicts (event date for the initial entry, owner-picked for later
+ * ones) — distinct from `createdAt`, the server write time.
+ */
+export interface TimelineEntryDoc {
+  date: Timestamp;
+  photoUrls: string[];
+  note: string | null;
+  isInitial: boolean;
+  createdAt: Timestamp;
 }
 
 /** Collection `orders`, doc id = auto. Never read/written by client code — server-only via Admin SDK. */

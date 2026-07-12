@@ -1,9 +1,13 @@
 import type { Metadata } from "next";
+import { cookies } from "next/headers";
 import { notFound } from "next/navigation";
 import { StarMapView } from "@/components/starmap/StarMapView";
 import { getStarMapBySlug } from "@/lib/starmaps";
+import { ownerCookieName, verifyOwnerToken } from "@/lib/starmapOwnerToken";
 
-export const revalidate = 3600;
+// Owner-cookie personalization (see SharedStarMapPage below) means this can
+// no longer be a static/ISR page — cookies() forces dynamic rendering.
+export const dynamic = "force-dynamic";
 
 function siteUrl(): string {
   return process.env.NEXT_PUBLIC_SITE_URL ?? "https://astrifer.com";
@@ -38,5 +42,11 @@ export default async function SharedStarMapPage({
   const starMap = await getStarMapBySlug(params.slug);
   if (!starMap) notFound();
 
-  return <StarMapView starMap={starMap} />;
+  // Owner cookie check personalizes this render per-visitor, so the page is
+  // effectively dynamic from here on — the `revalidate` export above no
+  // longer applies once cookies() is read (Next.js opts out automatically).
+  const ownerToken = cookies().get(ownerCookieName(params.slug))?.value;
+  const isOwner = await verifyOwnerToken(params.slug, ownerToken);
+
+  return <StarMapView starMap={starMap} isOwner={isOwner} />;
 }

@@ -89,7 +89,7 @@ export default async function JournalProductPage() {
             <div className="flex flex-col items-center gap-2 rounded-2xl border border-text/10 bg-text/[0.035] p-4">
               <p className="font-mono text-[10px] uppercase tracking-widest text-dim">Anılar sayfası</p>
               <div className="grid grid-cols-4 gap-3 p-2">
-                {DEMO_STAR_MAP.photos.slice(0, 4).map((photo, index) => (
+                {DEMO_STAR_MAP.entries.flatMap((entry) => entry.photos).slice(0, 4).map((photo, index) => (
                   <div key={photo.caption} className="w-20">
                     <PhotoSlot photo={photo} rotateDeg={PHOTO_ROTATIONS[index % PHOTO_ROTATIONS.length]} />
                   </div>

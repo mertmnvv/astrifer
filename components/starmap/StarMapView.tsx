@@ -3,7 +3,6 @@ import { StarChart } from "@/components/astrolab/StarChart";
 import { getSkyPalette } from "@/components/astrolab/palettes";
 import { AtlasPanel } from "@/components/atlas/AtlasPanel";
 import { LedgerRule } from "@/components/atlas/LedgerRule";
-import { MemoriesGallery } from "@/components/journal/MemoriesGallery";
 import { PageGate } from "@/components/journal/PageGate";
 import { VoiceNote } from "@/components/journal/VoiceNote";
 import { MusicToggle } from "@/components/ui/MusicToggle";
@@ -12,6 +11,7 @@ import { ScrollCue } from "@/components/ui/ScrollCue";
 import { computeSky } from "@/lib/astronomy/computeSky";
 import { buildSkyNarrative } from "@/lib/astronomy/skyNarrative";
 import type { StarMapRecord } from "@/lib/starmaps";
+import { Timeline } from "./Timeline";
 
 function formatEventDate(date: Date, timezone: string): string {
   return new Intl.DateTimeFormat("tr-TR", {
@@ -31,9 +31,11 @@ export interface StarMapViewProps {
   starMap: StarMapRecord;
   /** Preview from the configurator: swaps the footer CTA and shows a corner banner, no real page exists yet. */
   isPreview?: boolean;
+  /** True only when a valid owner cookie was verified server-side — see app/s/[slug]/page.tsx. */
+  isOwner?: boolean;
 }
 
-export function StarMapView({ starMap, isPreview = false }: StarMapViewProps) {
+export function StarMapView({ starMap, isPreview = false, isOwner = false }: StarMapViewProps) {
   const sky = computeSky({
     date: starMap.eventDateUtc,
     latitude: starMap.latitude,
@@ -112,10 +114,10 @@ export function StarMapView({ starMap, isPreview = false }: StarMapViewProps) {
           </AtlasPanel>
         </RevealOnScroll>
 
-        {/* Anılarımız — panel + her fotoğraf kendi gecikmesiyle beliriyor */}
-        {starMap.photos.length > 0 && (
+        {/* Zaman Çizelgesi — büyüyen fotoğraf koleksiyonu, sahibiyse ekleme kontrolleriyle */}
+        {(starMap.entries.length > 0 || isOwner) && (
           <div className="mt-24 w-full max-w-2xl">
-            <MemoriesGallery photos={starMap.photos} />
+            <Timeline slug={starMap.slug} createdAt={starMap.createdAt} entries={starMap.entries} isOwner={isOwner} />
           </div>
         )}
 
