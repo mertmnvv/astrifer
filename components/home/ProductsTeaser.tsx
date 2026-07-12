@@ -48,7 +48,7 @@ const PRODUCTS: ProductItem[] = [
     description: "Kapağında size özel yıldız haritası, içinde anılarınız ve sizin satırlarınız.",
     price: formatTRY(JOURNAL_PRICE),
     features: [
-      "El işçiliği hakiki deri ciltleme",
+      "Premium suni deri, el işçiliği ciltleme",
       "Özel gofre (sıcak baskı) kapak deseni",
       "Altın yaldızlı sayfa kenarı",
       "30 sayfa boş/çizgili fildişi kağıt",

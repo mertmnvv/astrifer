@@ -1,9 +1,19 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { StarChart } from "@/components/astrolab/StarChart";
 import { CoverPanel } from "@/components/journal/CoverPanel";
-import { PhotoSlot } from "@/components/journal/PhotoSlot";
+import {
+  CoverPreview,
+  FutureLetterPreview,
+  GiltEdgePreview,
+  GoldPenPreview,
+  MemoriesPreview,
+  PageStackPreview,
+  QrPreview,
+  SkyLogPreview,
+  TitleSpreadPreview,
+} from "@/components/journal/ContentPreviews";
 import { computeSky } from "@/lib/astronomy/computeSky";
+import { buildSkyNarrative } from "@/lib/astronomy/skyNarrative";
 import { formatTRY } from "@/lib/pricing";
 import { getPricingConfig } from "@/lib/pricingConfig";
 import { DEMO_STAR_MAP } from "@/lib/starmaps";
@@ -12,22 +22,8 @@ export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
   title: "Deri Defter — Astrifer",
-  description: "Kapağında adın, içinde o anın gerçek gökyüzü — deri ciltli, 30 sayfalık kişiye özel bir defter.",
+  description: "Kapağında adın, içinde o anın gerçek gökyüzü — vegan deri ciltli, 30 sayfalık kişiye özel bir defter.",
 };
-
-const CONTENTS = [
-  "Kapak — deri doku, kabartma Astrifer amblemi",
-  "Başlık sayfası + gerçek yıldız haritan",
-  "Gökyüzü Kaydı — o anın Ay evresi ve gezegenleri",
-  "Birlikte Anılarımız — kendi fotoğraflarınla (en fazla 4)",
-  "QR sayfası — dijital haritana anında bağlantı",
-  "30 boş / çizgili sayfa — kendi sözleriniz için",
-  "Altın yaldızlı sayfa kenarı — antika atlas ciltlerinden ince altın/pirinç şerit",
-  "Gelecek Mektubu — mühürlü cep, arka kapakta dikili",
-  "Altın renkli kalem — ayrı paketlenmiş hediye",
-];
-
-const PHOTO_ROTATIONS = [-2.5, 2, 1.5, -2];
 
 export default async function JournalProductPage() {
   const sky = computeSky({
@@ -35,9 +31,42 @@ export default async function JournalProductPage() {
     latitude: DEMO_STAR_MAP.latitude,
     longitude: DEMO_STAR_MAP.longitude,
   });
+  const narrative = buildSkyNarrative(sky);
+  const dateLabel = new Intl.DateTimeFormat("tr-TR", {
+    timeZone: DEMO_STAR_MAP.timezone,
+    dateStyle: "long",
+  }).format(DEMO_STAR_MAP.eventDateUtc);
   const { journalPrice } = await getPricingConfig();
 
   const orderParams = new URLSearchParams({ product: "journal", price: journalPrice.toString() });
+
+  const CONTENTS = [
+    { title: "Kapak — deri doku, kabartma Astrifer amblemi", preview: <CoverPreview title={DEMO_STAR_MAP.title} /> },
+    {
+      title: "Başlık sayfası + gerçek yıldız haritan",
+      preview: (
+        <TitleSpreadPreview
+          title={DEMO_STAR_MAP.title}
+          dateLabel={dateLabel}
+          locationName={DEMO_STAR_MAP.locationName}
+          sky={sky}
+        />
+      ),
+    },
+    { title: "Gökyüzü Kaydı — o anın Ay evresi ve gezegenleri", preview: <SkyLogPreview narrative={narrative} /> },
+    {
+      title: "Birlikte Anılarımız — kendi fotoğraflarınla (en fazla 4)",
+      preview: <MemoriesPreview photos={DEMO_STAR_MAP.entries.flatMap((entry) => entry.photos)} />,
+    },
+    { title: "QR sayfası — dijital haritana anında bağlantı", preview: <QrPreview /> },
+    { title: "30 boş / çizgili sayfa — kendi sözleriniz için", preview: <PageStackPreview /> },
+    {
+      title: "Altın yaldızlı sayfa kenarı — antika atlas ciltlerinden ince altın/pirinç şerit",
+      preview: <GiltEdgePreview />,
+    },
+    { title: "Gelecek Mektubu — mühürlü cep, arka kapakta dikili", preview: <FutureLetterPreview /> },
+    { title: "Altın renkli kalem — ayrı paketlenmiş hediye", preview: <GoldPenPreview /> },
+  ];
 
   return (
     <main className="min-h-screen px-4 py-10 sm:px-8 sm:py-16">
@@ -48,7 +77,7 @@ export default async function JournalProductPage() {
             Kapağında adın, içinde o an.
           </h1>
           <p className="mx-auto mt-3 max-w-xl text-sm text-subtle sm:text-base">
-            Deri ciltli, 30 sayfalık kişiye özel bir defter — kapakta gerçek
+            Vegan deri ciltli, 30 sayfalık kişiye özel bir defter — kapakta gerçek
             yıldız haritan, içinde anılarınız için boş sayfalar.
           </p>
         </header>
@@ -64,34 +93,19 @@ export default async function JournalProductPage() {
           <div className="order-2 flex flex-col gap-8">
             <div>
               <p className="mb-3 font-mono text-xs uppercase tracking-widest text-dim">İçindekiler</p>
-              <ol className="space-y-2">
+              <div className="grid grid-cols-2 gap-4 sm:grid-cols-3">
                 {CONTENTS.map((item, index) => (
-                  <li key={item} className="flex gap-3 text-sm text-text">
-                    <span className="font-mono text-xs text-amber">{(index + 1).toString().padStart(2, "0")}</span>
-                    <span>{item}</span>
-                  </li>
-                ))}
-              </ol>
-            </div>
-
-            <div className="flex flex-col items-center gap-2 rounded-2xl border border-text/10 bg-text/[0.035] p-4">
-              <p className="font-mono text-[10px] uppercase tracking-widest text-dim">
-                Yıldız haritası — iki sayfa birlikte tek gökyüzü
-              </p>
-              <div className="relative aspect-[2/1] w-full overflow-hidden rounded-md shadow-xl shadow-black/50">
-                <StarChart sky={sky} label="Örnek gökyüzü" className="h-full w-full" showLabels={false} />
-                {/* Ciltin ortadaki gölgesi — iki sayfanın birleşip tek gökyüzü oluşturduğu izlenimi */}
-                <div className="pointer-events-none absolute inset-y-0 left-1/2 w-12 -translate-x-1/2 bg-gradient-to-r from-black/35 via-transparent to-black/35" />
-                <div className="pointer-events-none absolute inset-y-0 left-1/2 w-px -translate-x-1/2 bg-black/60" />
-              </div>
-            </div>
-
-            <div className="flex flex-col items-center gap-2 rounded-2xl border border-text/10 bg-text/[0.035] p-4">
-              <p className="font-mono text-[10px] uppercase tracking-widest text-dim">Anılar sayfası</p>
-              <div className="grid grid-cols-4 gap-3 p-2">
-                {DEMO_STAR_MAP.entries.flatMap((entry) => entry.photos).slice(0, 4).map((photo, index) => (
-                  <div key={photo.caption} className="w-20">
-                    <PhotoSlot photo={photo} rotateDeg={PHOTO_ROTATIONS[index % PHOTO_ROTATIONS.length]} />
+                  <div
+                    key={item.title}
+                    className="flex flex-col gap-2 rounded-2xl border border-text/10 bg-text/[0.035] p-2.5"
+                  >
+                    <div className="aspect-[3/4] w-full overflow-hidden rounded-md">{item.preview}</div>
+                    <p className="flex gap-1.5 text-[11px] leading-snug text-text">
+                      <span className="shrink-0 font-mono text-[10px] text-amber">
+                        {(index + 1).toString().padStart(2, "0")}
+                      </span>
+                      <span>{item.title}</span>
+                    </p>
                   </div>
                 ))}
               </div>
