@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useState, type ReactNode } from "react";
 import { useRouter } from "next/navigation";
 import { StarChart } from "@/components/astrolab/StarChart";
+import { LedgerRule } from "@/components/atlas/LedgerRule";
 import { computeSky } from "@/lib/astronomy/computeSky";
 import { PlaceCombobox } from "@/components/ui/PlaceCombobox";
 import { RadioCardGroup } from "@/components/ui/RadioCardGroup";
@@ -102,6 +103,24 @@ export function CreateForm({ templates }: CreateFormProps) {
   const previewLabel = place
     ? `${place.name} üzerinde ${date} ${time} anının gökyüzü`
     : "Konum seçilince gökyüzü önizlemesi burada görünecek";
+
+  const posterDateLine = useMemo(() => {
+    if (!place || !eventDateUtc) return "Tarih ve konum bekleniyor";
+    try {
+      const formatted = new Intl.DateTimeFormat("tr-TR", {
+        timeZone: place.timezone,
+        dateStyle: "long",
+        timeStyle: "short",
+      }).format(eventDateUtc);
+      return `${formatted} · ${place.name}`;
+    } catch {
+      return `${date} · ${place.name}`;
+    }
+  }, [place, eventDateUtc, date]);
+
+  const posterCoords = place
+    ? `${Math.abs(place.latitude).toFixed(2)}°${place.latitude >= 0 ? "K" : "G"}   ${Math.abs(place.longitude).toFixed(2)}°${place.longitude >= 0 ? "D" : "B"}`
+    : "";
 
   const previewSlug = slugify(title) || "senin-sayfan";
   const previewUrl = `${SITE_HOST}/s/${previewSlug}`;
@@ -275,21 +294,29 @@ export function CreateForm({ templates }: CreateFormProps) {
 
       {/* LIVE PREVIEW */}
       <div className="order-1 flex flex-col gap-4 lg:sticky lg:top-28 lg:order-2 lg:self-start">
-        <div className="relative overflow-hidden rounded-[20px] border border-text/10 shadow-2xl shadow-black/50">
-          <div className="aspect-square">
-            <StarChart sky={sky} label={previewLabel} className="h-full w-full" palette={getSkyPalette(paletteId)} />
-          </div>
-          <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-void via-void/70 to-transparent px-6 py-5 text-center">
-            <h3 className="font-display text-2xl italic text-bright">{title || "Başlığın burada görünecek"}</h3>
-            <p className="mt-1.5 font-mono text-[10px] uppercase tracking-widest text-amber">
-              {place ? `${date} · ${place.name}` : "Tarih ve konum bekleniyor"}
-            </p>
+        <div className="mx-auto w-full max-w-[27rem]">
+          <div className="relative aspect-[3/4] rounded-md border border-text/[0.08] bg-panel shadow-2xl shadow-black/65">
+            <div className="pointer-events-none absolute inset-[13px] rounded-sm border border-amber/[0.18]" />
+            <div className="pointer-events-none absolute inset-4 rounded-sm border border-text/10" />
+            <div className="relative flex h-full flex-col items-center justify-between px-[26px] pb-[22px] pt-[34px]">
+              <div className="w-[72%] rounded-full border border-amber/[0.2] p-[7px]">
+                <div className="aspect-square overflow-hidden rounded-full border border-amber/40">
+                  <StarChart sky={sky} label={previewLabel} className="h-full w-full" palette={getSkyPalette(paletteId)} />
+                </div>
+              </div>
+              <div className="flex flex-col items-center gap-3 text-center">
+                <LedgerRule className="max-w-[5rem]" />
+                <p className="max-w-[32ch] font-display text-[17px] italic leading-relaxed text-text">
+                  “{message.trim() || "Sen benim gökyüzümdeki en güzel yıldızımsın."}”
+                </p>
+                <h3 className="font-display text-2xl italic text-bright">{title.trim() || "İsim & İsim"}</h3>
+                <p className="font-mono text-[9px] uppercase tracking-[0.2em] text-amber">{posterDateLine}</p>
+                <p className="font-mono text-[8px] tracking-[0.18em] text-dim">{posterCoords}</p>
+              </div>
+              <p className="font-mono text-[8px] tracking-[0.34em] text-faint">ASTRIFER</p>
+            </div>
           </div>
         </div>
-
-        {message && (
-          <p className="px-3 text-center font-display text-lg italic leading-relaxed text-muted">“{message}”</p>
-        )}
 
         <div className="flex flex-col gap-1 border-t border-text/10 pt-4">
           <span className="font-mono text-[9.5px] uppercase tracking-[0.14em] text-dim">Sayfanın Linki</span>

@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { motion } from "framer-motion";
-import { CoverPanel } from "./CoverPanel";
+import { LogoMark } from "@/components/LogoMark";
 import { MusicProvider, useMusic } from "./MusicContext";
 import { usePrefersReducedMotion } from "@/lib/hooks/usePrefersReducedMotion";
 
@@ -18,13 +18,14 @@ function GateButton({ title, subtitle, onOpen }: { title: string; subtitle: stri
         onOpen();
       }}
       aria-label="Aç"
-      className="block h-full w-full cursor-pointer text-left"
+      className="flex h-full w-full cursor-pointer flex-col items-center justify-center gap-3 bg-[radial-gradient(circle_at_50%_40%,#15101a_0%,#0b0810_70%)] px-6 text-center"
     >
-      <CoverPanel fullscreen title={title} subtitle={subtitle}>
-        <span className="mt-2 animate-bounce-y font-mono text-[10.5px] uppercase tracking-[0.14em] text-muted motion-reduce:animate-none">
-          Açmak için dokun …
-        </span>
-      </CoverPanel>
+      <LogoMark size={46} variant="compass" />
+      <p className="mt-1 font-display text-2xl italic text-bright sm:text-3xl">{title}</p>
+      <p className="font-mono text-[10px] uppercase tracking-[0.25em] text-amber">{subtitle}</p>
+      <span className="mt-2 animate-bounce-y font-mono text-[10.5px] uppercase tracking-[0.14em] text-muted motion-reduce:animate-none">
+        Zaman Kapsülünü Aç
+      </span>
     </button>
   );
 }
@@ -37,10 +38,9 @@ export interface PageGateProps {
 }
 
 /**
- * Full-viewport leather cover with the whole card standing in as the "Aç"
- * gesture in front of the rest of the page. Opening it is the one real user
- * gesture that lets the shared background track start (browsers block
- * unprompted autoplay), and doubles as a ceremonial "open the gift" moment.
+ * Full-viewport aperture standing in as the "Aç" gesture in front of the
+ * rest of the page. Opening it is the one real user gesture that lets the
+ * shared background track start (browsers block unprompted autoplay).
  * `children` is always mounted underneath — nothing extra to fetch or
  * animate in once the gate lifts, it's just uncovered.
  */
@@ -64,18 +64,14 @@ export function PageGate({ title, subtitle, musicUrl, children }: PageGateProps)
 
   return (
     <MusicProvider src={musicUrl}>
-      <div
-        className={`fixed inset-0 z-50 ${opened ? "pointer-events-none" : ""}`}
-        style={{ perspective: reducedMotion ? undefined : "2200px" }}
-      >
+      <div className={`fixed inset-0 z-50 ${opened ? "pointer-events-none" : ""}`}>
         <motion.div
           className="absolute inset-0"
-          style={{ transformOrigin: "left center", backfaceVisibility: "hidden" }}
           initial={false}
           animate={
             reducedMotion
               ? { opacity: opened ? 0 : 1 }
-              : { rotateY: opened ? -115 : 0, boxShadow: opened ? "0 0 0 rgba(0,0,0,0)" : "40px 0 60px rgba(0,0,0,0.5)" }
+              : { clipPath: opened ? "circle(0% at 50% 50%)" : "circle(76% at 50% 50%)" }
           }
           transition={{ duration: 1.15, ease: [0.65, 0, 0.35, 1] }}
         >
