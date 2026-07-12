@@ -13,19 +13,19 @@ interface FaqItemData {
 const FAQ_ITEMS: FaqItemData[] = [
   {
     question: "Yıldız haritaları ne kadar doğru?",
-    answer: "Yıldız haritalarımız, gök cisimlerinin konumlarını hassasiyetle hesaplayan profesyonel astronomik hesaplama motorunu kullanır. Seçtiğiniz tarih, saat ve konumdaki gökyüzü tamamen gerçekçi ve bilimsel doğruluktadır.",
+    answer: "Astronomik olarak tam doğru. Girdiğiniz tarih, saat ve konuma göre o anın gerçek yıldız, gezegen ve Ay konumları hesaplanır — tahmini ya da dekoratif bir çizim değildir.",
   },
   {
     question: "Dijital ve fiziksel ürün arasındaki fark nedir?",
-    answer: "Dijital ürün satın aldığınızda, size özel hazırlanan ve müzik eşliğinde anılarınızı (fotoğraf, ses kaydı, kişisel mesaj) saklayabileceğiniz kalıcı bir web adresi alırsınız. Fiziksel ürünlerde ise yüksek kaliteli (300 DPI) baskı adresinize kargolanır ve üzerinde dijital sayfanıza yönlendiren şık bir QR kod yer alır.",
+    answer: "Dijital Sayfa, size özel kalıcı bir web adresi ve paylaşılabilir bir zaman kapsülü sayfasıdır. Poster ve Deri Defter ise bu dijital sayfanın fiziksel bir uzantısıdır — her ikisinde de dijital sayfanıza götüren bir QR kod bulunur, yani fiziksel ürünü alanlar dijital deneyimi de otomatik olarak elde eder.",
   },
   {
     question: "Kargo süresi nedir?",
-    answer: "Fiziksel siparişleriniz (Poster ve Deri Defter) 2 iş günü içerisinde hazırlanarak kargoya teslim edilir. Dijital sayfalar ise ödeme onaylandığı an anında oluşturulur ve hemen erişilebilir olur.",
+    answer: "Poster siparişleri 3-5 iş günü, Deri Defter siparişleri 5-7 iş günü içinde kargoya verilir. Kargo ücreti fiyata dahildir.",
   },
   {
     question: "Fotoğraf ve ses kaydı eklemek zorunlu mu?",
-    answer: "Hayır, tamamen isteğe bağlıdır. Zaman kapsülünüzü sadece yıldız haritası ve kişisel bir mesajla oluşturabileceğiniz gibi fotoğraf ve ses kayıtlarıyla da zenginleştirebilirsiniz.",
+    answer: "Hayır, tamamen opsiyoneldir. Yalnızca tarih, saat ve konum bilgisiyle de eksiksiz bir zaman kapsülü oluşturabilirsiniz; fotoğraf ve sesli mesaj isteğe bağlı bir zenginleştirmedir.",
   },
 ];
 
