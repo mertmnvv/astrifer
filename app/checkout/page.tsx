@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { CoverPanel } from "@/components/journal/CoverPanel";
-import { DIGITAL_PRICE, JOURNAL_PRICE, formatTRY } from "@/lib/pricing";
+import { formatTRY } from "@/lib/pricing";
+import { getPricingConfig } from "@/lib/pricingConfig";
 import { SiteHeader } from "@/components/layout/SiteHeader";
 import { SiteFooter } from "@/components/layout/SiteFooter";
 import { SectionHeading } from "@/components/atlas/SectionHeading";
@@ -28,11 +29,13 @@ function LedgerRow({ label, value }: { label: string; value: string }) {
   );
 }
 
-export default function CheckoutPage({
+export default async function CheckoutPage({
   searchParams,
 }: {
   searchParams: { [key: string]: string | string[] | undefined };
 }) {
+  const { digitalPrice, journalPrice } = await getPricingConfig();
+
   const get = (key: string) => {
     const value = searchParams[key];
     return Array.isArray(value) ? value[0] : value;
@@ -63,8 +66,8 @@ export default function CheckoutPage({
   // digital-page order, which never had a price attached until now.
   const isDigitalOrder = !product && Boolean(title);
   const effectiveProduct = product ?? (isDigitalOrder ? "digital" : undefined);
-  const basePrice = priceParam ? Number(priceParam) : isDigitalOrder ? DIGITAL_PRICE : undefined;
-  const grandTotal = (basePrice ?? 0) + (journalAdded ? JOURNAL_PRICE : 0);
+  const basePrice = priceParam ? Number(priceParam) : isDigitalOrder ? digitalPrice : undefined;
+  const grandTotal = (basePrice ?? 0) + (journalAdded ? journalPrice : 0);
 
   const addOnOnParams = toSearchParams(searchParams);
   addOnOnParams.set("addOn", "journal");
@@ -124,7 +127,7 @@ export default function CheckoutPage({
               <div className="flex-1">
                 <p className="font-mono text-[10px] uppercase tracking-widest text-amber">Ekstra: Deri Defter</p>
                 <p className="mt-0.5 text-xs text-subtle">Kapağında haritan, içinde 30 boş sayfa.</p>
-                <p className="mt-1 font-display text-lg italic text-text">{formatTRY(JOURNAL_PRICE)}</p>
+                <p className="mt-1 font-display text-lg italic text-text">{formatTRY(journalPrice)}</p>
               </div>
               <Link
                 href={`?${(journalAdded ? addOnOffParams : addOnOnParams).toString()}`}

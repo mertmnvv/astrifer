@@ -4,8 +4,11 @@ import { StarChart } from "@/components/astrolab/StarChart";
 import { CoverPanel } from "@/components/journal/CoverPanel";
 import { PhotoSlot } from "@/components/journal/PhotoSlot";
 import { computeSky } from "@/lib/astronomy/computeSky";
-import { formatTRY, JOURNAL_PRICE } from "@/lib/pricing";
+import { formatTRY } from "@/lib/pricing";
+import { getPricingConfig } from "@/lib/pricingConfig";
 import { DEMO_STAR_MAP } from "@/lib/starmaps";
+
+export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
   title: "Deri Defter — Astrifer",
@@ -26,14 +29,15 @@ const CONTENTS = [
 
 const PHOTO_ROTATIONS = [-2.5, 2, 1.5, -2];
 
-export default function JournalProductPage() {
+export default async function JournalProductPage() {
   const sky = computeSky({
     date: DEMO_STAR_MAP.eventDateUtc,
     latitude: DEMO_STAR_MAP.latitude,
     longitude: DEMO_STAR_MAP.longitude,
   });
+  const { journalPrice } = await getPricingConfig();
 
-  const orderParams = new URLSearchParams({ product: "journal", price: JOURNAL_PRICE.toString() });
+  const orderParams = new URLSearchParams({ product: "journal", price: journalPrice.toString() });
 
   return (
     <main className="min-h-screen px-4 py-10 sm:px-8 sm:py-16">
@@ -96,7 +100,7 @@ export default function JournalProductPage() {
             <div className="rounded-2xl border border-text/10 bg-text/[0.035] p-4">
               <div className="flex items-baseline justify-between">
                 <span className="font-mono text-xs uppercase tracking-widest text-subtle">Fiyat</span>
-                <span className="font-display text-3xl italic text-amber">{formatTRY(JOURNAL_PRICE)}</span>
+                <span className="font-display text-3xl italic text-amber">{formatTRY(journalPrice)}</span>
               </div>
               <p className="mt-1 text-[11px] text-dim">
                 Kargo dahil. Üretim süresi 5-7 iş günü. Altın renkli kalem hediyeli.

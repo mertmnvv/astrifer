@@ -1,19 +1,23 @@
 import type { Metadata } from "next";
 import { computeSky } from "@/lib/astronomy/computeSky";
+import { getPricingConfig } from "@/lib/pricingConfig";
 import { DEMO_STAR_MAP } from "@/lib/starmaps";
 import { PosterConfigurator } from "./PosterConfigurator";
+
+export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
   title: "Poster & Çerçeve — Astrifer",
   description: "Kendi yıldız haritanı 300 DPI baskı kalitesinde posterde ya da çerçevede duvarına as.",
 };
 
-export default function PosterProductPage() {
+export default async function PosterProductPage() {
   const sky = computeSky({
     date: DEMO_STAR_MAP.eventDateUtc,
     latitude: DEMO_STAR_MAP.latitude,
     longitude: DEMO_STAR_MAP.longitude,
   });
+  const { posterSizes, frameOptions } = await getPricingConfig();
 
   return (
     <main className="min-h-screen px-4 py-10 sm:px-8 sm:py-16">
@@ -28,7 +32,12 @@ export default function PosterProductPage() {
             haritan — poster olarak ya da hazır çerçevede.
           </p>
         </header>
-        <PosterConfigurator sky={sky} previewLabel={`${DEMO_STAR_MAP.locationName} örnek gökyüzü`} />
+        <PosterConfigurator
+          sky={sky}
+          previewLabel={`${DEMO_STAR_MAP.locationName} örnek gökyüzü`}
+          posterSizes={posterSizes}
+          frameOptions={frameOptions}
+        />
       </div>
     </main>
   );

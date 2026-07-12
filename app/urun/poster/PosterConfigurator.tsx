@@ -6,21 +6,27 @@ import { StarChart } from "@/components/astrolab/StarChart";
 import { FrameMockup } from "@/components/ui/FrameMockup";
 import { RadioCardGroup } from "@/components/ui/RadioCardGroup";
 import type { ComputeSkyResult } from "@/lib/astronomy/computeSky";
-import { FRAME_OPTIONS, POSTER_SIZES, formatTRY, priceFor, type FrameOption, type PosterSize } from "@/lib/pricing";
+import { formatTRY, type FrameOption, type PosterSize } from "@/lib/pricing";
 
 export interface PosterConfiguratorProps {
   sky: ComputeSkyResult;
   previewLabel: string;
+  posterSizes: { value: PosterSize; label: string; basePrice: number }[];
+  frameOptions: { value: FrameOption; label: string; description: string; surcharge: number }[];
 }
 
-export function PosterConfigurator({ sky, previewLabel }: PosterConfiguratorProps) {
+export function PosterConfigurator({ sky, previewLabel, posterSizes, frameOptions }: PosterConfiguratorProps) {
   const router = useRouter();
   const [size, setSize] = useState<PosterSize>("50x50");
   const [frame, setFrame] = useState<FrameOption>("black");
 
-  const price = useMemo(() => priceFor(size, frame), [size, frame]);
-  const sizeLabel = POSTER_SIZES.find((option) => option.value === size)?.label ?? size;
-  const frameLabel = FRAME_OPTIONS.find((option) => option.value === frame)?.label ?? frame;
+  const price = useMemo(() => {
+    const sizePrice = posterSizes.find((option) => option.value === size)?.basePrice ?? 0;
+    const frameSurcharge = frameOptions.find((option) => option.value === frame)?.surcharge ?? 0;
+    return sizePrice + frameSurcharge;
+  }, [size, frame, posterSizes, frameOptions]);
+  const sizeLabel = posterSizes.find((option) => option.value === size)?.label ?? size;
+  const frameLabel = frameOptions.find((option) => option.value === frame)?.label ?? frame;
 
   const handleOrder = () => {
     const params = new URLSearchParams({
@@ -47,7 +53,7 @@ export function PosterConfigurator({ sky, previewLabel }: PosterConfiguratorProp
         </p>
 
         <div className="mt-2 flex flex-wrap justify-center gap-3">
-          {FRAME_OPTIONS.map((option) => (
+          {frameOptions.map((option) => (
             <button
               key={option.value}
               type="button"
@@ -75,7 +81,7 @@ export function PosterConfigurator({ sky, previewLabel }: PosterConfiguratorProp
             value={size}
             onChange={setSize}
             columnsClassName="grid-cols-2"
-            options={POSTER_SIZES.map((option) => ({ value: option.value, label: option.label }))}
+            options={posterSizes.map((option) => ({ value: option.value, label: option.label }))}
           />
         </div>
 
@@ -87,7 +93,7 @@ export function PosterConfigurator({ sky, previewLabel }: PosterConfiguratorProp
             value={frame}
             onChange={setFrame}
             columnsClassName="grid-cols-2"
-            options={FRAME_OPTIONS.map((option) => ({
+            options={frameOptions.map((option) => ({
               value: option.value,
               label: option.label,
               description: option.description,

@@ -10,6 +10,7 @@ const NAV_ITEMS = [
   { href: "/admin", label: "Özet" },
   { href: "/admin/orders", label: "Siparişler" },
   { href: "/admin/templates", label: "Şablonlar" },
+  { href: "/admin/pricing", label: "Fiyatlar" },
 ];
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {

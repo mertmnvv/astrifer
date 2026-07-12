@@ -64,3 +64,16 @@ export interface OrderDoc {
   createdAt: Timestamp;
   updatedAt: Timestamp;
 }
+
+/**
+ * Collection `config`, doc id `pricing`. Admin-editable override for the
+ * defaults in lib/pricing.ts — see lib/pricingConfig.ts for the fallback
+ * merge. Never read/written by client code — server-only via Admin SDK.
+ */
+export interface PricingConfigDoc {
+  posterSizes: { value: string; label: string; basePrice: number }[];
+  frameOptions: { value: string; label: string; description: string; surcharge: number }[];
+  journalPrice: number;
+  digitalPrice: number;
+  updatedAt: Timestamp;
+}
