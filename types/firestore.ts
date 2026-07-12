@@ -6,7 +6,7 @@ import type { Timestamp } from "firebase-admin/firestore";
 
 export type TemplateCategory = "dogum" | "yildonumu" | "teklif" | "mezuniyet" | "anma";
 export type OrderStatus = "pending" | "paid" | "failed" | "refunded" | "fulfilled" | "shipped";
-export type ProductType = "digital" | "poster" | "framed_poster";
+export type ProductType = "digital" | "poster" | "framed_poster" | "journal";
 
 /** Collection `templates`, doc id = slug. */
 export interface TemplateDoc {

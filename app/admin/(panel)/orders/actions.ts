@@ -4,11 +4,10 @@ import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 import { getBucket, getDb } from "@/lib/firebase/admin";
 import { renderPrintFile } from "@/lib/printRender";
-import type { OrderDoc, OrderStatus, ProductType } from "@/types/firestore";
+import type { OrderDoc, OrderStatus } from "@/types/firestore";
 import type { PosterSize } from "@/lib/pricing";
+import { PRINTABLE_PRODUCTS, STATUS_OPTIONS as VALID_STATUSES } from "./shared";
 
-const VALID_STATUSES: OrderStatus[] = ["pending", "paid", "failed", "refunded", "fulfilled", "shipped"];
-const PRINTABLE_PRODUCTS: ProductType[] = ["poster", "framed_poster"];
 const SIGNED_URL_TTL_MS = 5 * 60 * 1000;
 
 export async function updateOrderAction(formData: FormData) {

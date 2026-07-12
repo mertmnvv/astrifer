@@ -1,22 +1,11 @@
+import Link from "next/link";
 import { isFirebaseConfigured } from "@/lib/firebase/isConfigured";
 import { formatTRY } from "@/lib/pricing";
-import type { OrderDoc, OrderStatus, ProductType } from "@/types/firestore";
+import type { OrderDoc } from "@/types/firestore";
 import { getPrintDownloadUrlAction, renderPrintFileAction, updateOrderAction } from "./actions";
+import { PRINTABLE_PRODUCTS, PRODUCT_FILTERS, STATUS_LABELS, STATUS_OPTIONS, type ProductFilter } from "./shared";
 
 export const dynamic = "force-dynamic";
-
-const PRINTABLE_PRODUCTS: ProductType[] = ["poster", "framed_poster"];
-
-const STATUS_LABELS: Record<OrderStatus, string> = {
-  pending: "Bekliyor",
-  paid: "Ödendi",
-  failed: "Başarısız",
-  refunded: "İade edildi",
-  fulfilled: "Hazırlandı",
-  shipped: "Kargoya verildi",
-};
-
-const STATUS_OPTIONS = Object.keys(STATUS_LABELS) as OrderStatus[];
 
 interface OrderRow extends OrderDoc {
   id: string;
@@ -32,7 +21,11 @@ function formatDate(timestamp: OrderDoc["createdAt"]): string {
   return new Intl.DateTimeFormat("tr-TR", { dateStyle: "medium", timeStyle: "short" }).format(timestamp.toDate());
 }
 
-export default async function AdminOrdersPage() {
+export default async function AdminOrdersPage({
+  searchParams,
+}: {
+  searchParams: { product?: string };
+}) {
   if (!isFirebaseConfigured()) {
     return (
       <p className="text-sm text-subtle">
@@ -42,11 +35,43 @@ export default async function AdminOrdersPage() {
     );
   }
 
-  const orders = await getOrders();
+  const activeFilter = PRODUCT_FILTERS.find((filter) => filter.value === searchParams.product)?.value as
+    | ProductFilter
+    | undefined;
+  const allOrders = await getOrders();
+  const orders = activeFilter
+    ? allOrders.filter((order) =>
+        PRODUCT_FILTERS.find((filter) => filter.value === activeFilter)!.matches.includes(order.productType),
+      )
+    : allOrders;
 
   return (
     <div className="space-y-6">
       <h1 className="font-display text-2xl italic text-bright">Siparişler</h1>
+
+      <div className="flex flex-wrap items-center gap-2">
+        <Link
+          href="/admin/orders"
+          className={`rounded-full border px-3 py-1 font-mono text-[10px] uppercase tracking-widest transition-colors ${
+            !activeFilter ? "border-amber/60 bg-amber/15 text-amber" : "border-text/20 text-subtle hover:border-amber/50 hover:text-amber"
+          }`}
+        >
+          Tümü
+        </Link>
+        {PRODUCT_FILTERS.map((filter) => (
+          <Link
+            key={filter.value}
+            href={`/admin/orders?product=${filter.value}`}
+            className={`rounded-full border px-3 py-1 font-mono text-[10px] uppercase tracking-widest transition-colors ${
+              activeFilter === filter.value
+                ? "border-amber/60 bg-amber/15 text-amber"
+                : "border-text/20 text-subtle hover:border-amber/50 hover:text-amber"
+            }`}
+          >
+            {filter.label}
+          </Link>
+        ))}
+      </div>
 
       {orders.length === 0 ? (
         <p className="text-sm text-subtle">Henüz sipariş yok.</p>
@@ -68,13 +93,17 @@ export default async function AdminOrdersPage() {
                 <tr key={order.id} className="border-t border-text/10">
                   <td className="px-4 py-3 align-top text-subtle">{formatDate(order.createdAt)}</td>
                   <td className="px-4 py-3 align-top">
-                    <div className="text-text">{order.customerName ?? "—"}</div>
+                    <Link href={`/admin/orders/${order.id}`} className="text-text hover:text-amber hover:underline">
+                      {order.customerName ?? "—"}
+                    </Link>
                     <div className="text-xs text-subtle">{order.customerEmail}</div>
                   </td>
                   <td className="px-4 py-3 align-top text-text">
-                    {order.productType}
-                    {order.size ? ` · ${order.size}` : ""}
-                    {order.frameOption && order.frameOption !== "none" ? ` · ${order.frameOption}` : ""}
+                    <Link href={`/admin/orders/${order.id}`} className="hover:text-amber hover:underline">
+                      {order.productType}
+                      {order.size ? ` · ${order.size}` : ""}
+                      {order.frameOption && order.frameOption !== "none" ? ` · ${order.frameOption}` : ""}
+                    </Link>
                   </td>
                   <td className="px-4 py-3 align-top text-text">{formatTRY(order.priceAmount)}</td>
                   <td className="px-4 py-3 align-top">
