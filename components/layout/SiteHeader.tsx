@@ -4,13 +4,14 @@ import Link from "next/link";
 import { motion, useScroll, useTransform } from "framer-motion";
 import { Logo } from "@/components/Logo";
 import { LogoMark } from "@/components/LogoMark";
+import { MobileNav } from "@/components/layout/MobileNav";
 
 const NAV_LINKS = [
   { href: "/#nasil-calisir", label: "Nasıl Çalışır" },
   { href: "/#urunler", label: "Ürünler" },
 ];
 
-/** Fixed top bar: logo + a couple of nav links + primary CTA. Same layout at every width — shrinks, never restructures into an app-style drawer/hamburger. */
+/** Fixed top bar: logo + nav links + primary CTA. Below `sm` the text links collapse behind a hamburger that opens a right-side drawer (MobileNav) sharing this same NAV_LINKS list. */
 export function SiteHeader() {
   const { scrollY } = useScroll();
   const background = useTransform(scrollY, [0, 96], ["rgba(11,8,16,0)", "rgba(11,8,16,0.72)"]);
@@ -25,6 +26,7 @@ export function SiteHeader() {
           <Logo size={26} className="hidden sm:inline-block" />
         </Link>
         <nav className="flex items-center gap-4 sm:gap-7">
+          <MobileNav links={NAV_LINKS} />
           {NAV_LINKS.map((link) => (
             <Link
               key={link.href}
