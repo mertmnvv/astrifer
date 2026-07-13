@@ -74,6 +74,22 @@ export interface OrderDoc {
   /** Storage path under `starmaps-print/`, set once an admin renders the print file. Never a direct URL — see lib/printRender.ts. */
   printFilePath: string | null;
   printFileRenderedAt: Timestamp | null;
+  /** Poster-only: the free-text line printed on the art band — distinct from StarMapDoc.message (the digital page's own message). */
+  posterPersonalMessage: string | null;
+  /** Poster-only: nebula hue mood override; null means "use the memory-type default". */
+  posterColorMood: "warm" | "cool" | "neutral" | null;
+  /** Journal-only: user-authored letter for the sealed back-cover insert. */
+  journalLetterText: string | null;
+  /** Journal-only: the date the sealed letter insert is meant to be opened. */
+  journalLetterOpeningDate: Timestamp | null;
+  /**
+   * Journal-only: ordered manifest of all 26 rendered page Storage paths
+   * (see lib/journalPrintRender.ts) — the 15 blank-page slots repeat the
+   * same path rather than storing 15 redundant renders. Never a direct URL.
+   */
+  printFilePaths: string[] | null;
+  /** Journal-only: the sealed letter insert's own print file — same locked-down security rule as printFilePath, kept separate since it's more sensitive than the rest of the book. */
+  letterInsertPrintPath: string | null;
   createdAt: Timestamp;
   updatedAt: Timestamp;
 }

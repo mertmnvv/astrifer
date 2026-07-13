@@ -56,3 +56,16 @@ export function buildSkyNarrative(sky: ComputeSkyResult): string {
 
   return sentences.join(" ");
 }
+
+/**
+ * Longer-form, prose-format version of buildSkyNarrative — same underlying
+ * real ephemeris facts (Moon phase/illumination, visible planets), written
+ * as a couple of extra sentences for the journal's standalone "Günün Anlamı
+ * ve Önemi" page rather than the compact one-liner used elsewhere.
+ */
+export function buildSkyEssay(sky: ComputeSkyResult): string {
+  const short = buildSkyNarrative(sky);
+  const closing =
+    "O gece gökyüzü neyse, bugün de öyle kalıyor — yıldızlar zamanla yer değiştirse de, o ana ait bu harita hep aynı anı taşıyacak.";
+  return short ? `${short} ${closing}` : closing;
+}

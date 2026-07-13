@@ -2,23 +2,53 @@
 
 import { useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
-import { StarChart } from "@/components/astrolab/StarChart";
+import { PosterArt } from "@/components/astrolab/PosterArt";
+import { PosterTextBand } from "@/components/astrolab/PosterTextBand";
+import type { NebulaMood } from "@/components/astrolab/nebulaMood";
+import { getSkyPalette } from "@/components/astrolab/palettes";
 import { FrameMockup } from "@/components/ui/FrameMockup";
 import { RadioCardGroup } from "@/components/ui/RadioCardGroup";
 import type { ComputeSkyResult } from "@/lib/astronomy/computeSky";
-import { formatTRY, type FrameOption, type PosterSize } from "@/lib/pricing";
+import { DEFAULT_FRAME_OPTION, formatTRY, type FrameOption, type PosterSize } from "@/lib/pricing";
+
+const MOOD_OPTIONS: { value: NebulaMood; label: string }[] = [
+  { value: "warm", label: "Sıcak" },
+  { value: "cool", label: "Soğuk" },
+  { value: "neutral", label: "Nötr" },
+];
+
+const MESSAGE_MAX_LENGTH = 240;
 
 export interface PosterConfiguratorProps {
   sky: ComputeSkyResult;
-  previewLabel: string;
+  headline: string;
+  names: string;
+  dateTimeLabel: string;
+  coordsLabel: string;
+  defaultMessage: string;
+  photoUrl: string | null;
+  qrUrl: string;
   posterSizes: { value: PosterSize; label: string; basePrice: number }[];
   frameOptions: { value: FrameOption; label: string; description: string; surcharge: number }[];
 }
 
-export function PosterConfigurator({ sky, previewLabel, posterSizes, frameOptions }: PosterConfiguratorProps) {
+export function PosterConfigurator({
+  sky,
+  headline,
+  names,
+  dateTimeLabel,
+  coordsLabel,
+  defaultMessage,
+  photoUrl,
+  qrUrl,
+  posterSizes,
+  frameOptions,
+}: PosterConfiguratorProps) {
   const router = useRouter();
   const [size, setSize] = useState<PosterSize>("50x50");
-  const [frame, setFrame] = useState<FrameOption>("black");
+  const [frame, setFrame] = useState<FrameOption>(DEFAULT_FRAME_OPTION);
+  const [mood, setMood] = useState<NebulaMood>("warm");
+  const [message, setMessage] = useState(defaultMessage);
 
   const price = useMemo(() => {
     const sizePrice = posterSizes.find((option) => option.value === size)?.basePrice ?? 0;
@@ -30,9 +60,11 @@ export function PosterConfigurator({ sky, previewLabel, posterSizes, frameOption
 
   const handleOrder = () => {
     const params = new URLSearchParams({
-      product: frame === "none" ? "poster" : "framed_poster",
+      product: frame === "frameless" ? "poster" : "framed_poster",
       size,
       frame,
+      mood,
+      message,
       price: price.toString(),
     });
     router.push(`/checkout?${params.toString()}`);
@@ -43,8 +75,23 @@ export function PosterConfigurator({ sky, previewLabel, posterSizes, frameOption
       <div className="order-1 flex flex-col items-center gap-4">
         <div className="w-full max-w-lg">
           <FrameMockup frame={frame} className="w-full">
-            <div className="aspect-square w-full">
-              <StarChart sky={sky} label={previewLabel} className="h-full w-full" />
+            <div className="flex aspect-square w-full flex-col overflow-hidden">
+              <PosterArt
+                sky={sky}
+                palette={getSkyPalette("gece-laciverti")}
+                mood={mood}
+                photoUrl={photoUrl}
+                qrUrl={qrUrl}
+                className="flex-[0_0_84%]"
+              />
+              <PosterTextBand
+                headline={headline}
+                personalMessage={message}
+                names={names}
+                dateTimeLabel={dateTimeLabel}
+                coordsLabel={coordsLabel}
+                className="flex-[0_0_16%]"
+              />
             </div>
           </FrameMockup>
         </div>
@@ -65,7 +112,7 @@ export function PosterConfigurator({ sky, previewLabel, posterSizes, frameOption
               }`}
             >
               <FrameMockup frame={option.value} className="h-full w-full">
-                <div className="h-full w-full" />
+                <div className="h-full w-full bg-[#0d1024]" />
               </FrameMockup>
             </button>
           ))}
@@ -101,13 +148,40 @@ export function PosterConfigurator({ sky, previewLabel, posterSizes, frameOption
           />
         </div>
 
+        <div>
+          <p className="mb-1.5 font-mono text-xs uppercase tracking-widest text-dim">Renk Ruhu</p>
+          <RadioCardGroup
+            name="mood"
+            ariaLabel="Nebula renk ruhu"
+            value={mood}
+            onChange={setMood}
+            columnsClassName="grid-cols-3"
+            options={MOOD_OPTIONS}
+          />
+        </div>
+
+        <div>
+          <label htmlFor="poster-message" className="mb-1.5 block font-mono text-xs uppercase tracking-widest text-dim">
+            Kişisel Mesaj
+          </label>
+          <textarea
+            id="poster-message"
+            rows={3}
+            maxLength={MESSAGE_MAX_LENGTH}
+            value={message}
+            onChange={(event) => setMessage(event.target.value)}
+            className="w-full resize-none rounded-[10px] border border-text/[0.14] bg-text/[0.04] px-3 py-2.5 font-display text-sm italic text-text placeholder:text-subtle focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-amber"
+          />
+        </div>
+
         <div className="rounded-2xl border border-text/10 bg-text/[0.035] p-4">
           <div className="flex items-baseline justify-between">
             <span className="font-mono text-xs uppercase tracking-widest text-subtle">Toplam</span>
             <span className="font-display text-3xl italic text-amber">{formatTRY(price)}</span>
           </div>
           <p className="mt-1 text-[11px] text-dim">
-            300 DPI baskı, kargo dahil. Üretim süresi 3-5 iş günü.
+            300 DPI giclée fine-art baskı, mat kağıt (210-230gsm), pigment mürekkep, anti-reflektif akrilik koruma.
+            Kargo dahil. Üretim süresi 3-5 iş günü.
           </p>
         </div>
 

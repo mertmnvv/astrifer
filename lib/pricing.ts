@@ -1,5 +1,6 @@
 export type PosterSize = "30x30" | "40x40" | "50x50" | "70x70";
-export type FrameOption = "none" | "black" | "oak";
+/** "Derin Gökyüzü" frame options — thin-black-metal is the new default, replacing the old doğal ahşap/oak option. */
+export type FrameOption = "frameless" | "black-wood-white-mat" | "thin-black-metal";
 
 /**
  * Fallback defaults, used when Firestore has no `config/pricing` doc yet
@@ -14,10 +15,23 @@ export const POSTER_SIZES: { value: PosterSize; label: string; basePrice: number
 ];
 
 export const FRAME_OPTIONS: { value: FrameOption; label: string; description: string; surcharge: number }[] = [
-  { value: "none", label: "Çerçevesiz", description: "180g mat, sadece poster.", surcharge: 0 },
-  { value: "black", label: "Siyah Ahşap", description: "Mat siyah ahşap çerçeve.", surcharge: 393 },
-  { value: "oak", label: "Doğal Ahşap", description: "Ham meşe dokulu çerçeve.", surcharge: 551 },
+  { value: "frameless", label: "Çerçevesiz", description: "210-230gsm mat giclée baskı, sadece poster.", surcharge: 0 },
+  {
+    value: "black-wood-white-mat",
+    label: "Siyah Ahşap + Beyaz Paspartu",
+    description: "Mat siyah ahşap çerçeve, beyaz paspartulu.",
+    surcharge: 393,
+  },
+  {
+    value: "thin-black-metal",
+    label: "İnce Siyah Metal",
+    description: "İnce profilli, sade siyah metal çerçeve.",
+    surcharge: 460,
+  },
 ];
+
+/** Default frame for a new poster order — see app/urun/poster/PosterConfigurator.tsx. */
+export const DEFAULT_FRAME_OPTION: FrameOption = "thin-black-metal";
 
 export function priceFor(size: PosterSize, frame: FrameOption): number {
   const sizePrice = POSTER_SIZES.find((option) => option.value === size)?.basePrice ?? 0;

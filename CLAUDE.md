@@ -36,12 +36,28 @@ evresi, gezegen konumları) hesaplanır ve kalıcı bir dijital sayfa +
   (`starMaps/{slug}/entries` alt koleksiyonu, `components/starmap/Timeline.tsx`).
   Sayfa sahibi 6 ayda bir yeni bir an ekleyebilir; ekleme penceresi
   açıldığında sayfada rozet gösterilir.
-- **Poster & Çerçeve** (`/urun/poster`) — boyut × çerçeve konfigüratörü,
-  300 DPI baskı.
-- **Deri Defter** (`/urun/defter`) — **suni/vegan deri** (asla "hakiki
-  deri" denmez), gofre kapak deseni, altın yaldızlı sayfa kenarı,
-  mühürlü cep içinde "Gelecek Mektubu", altın renkli kalem, 30 sayfa,
-  "Birlikte Anılarımız" fotoğraf sayfası (en fazla 4 foto).
+- **Poster & Çerçeve** (`/urun/poster`) — "Derin Gökyüzü": tarih+konum+anı
+  türünden seeded/procedural nebula + Samanyolu + gerçek renk çeşitliliğinde
+  yoğun yıldız alanı (`components/astrolab/drawNebulaSky.ts`,
+  `drawDeepSkyField.ts`), tek fotoğraf vinyeti, siparişin gerçek dijital
+  sayfa URL'ine kodlanan QR (`lib/qrcode.ts`). Yazı bandı ayrı bir HTML
+  bileşeni (`PosterTextBand.tsx`, canlı güncellenir, canvas'a gömülü
+  değil); baskı dosyası üretilirken (`lib/printRender.ts`) sanat alanı +
+  bant Puppeteer ile tek görüntüde birleştirilir. Boyut × çerçeve
+  (çerçevesiz / siyah ahşap+beyaz paspartu / ince siyah metal, varsayılan)
+  × Sıcak/Soğuk/Nötr renk ruhu konfigüratörü.
+- **Deri Defter** (`/urun/defter`) — "Modern Gece + Altın": **suni/vegan
+  deri** (asla "hakiki deri" denmez), koyu lacivert kapak + ince-çizgi-yıldız
+  logo, altın yaldızlı sayfa kenarı, 26 sayfa (kapak, 2 sayfa mücevher
+  kesimi numaralı yıldız haritası, Yıldız Anahtarı + Günün Anlamı, 4 ayrı
+  "Birlikte Anılarımız" fotoğraf sayfası, Günün Anlamı ve Önemi, QR sayfası,
+  15 boş/çizgili sayfa, mühürlü cep arka kapak), altın renkli kalem
+  (`components/journal/night/`). Gelecek Mektubu metni + açılış tarihi
+  konfigüratörden girilir (`JournalConfigurator.tsx`) ve kitabın kendisinden
+  ayrı, mühürlü bir ek olarak basılır (`lib/journalPrintRender.ts`) —
+  26 fiziksel sayfa 13 farklı dosyaya render edilir (15 boş sayfa tekrar
+  kullanılır), mektup eki ayrı ve daha kısıtlı bir indirme aksiyonuna
+  bağlıdır.
 
 Fiyatlar `config/pricing` Firestore dokümanından okunuyor
 (`lib/pricingConfig.ts`, `/admin/pricing`'den düzenlenebilir);

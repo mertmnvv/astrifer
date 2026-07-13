@@ -102,7 +102,7 @@ export default async function AdminOrdersPage({
                     <Link href={`/admin/orders/${order.id}`} className="hover:text-amber hover:underline">
                       {order.productType}
                       {order.size ? ` · ${order.size}` : ""}
-                      {order.frameOption && order.frameOption !== "none" ? ` · ${order.frameOption}` : ""}
+                      {order.frameOption && order.frameOption !== "frameless" ? ` · ${order.frameOption}` : ""}
                     </Link>
                   </td>
                   <td className="px-4 py-3 align-top text-text">{formatTRY(order.priceAmount)}</td>

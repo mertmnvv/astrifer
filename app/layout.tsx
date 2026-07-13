@@ -3,7 +3,7 @@ import { Instrument_Serif, JetBrains_Mono, Hanken_Grotesk, Spectral } from "next
 import "./globals.css";
 
 const displayFont = Instrument_Serif({
-  subsets: ["latin"],
+  subsets: ["latin", "latin-ext"],
   weight: "400",
   style: ["normal", "italic"],
   variable: "--font-display",
@@ -11,21 +11,21 @@ const displayFont = Instrument_Serif({
 });
 
 const monoFont = JetBrains_Mono({
-  subsets: ["latin"],
+  subsets: ["latin", "latin-ext"],
   weight: ["400", "500"],
   variable: "--font-mono",
   display: "swap",
 });
 
 const bodyFont = Hanken_Grotesk({
-  subsets: ["latin"],
+  subsets: ["latin", "latin-ext"],
   weight: ["300", "400", "500", "600"],
   variable: "--font-body",
   display: "swap",
 });
 
 const logoFont = Spectral({
-  subsets: ["latin"],
+  subsets: ["latin", "latin-ext"],
   weight: "500",
   style: ["normal", "italic"],
   variable: "--font-logo",

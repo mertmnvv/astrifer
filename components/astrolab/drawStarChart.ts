@@ -35,8 +35,10 @@ const METEOR_DURATION_SECONDS = 1.1;
 
 // Cheap deterministic hash (djb2) — used only to desynchronize cosmetic
 // animation (twinkle phase, meteor timing/position), never to derive real
-// star positions or data.
-function hash(input: string): number {
+// star positions or data. Exported so other decorative drawing modules
+// (nebula/deep-sky-field/jewel-star) can derive their own cosmetic seeds
+// from the same star/body names without duplicating this function.
+export function hash(input: string): number {
   let h = 5381;
   for (let i = 0; i < input.length; i++) {
     h = (h * 33) ^ input.charCodeAt(i);
@@ -45,7 +47,7 @@ function hash(input: string): number {
 }
 
 /** Maps horizontal coordinates to a point in the sky field. North is up, azimuth runs clockwise. */
-function project(
+export function project(
   azimuthDeg: number,
   altitudeDeg: number,
   cx: number,
@@ -61,7 +63,7 @@ function project(
   };
 }
 
-function starRadius(mag: number, scale: number): number {
+export function starRadius(mag: number, scale: number): number {
   return Math.max(0.5, 3.4 - mag * 0.55) * scale;
 }
 
@@ -137,7 +139,7 @@ function drawLabel(
   ctx.restore();
 }
 
-function drawPlanet(
+export function drawPlanet(
   ctx: CanvasRenderingContext2D,
   point: { x: number; y: number },
   mag: number,
@@ -158,7 +160,7 @@ function drawPlanet(
   ctx.restore();
 }
 
-function drawSun(ctx: CanvasRenderingContext2D, point: { x: number; y: number }, scale: number, palette: SkyPalette) {
+export function drawSun(ctx: CanvasRenderingContext2D, point: { x: number; y: number }, scale: number, palette: SkyPalette) {
   const r = 6 * scale;
   ctx.save();
   ctx.strokeStyle = palette.sun;
@@ -177,7 +179,7 @@ function drawSun(ctx: CanvasRenderingContext2D, point: { x: number; y: number },
   ctx.restore();
 }
 
-function drawMoon(
+export function drawMoon(
   ctx: CanvasRenderingContext2D,
   point: { x: number; y: number },
   illumination: number,
