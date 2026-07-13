@@ -7,6 +7,7 @@ import { QrPage } from "@/components/journal/night/QrPage";
 import { StarKeyPage } from "@/components/journal/night/StarKeyPage";
 import { StarMapSpreadPage } from "@/components/journal/night/StarMapSpreadPage";
 import { pickNumberedStars, splitSkyByAzimuth } from "@/components/journal/starMapSpread";
+import { ScaledPreview } from "@/components/ScaledPreview";
 import { computeSky } from "@/lib/astronomy/computeSky";
 import { buildSkyEssay, buildSkyNarrative } from "@/lib/astronomy/skyNarrative";
 import { getSiteUrl } from "@/lib/siteUrl";
@@ -42,13 +43,24 @@ export default async function JournalProductPage() {
     { title: "Büyük Yıldız Haritası — 2. sayfa", preview: <StarMapSpreadPage sky={sky} numberedStars={page2Stars} /> },
     {
       title: "Yıldız Anahtarı + Günün Anlamı",
-      preview: <StarKeyPage numberedStars={[...page1Stars, ...page2Stars]} narrative={buildSkyNarrative(sky)} />,
+      preview: (
+        <ScaledPreview designWidth={600} designHeight={800} className="h-full w-full">
+          <StarKeyPage numberedStars={[...page1Stars, ...page2Stars]} narrative={buildSkyNarrative(sky)} widthPx={600} heightPx={800} />
+        </ScaledPreview>
+      ),
     },
     ...MEMORY_CAPTIONS.map((caption, index) => ({
       title: `Birlikte Anılarımız — ${caption}`,
       preview: <MemoryPage photo={memoryPhotos[index] ?? {}} caption={memoryPhotos[index]?.caption ?? caption} />,
     })),
-    { title: "Günün Anlamı ve Önemi — uzun, düzyazı formatında", preview: <EssayPage essay={buildSkyEssay(sky)} /> },
+    {
+      title: "Günün Anlamı ve Önemi — uzun, düzyazı formatında",
+      preview: (
+        <ScaledPreview designWidth={600} designHeight={800} className="h-full w-full">
+          <EssayPage essay={buildSkyEssay(sky)} widthPx={600} heightPx={800} />
+        </ScaledPreview>
+      ),
+    },
     { title: "QR sayfası — dijital yaşayan sayfaya bağlantı", preview: <QrPage qrUrl={qrUrl} /> },
     { title: "15 boş / çizgili sayfa — kendi sözleriniz için", preview: <div className="flex h-full w-full items-center justify-center bg-[#05060d] text-center font-mono text-3xl italic text-amber">15</div> },
     { title: "Arka kapak — Gelecek Mektubu, mühürlü cep", preview: <BackCoverPage /> },

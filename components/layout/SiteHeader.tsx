@@ -11,7 +11,12 @@ const NAV_LINKS = [
   { href: "/#urunler", label: "Ürünler" },
 ];
 
-/** Fixed top bar: logo + nav links + primary CTA. Below `sm` the text links collapse behind a hamburger that opens a right-side drawer (MobileNav) sharing this same NAV_LINKS list. */
+/**
+ * Fixed top bar: logo + nav links + primary CTA. Below `sm` the text links
+ * collapse behind a thin-line-star trigger (left side, next to the logo)
+ * that opens a left-side sliding panel (MobileNav) sharing this same
+ * NAV_LINKS list — the trigger sits on the same side the panel opens from.
+ */
 export function SiteHeader() {
   const { scrollY } = useScroll();
   const background = useTransform(scrollY, [0, 96], ["rgba(11,8,16,0)", "rgba(11,8,16,0.72)"]);
@@ -21,12 +26,14 @@ export function SiteHeader() {
     <motion.header style={{ backgroundColor: background }} className="fixed inset-x-0 top-0 z-40 backdrop-blur-md">
       <motion.div style={{ opacity: borderOpacity }} className="absolute inset-x-0 bottom-0 h-px bg-text/10" />
       <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-3 sm:px-8 sm:py-4">
-        <Link href="/" className="flex items-center" aria-label="Astrifer anasayfa">
-          <LogoMark size={22} className="sm:hidden" />
-          <Logo size={26} className="hidden sm:inline-block" />
-        </Link>
-        <nav className="flex items-center gap-4 sm:gap-7">
+        <div className="flex items-center gap-1 sm:gap-0">
           <MobileNav links={NAV_LINKS} />
+          <Link href="/" className="flex items-center" aria-label="Astrifer anasayfa">
+            <LogoMark size={22} className="sm:hidden" />
+            <Logo size={26} className="hidden sm:inline-block" />
+          </Link>
+        </div>
+        <nav className="flex items-center gap-4 sm:gap-7">
           {NAV_LINKS.map((link) => (
             <Link
               key={link.href}
