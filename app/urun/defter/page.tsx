@@ -1,4 +1,6 @@
 import type { Metadata } from "next";
+import { cookies } from "next/headers";
+import { ContinueYourPageBanner } from "@/components/ContinueYourPageBanner";
 import { CrossSell } from "@/components/CrossSell";
 import { SiteHeader } from "@/components/layout/SiteHeader";
 import { SiteFooter } from "@/components/layout/SiteFooter";
@@ -15,7 +17,8 @@ import { computeSky } from "@/lib/astronomy/computeSky";
 import { buildSkyEssay, buildSkyNarrative } from "@/lib/astronomy/skyNarrative";
 import { getSiteUrl } from "@/lib/siteUrl";
 import { getPricingConfig } from "@/lib/pricingConfig";
-import { DEMO_STAR_MAP } from "@/lib/starmaps";
+import { DEMO_STAR_MAP, getStarMapBySlug } from "@/lib/starmaps";
+import { ownerCookieName, verifyOwnerToken } from "@/lib/starmapOwnerToken";
 import { JournalConfigurator } from "./JournalConfigurator";
 
 export const dynamic = "force-dynamic";
@@ -27,21 +30,30 @@ export const metadata: Metadata = {
 
 const MEMORY_CAPTIONS = ["İlk “Merhaba”", "O Gece", "Yüzük", "Ailece"];
 
-export default async function JournalProductPage() {
+export default async function JournalProductPage({
+  searchParams,
+}: {
+  searchParams: { slug?: string };
+}) {
+  const ownStarMap = searchParams.slug ? await getStarMapBySlug(searchParams.slug) : null;
+  const ownerToken = ownStarMap ? cookies().get(ownerCookieName(ownStarMap.slug))?.value : undefined;
+  const isVerifiedOwner = ownStarMap ? await verifyOwnerToken(ownStarMap.slug, ownerToken) : false;
+  const source = isVerifiedOwner && ownStarMap ? ownStarMap : DEMO_STAR_MAP;
+
   const sky = computeSky({
-    date: DEMO_STAR_MAP.eventDateUtc,
-    latitude: DEMO_STAR_MAP.latitude,
-    longitude: DEMO_STAR_MAP.longitude,
+    date: source.eventDateUtc,
+    latitude: source.latitude,
+    longitude: source.longitude,
   });
   const page1Stars = pickNumberedStars(splitSkyByAzimuth(sky, 0, 180), 6, 1);
   const page2Stars = pickNumberedStars(splitSkyByAzimuth(sky, 180, 360), 6, 7);
-  const initialEntry = DEMO_STAR_MAP.entries.find((entry) => entry.isInitial) ?? DEMO_STAR_MAP.entries[0];
+  const initialEntry = source.entries.find((entry) => entry.isInitial) ?? source.entries[0];
   const memoryPhotos = initialEntry?.photos ?? [];
-  const qrUrl = `${getSiteUrl()}/s/${DEMO_STAR_MAP.slug}`;
+  const qrUrl = `${getSiteUrl()}/s/${source.slug}`;
   const { journalPrice } = await getPricingConfig();
 
   const CONTENTS: { title: string; preview: React.ReactNode }[] = [
-    { title: "Kapak — suni deri, altın yaldız ince-çizgi-yıldız logo ve isimler", preview: <NightCoverPage names={DEMO_STAR_MAP.title} /> },
+    { title: "Kapak — suni deri, altın yaldız ince-çizgi-yıldız logo ve isimler", preview: <NightCoverPage names={source.title} /> },
     { title: "Büyük Yıldız Haritası — 1. sayfa, mücevher kesimi numaralı yıldızlar", preview: <StarMapSpreadPage sky={sky} numberedStars={page1Stars} /> },
     { title: "Büyük Yıldız Haritası — 2. sayfa", preview: <StarMapSpreadPage sky={sky} numberedStars={page2Stars} /> },
     {
@@ -85,6 +97,8 @@ export default async function JournalProductPage() {
             </p>
           </header>
 
+          <ContinueYourPageBanner />
+
           <div className="mb-10">
             <p className="mb-3 font-mono text-xs uppercase tracking-widest text-dim">İçindekiler</p>
             <div className="grid grid-cols-2 gap-4 sm:grid-cols-3">
@@ -103,7 +117,7 @@ export default async function JournalProductPage() {
             </p>
           </div>
 
-          <JournalConfigurator names={DEMO_STAR_MAP.title} journalPrice={journalPrice} slug={DEMO_STAR_MAP.slug} />
+          <JournalConfigurator names={source.title} journalPrice={journalPrice} slug={source.slug} />
           <CrossSell exclude="journal" />
         </div>
       </main>
