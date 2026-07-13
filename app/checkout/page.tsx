@@ -54,6 +54,9 @@ export default async function CheckoutPage({
   const photoUrls = photosParam ? photosParam.split(",").filter(Boolean) : [];
   const voiceUrl = get("voice");
   const journalAdded = get("addOn") === "journal";
+  const mood = get("mood");
+  const letterText = get("letterText");
+  const letterOpeningDate = get("letterOpeningDate");
 
   const productLabel: Record<string, string> = {
     framed_poster: "Çerçeveli Poster",
@@ -100,14 +103,24 @@ export default async function CheckoutPage({
                   <LedgerRow label="Ürün" value={productLabel[effectiveProduct] ?? effectiveProduct} />
                 )}
                 {size && <LedgerRow label="Boyut" value={size} />}
-                {frame && frame !== "none" && <LedgerRow label="Çerçeve" value={frame} />}
+                {frame && frame !== "frameless" && <LedgerRow label="Çerçeve" value={frame} />}
+                {mood && <LedgerRow label="Renk Ruhu" value={mood} />}
                 {photoUrls.length > 0 && <LedgerRow label="Fotoğraflar" value={`${photoUrls.length} adet yüklendi`} />}
                 {voiceUrl && <LedgerRow label="Sesli mesaj" value="Eklendi" />}
+                {letterOpeningDate && <LedgerRow label="Mektup Açılış Tarihi" value={letterOpeningDate} />}
               </div>
               {message && (
                 <div className="mt-2 border-t border-text/[0.08] pt-4">
                   <p className="font-mono text-[11px] uppercase tracking-widest text-dim">Mesaj</p>
                   <p className="mt-1.5 font-display text-base italic leading-relaxed text-text">{message}</p>
+                </div>
+              )}
+              {letterText && (
+                <div className="mt-2 border-t border-text/[0.08] pt-4">
+                  <p className="font-mono text-[11px] uppercase tracking-widest text-dim">Gelecek Mektubu</p>
+                  <p className="mt-1.5 whitespace-pre-line font-display text-base italic leading-relaxed text-text">
+                    {letterText}
+                  </p>
                 </div>
               )}
               {basePrice !== undefined && !Number.isNaN(basePrice) && (
@@ -126,7 +139,7 @@ export default async function CheckoutPage({
               </div>
               <div className="flex-1">
                 <p className="font-mono text-[10px] uppercase tracking-widest text-amber">Ekstra: Deri Defter</p>
-                <p className="mt-0.5 text-xs text-subtle">Kapağında haritan, içinde 30 boş sayfa.</p>
+                <p className="mt-0.5 text-xs text-subtle">Kapağında haritan, 26 sayfalık kişiye özel bir defter.</p>
                 <p className="mt-1 font-display text-lg italic text-text">{formatTRY(journalPrice)}</p>
               </div>
               <Link

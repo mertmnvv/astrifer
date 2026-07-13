@@ -69,7 +69,7 @@ export default async function AdminOrderDetailPage({ params }: { params: { id: s
               <LedgerRow label="E-posta" value={order.customerEmail} />
               <LedgerRow label="Ürün" value={PRODUCT_LABELS[order.productType]} />
               {order.size && <LedgerRow label="Boyut" value={order.size} />}
-              {order.frameOption && order.frameOption !== "none" && (
+              {order.frameOption && order.frameOption !== "frameless" && (
                 <LedgerRow label="Çerçeve" value={order.frameOption} />
               )}
               <LedgerRow label="Tutar" value={formatTRY(order.priceAmount)} />
@@ -168,7 +168,7 @@ export default async function AdminOrderDetailPage({ params }: { params: { id: s
             </div>
           ) : order.productType === "poster" || order.productType === "framed_poster" ? (
             <div className="w-full max-w-md">
-              <FrameMockup frame={(order.frameOption ?? "none") as FrameOption} className="w-full">
+              <FrameMockup frame={(order.frameOption ?? "frameless") as FrameOption} className="w-full">
                 <div className="aspect-square w-full">
                   <StarChart
                     sky={sky}

@@ -1,10 +1,23 @@
 import type { ReactNode } from "react";
 import type { FrameOption } from "@/lib/pricing";
 
-const FRAME_STYLES: Record<FrameOption, { background: string; padding: string; radius: string } | null> = {
-  none: null,
-  black: { background: "linear-gradient(135deg, #1c1a18, #0d0c0b)", padding: "5.5%", radius: "4px" },
-  oak: { background: "linear-gradient(135deg, #8a6a42, #5c4225)", padding: "5.5%", radius: "4px" },
+interface FrameStyle {
+  background: string;
+  padding: string;
+  radius: string;
+  /** Inner white mat between the frame and the art, e.g. black-wood-white-mat. */
+  matPadding?: string;
+}
+
+const FRAME_STYLES: Record<FrameOption, FrameStyle | null> = {
+  frameless: null,
+  "black-wood-white-mat": {
+    background: "linear-gradient(135deg, #1c1a18, #0d0c0b)",
+    padding: "4.5%",
+    radius: "4px",
+    matPadding: "5%",
+  },
+  "thin-black-metal": { background: "#141416", padding: "1.6%", radius: "2px" },
 };
 
 export interface FrameMockupProps {
@@ -27,12 +40,11 @@ export function FrameMockup({ frame, children, className }: FrameMockupProps) {
     );
   }
 
-  return (
-    <div
-      className={`shadow-2xl shadow-black/50 ${className ?? ""}`}
-      style={{ background: style.background, padding: style.padding, borderRadius: style.radius }}
-    >
-      {children}
+  const framed = (
+    <div style={{ background: style.background, padding: style.padding, borderRadius: style.radius }}>
+      {style.matPadding ? <div style={{ background: "#f4f2ec", padding: style.matPadding }}>{children}</div> : children}
     </div>
   );
+
+  return <div className={`shadow-2xl shadow-black/50 ${className ?? ""}`}>{framed}</div>;
 }

@@ -51,7 +51,10 @@ export async function renderPrintFileAction(formData: FormData) {
     throw new Error("Bu sipariş türü için baskı dosyası üretilemez.");
   }
 
-  const result = await renderPrintFile(order.starMapSlug, order.size as PosterSize);
+  const result = await renderPrintFile(order.starMapSlug, order.size as PosterSize, {
+    mood: order.posterColorMood ?? undefined,
+    message: order.posterPersonalMessage ?? undefined,
+  });
 
   await orderRef.update({
     printFilePath: result.storagePath,

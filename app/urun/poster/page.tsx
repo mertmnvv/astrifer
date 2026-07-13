@@ -1,6 +1,9 @@
 import type { Metadata } from "next";
+import { resolvePosterHeadline } from "@/components/astrolab/posterHeadline";
 import { computeSky } from "@/lib/astronomy/computeSky";
+import { formatCoords } from "@/lib/geo/formatCoords";
 import { getPricingConfig } from "@/lib/pricingConfig";
+import { getSiteUrl } from "@/lib/siteUrl";
 import { DEMO_STAR_MAP } from "@/lib/starmaps";
 import { PosterConfigurator } from "./PosterConfigurator";
 
@@ -19,6 +22,15 @@ export default async function PosterProductPage() {
   });
   const { posterSizes, frameOptions } = await getPricingConfig();
 
+  const dateTimeLabel = new Intl.DateTimeFormat("tr-TR", {
+    timeZone: DEMO_STAR_MAP.timezone,
+    dateStyle: "long",
+    timeStyle: "short",
+  })
+    .format(DEMO_STAR_MAP.eventDateUtc)
+    .toUpperCase();
+  const photoUrl = DEMO_STAR_MAP.entries.flatMap((entry) => entry.photos).find((photo) => photo.url)?.url ?? null;
+
   return (
     <main className="min-h-screen px-4 py-10 sm:px-8 sm:py-16">
       <div className="mx-auto max-w-6xl">
@@ -34,7 +46,13 @@ export default async function PosterProductPage() {
         </header>
         <PosterConfigurator
           sky={sky}
-          previewLabel={`${DEMO_STAR_MAP.locationName} örnek gökyüzü`}
+          headline={resolvePosterHeadline("teklif")}
+          names={DEMO_STAR_MAP.title}
+          dateTimeLabel={dateTimeLabel}
+          coordsLabel={formatCoords(DEMO_STAR_MAP.latitude, DEMO_STAR_MAP.longitude)}
+          defaultMessage={DEMO_STAR_MAP.message ?? ""}
+          photoUrl={photoUrl}
+          qrUrl={`${getSiteUrl()}/s/${DEMO_STAR_MAP.slug}`}
           posterSizes={posterSizes}
           frameOptions={frameOptions}
         />
