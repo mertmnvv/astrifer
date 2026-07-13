@@ -9,6 +9,7 @@ export interface QrCodeProps {
   darkColor?: string;
   lightColor?: string;
   className?: string;
+  onReady?: () => void;
 }
 
 /**
@@ -16,17 +17,21 @@ export interface QrCodeProps {
  * generateQrSvg() code path in the live browser preview and inside the
  * headless-Chromium print render, so both surfaces always match.
  */
-export function QrCode({ url, sizePx, darkColor, lightColor, className }: QrCodeProps) {
+export function QrCode({ url, sizePx, darkColor, lightColor, className, onReady }: QrCodeProps) {
   const [svg, setSvg] = useState<string | null>(null);
 
   useEffect(() => {
     let cancelled = false;
     generateQrSvg({ url, darkColor, lightColor }).then((markup) => {
-      if (!cancelled) setSvg(markup);
+      if (!cancelled) {
+        setSvg(markup);
+        onReady?.();
+      }
     });
     return () => {
       cancelled = true;
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [url, darkColor, lightColor]);
 
   return (

@@ -51,7 +51,7 @@ const PRODUCTS: ProductItem[] = [
       "Premium suni deri, el işçiliği ciltleme",
       "Özel gofre (sıcak baskı) kapak deseni",
       "Altın yaldızlı sayfa kenarı",
-      "30 sayfa boş/çizgili fildişi kağıt",
+      "15 sayfa boş/çizgili, 26 sayfalık kitap",
       "Birlikte Anılarımız fotoğraf sayfası (4 foto)",
       "Gelecek Mektubu — ileri tarihe mühürlü mektup",
       "Hediye altın renkli kalem",

@@ -1,7 +1,14 @@
 import type { OrderStatus, ProductType } from "@/types/firestore";
 
-/** Product types the 300 DPI render pipeline (lib/printRender.ts) currently supports. */
-export const PRINTABLE_PRODUCTS: ProductType[] = ["poster", "framed_poster"];
+/**
+ * Product types with a 300 DPI print pipeline: poster/framed_poster use
+ * lib/printRender.ts, journal uses lib/journalPrintRender.ts (a full
+ * 26-page manifest + a separate sealed letter insert).
+ */
+export const PRINTABLE_PRODUCTS: ProductType[] = ["poster", "framed_poster", "journal"];
+
+/** Subset of PRINTABLE_PRODUCTS that use the single-image poster pipeline (lib/printRender.ts). */
+export const POSTER_PRINTABLE_PRODUCTS: ProductType[] = ["poster", "framed_poster"];
 
 export const STATUS_LABELS: Record<OrderStatus, string> = {
   pending: "Bekliyor",
