@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { CrossSell } from "@/components/CrossSell";
 import { StarChart } from "@/components/astrolab/StarChart";
 import { getSkyPalette } from "@/components/astrolab/palettes";
 import { AtlasPanel } from "@/components/atlas/AtlasPanel";
@@ -168,6 +169,15 @@ export function StarMapView({ starMap, isPreview = false, isOwner = false }: Sta
                 Düzenlemeye Dön
               </Link>
             </>
+          ) : isOwner ? (
+            <>
+              <p className="font-display text-xl italic text-text sm:text-2xl">
+                Anını fiziksel bir ürüne dönüştür.
+              </p>
+              <p className="text-sm leading-relaxed text-subtle">
+                Bu gökyüzünü bir posterde ya da deri defterde sonsuza dek sakla.
+              </p>
+            </>
           ) : (
             <>
               <p className="font-display text-xl italic text-text sm:text-2xl">Bu an burada, sonsuza dek.</p>
@@ -183,6 +193,11 @@ export function StarMapView({ starMap, isPreview = false, isOwner = false }: Sta
             </>
           )}
         </RevealOnScroll>
+        {!isPreview && isOwner && (
+          <div className="w-full max-w-2xl">
+            <CrossSell exclude={["digital"]} />
+          </div>
+        )}
       </main>
     </PageGate>
   );

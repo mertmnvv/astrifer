@@ -1,5 +1,7 @@
 import type { Metadata } from "next";
+import { cookies } from "next/headers";
 import { resolvePosterHeadline } from "@/components/astrolab/posterHeadline";
+import { ContinueYourPageBanner } from "@/components/ContinueYourPageBanner";
 import { CrossSell } from "@/components/CrossSell";
 import { SiteHeader } from "@/components/layout/SiteHeader";
 import { SiteFooter } from "@/components/layout/SiteFooter";
@@ -7,7 +9,8 @@ import { computeSky } from "@/lib/astronomy/computeSky";
 import { formatCoords } from "@/lib/geo/formatCoords";
 import { getPricingConfig } from "@/lib/pricingConfig";
 import { getSiteUrl } from "@/lib/siteUrl";
-import { DEMO_STAR_MAP } from "@/lib/starmaps";
+import { DEMO_STAR_MAP, getStarMapBySlug } from "@/lib/starmaps";
+import { ownerCookieName, verifyOwnerToken } from "@/lib/starmapOwnerToken";
 import { PosterConfigurator } from "./PosterConfigurator";
 
 export const dynamic = "force-dynamic";
@@ -17,22 +20,31 @@ export const metadata: Metadata = {
   description: "Kendi yıldız haritanı 300 DPI baskı kalitesinde posterde ya da çerçevede duvarına as.",
 };
 
-export default async function PosterProductPage() {
+export default async function PosterProductPage({
+  searchParams,
+}: {
+  searchParams: { slug?: string };
+}) {
+  const ownStarMap = searchParams.slug ? await getStarMapBySlug(searchParams.slug) : null;
+  const ownerToken = ownStarMap ? cookies().get(ownerCookieName(ownStarMap.slug))?.value : undefined;
+  const isVerifiedOwner = ownStarMap ? await verifyOwnerToken(ownStarMap.slug, ownerToken) : false;
+  const source = isVerifiedOwner && ownStarMap ? ownStarMap : DEMO_STAR_MAP;
+
   const sky = computeSky({
-    date: DEMO_STAR_MAP.eventDateUtc,
-    latitude: DEMO_STAR_MAP.latitude,
-    longitude: DEMO_STAR_MAP.longitude,
+    date: source.eventDateUtc,
+    latitude: source.latitude,
+    longitude: source.longitude,
   });
   const { posterSizes, frameOptions } = await getPricingConfig();
 
   const dateTimeLabel = new Intl.DateTimeFormat("tr-TR", {
-    timeZone: DEMO_STAR_MAP.timezone,
+    timeZone: source.timezone,
     dateStyle: "long",
     timeStyle: "short",
   })
-    .format(DEMO_STAR_MAP.eventDateUtc)
+    .format(source.eventDateUtc)
     .toUpperCase();
-  const photoUrl = DEMO_STAR_MAP.entries.flatMap((entry) => entry.photos).find((photo) => photo.url)?.url ?? null;
+  const photoUrl = source.entries.flatMap((entry) => entry.photos).find((photo) => photo.url)?.url ?? null;
 
   return (
     <>
@@ -49,16 +61,17 @@ export default async function PosterProductPage() {
               haritan — poster olarak ya da hazır çerçevede.
             </p>
           </header>
+          <ContinueYourPageBanner />
           <PosterConfigurator
             sky={sky}
-            headline={resolvePosterHeadline("teklif")}
-            names={DEMO_STAR_MAP.title}
+            headline={resolvePosterHeadline(isVerifiedOwner ? null : "teklif")}
+            names={source.title}
             dateTimeLabel={dateTimeLabel}
-            coordsLabel={formatCoords(DEMO_STAR_MAP.latitude, DEMO_STAR_MAP.longitude)}
-            defaultMessage={DEMO_STAR_MAP.message ?? ""}
+            coordsLabel={formatCoords(source.latitude, source.longitude)}
+            defaultMessage={source.message ?? ""}
             photoUrl={photoUrl}
-            qrUrl={`${getSiteUrl()}/s/${DEMO_STAR_MAP.slug}`}
-            slug={DEMO_STAR_MAP.slug}
+            qrUrl={`${getSiteUrl()}/s/${source.slug}`}
+            slug={source.slug}
             posterSizes={posterSizes}
             frameOptions={frameOptions}
           />

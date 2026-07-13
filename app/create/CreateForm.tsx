@@ -14,6 +14,7 @@ import { SKY_PALETTES, DEFAULT_SKY_PALETTE, getSkyPalette } from "@/components/a
 import { BUILTIN_PLACES, type PlaceResult } from "@/lib/geocode/cities";
 import { zonedTimeToUtc, utcToZonedTime } from "@/lib/geocode/timezone";
 import { addToCart } from "@/lib/cart";
+import { setLastCreatedPage } from "@/lib/lastCreatedPage";
 import { DIGITAL_PRICE, formatTRY } from "@/lib/pricing";
 import { slugify } from "@/lib/slug";
 import type { TemplateOption } from "@/lib/templates";
@@ -269,6 +270,7 @@ export function CreateForm({ templates }: CreateFormProps) {
         summary: [posterDateLine],
         slug,
       });
+      setLastCreatedPage({ slug, title, locationName: place.name });
 
       const next = "/sepet";
       router.push(`/s/${slug}/claim?token=${encodeURIComponent(ownerToken)}&next=${encodeURIComponent(next)}`);
