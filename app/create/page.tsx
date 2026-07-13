@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { CrossSell } from "@/components/CrossSell";
 import { CreateForm } from "./CreateForm";
 import { FALLBACK_TEMPLATES, type TemplateOption } from "@/lib/templates";
 import { isFirebaseConfigured } from "@/lib/firebase/isConfigured";
@@ -36,7 +37,7 @@ async function loadTemplates(): Promise<TemplateOption[]> {
         name: data.name,
         category: data.category,
         description: data.description ?? "",
-        defaultMessage: data.defaultMessage ?? "",
+        exampleMessages: data.exampleMessages ?? [],
       };
     });
   } catch {
@@ -61,6 +62,7 @@ export default async function CreatePage() {
           <RevealOnScroll delayMs={120}>
             <CreateForm templates={templates} />
           </RevealOnScroll>
+          <CrossSell exclude="digital" />
         </div>
       </main>
       <SiteFooter />

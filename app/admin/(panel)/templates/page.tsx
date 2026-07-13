@@ -127,10 +127,22 @@ export default async function AdminTemplatesPage() {
             <input id="description" name="description" className={FIELD_CLASS} />
           </div>
           <div className="space-y-1.5 sm:col-span-2">
-            <label htmlFor="defaultMessage" className={FIELD_LABEL_CLASS}>
-              Varsayılan mesaj
+            <label htmlFor="exampleMessage1" className={FIELD_LABEL_CLASS}>
+              Örnek Mesaj 1
             </label>
-            <input id="defaultMessage" name="defaultMessage" className={FIELD_CLASS} />
+            <input id="exampleMessage1" name="exampleMessage1" className={FIELD_CLASS} />
+          </div>
+          <div className="space-y-1.5 sm:col-span-2">
+            <label htmlFor="exampleMessage2" className={FIELD_LABEL_CLASS}>
+              Örnek Mesaj 2
+            </label>
+            <input id="exampleMessage2" name="exampleMessage2" className={FIELD_CLASS} />
+          </div>
+          <div className="space-y-1.5 sm:col-span-2">
+            <label htmlFor="exampleMessage3" className={FIELD_LABEL_CLASS}>
+              Örnek Mesaj 3
+            </label>
+            <input id="exampleMessage3" name="exampleMessage3" className={FIELD_CLASS} />
           </div>
           <button
             type="submit"

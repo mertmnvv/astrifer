@@ -1,4 +1,7 @@
 import type { Metadata } from "next";
+import { CrossSell } from "@/components/CrossSell";
+import { SiteHeader } from "@/components/layout/SiteHeader";
+import { SiteFooter } from "@/components/layout/SiteFooter";
 import { BackCoverPage } from "@/components/journal/night/BackCoverPage";
 import { EssayPage } from "@/components/journal/night/EssayPage";
 import { MemoryPage } from "@/components/journal/night/MemoryPage";
@@ -67,39 +70,44 @@ export default async function JournalProductPage() {
   ];
 
   return (
-    <main className="min-h-screen px-4 py-10 sm:px-8 sm:py-16">
-      <div className="mx-auto max-w-5xl">
-        <header className="mb-8 flex flex-col items-center text-center sm:mb-12">
-          <p className="font-mono text-[11px] uppercase tracking-[0.34em] text-amber">Deri Defter</p>
-          <h1 className="mt-3.5 font-display text-3xl italic text-bright sm:text-5xl">
-            Kapağında adın, içinde o an.
-          </h1>
-          <p className="mx-auto mt-3 max-w-xl text-sm text-subtle sm:text-base">
-            Premium suni deri ciltli, 26 sayfalık kişiye özel bir defter — kapakta gerçek
-            yıldız haritan, içinde anılarınız ve mühürlü bir gelecek mektubu.
-          </p>
-        </header>
+    <>
+      <SiteHeader />
+      <main className="min-h-screen px-4 pb-16 pt-28 sm:px-8 sm:pb-24 sm:pt-36">
+        <div className="mx-auto max-w-5xl">
+          <header className="mb-8 flex flex-col items-center text-center sm:mb-12">
+            <p className="font-mono text-[11px] uppercase tracking-[0.34em] text-amber">Deri Defter</p>
+            <h1 className="mt-3.5 font-display text-3xl italic text-bright sm:text-5xl">
+              Kapağında adın, içinde o an.
+            </h1>
+            <p className="mx-auto mt-3 max-w-xl text-sm text-subtle sm:text-base">
+              Premium suni deri ciltli, 26 sayfalık kişiye özel bir defter — kapakta gerçek
+              yıldız haritan, içinde anılarınız ve mühürlü bir gelecek mektubu.
+            </p>
+          </header>
 
-        <div className="mb-10">
-          <p className="mb-3 font-mono text-xs uppercase tracking-widest text-dim">İçindekiler</p>
-          <div className="grid grid-cols-2 gap-4 sm:grid-cols-3">
-            {CONTENTS.map((item, index) => (
-              <div key={item.title} className="flex flex-col gap-2 rounded-2xl border border-text/10 bg-text/[0.035] p-2.5">
-                <div className="aspect-[3/4] w-full overflow-hidden rounded-md">{item.preview}</div>
-                <p className="flex gap-1.5 text-[11px] leading-snug text-text">
-                  <span className="shrink-0 font-mono text-[10px] text-amber">{(index + 1).toString().padStart(2, "0")}</span>
-                  <span>{item.title}</span>
-                </p>
-              </div>
-            ))}
+          <div className="mb-10">
+            <p className="mb-3 font-mono text-xs uppercase tracking-widest text-dim">İçindekiler</p>
+            <div className="grid grid-cols-2 gap-4 sm:grid-cols-3">
+              {CONTENTS.map((item, index) => (
+                <div key={item.title} className="flex flex-col gap-2 rounded-2xl border border-text/10 bg-text/[0.035] p-2.5">
+                  <div className="aspect-[3/4] w-full overflow-hidden rounded-md">{item.preview}</div>
+                  <p className="flex gap-1.5 text-[11px] leading-snug text-text">
+                    <span className="shrink-0 font-mono text-[10px] text-amber">{(index + 1).toString().padStart(2, "0")}</span>
+                    <span>{item.title}</span>
+                  </p>
+                </div>
+              ))}
+            </div>
+            <p className="mt-3 font-mono text-[10px] uppercase tracking-widest text-amber">
+              + Yanında altın renkli kalem gönderilir (ayrı paketleme)
+            </p>
           </div>
-          <p className="mt-3 font-mono text-[10px] uppercase tracking-widest text-amber">
-            + Yanında altın renkli kalem gönderilir (ayrı paketleme)
-          </p>
-        </div>
 
-        <JournalConfigurator names={DEMO_STAR_MAP.title} journalPrice={journalPrice} />
-      </div>
-    </main>
+          <JournalConfigurator names={DEMO_STAR_MAP.title} journalPrice={journalPrice} slug={DEMO_STAR_MAP.slug} />
+          <CrossSell exclude="journal" />
+        </div>
+      </main>
+      <SiteFooter />
+    </>
   );
 }

@@ -27,6 +27,30 @@ function formatCoordinates(latitude: number, longitude: number): string {
   return `${lat} ${lon}`;
 }
 
+/**
+ * "Düzenle"/"Düzenlemeye Dön" both send the visitor back to /create — this
+ * builds the same query-param shape CreateForm's own buildShareParams()
+ * produces, so its restore-from-URL effect can continue editing the
+ * existing draft instead of handing back a blank form.
+ */
+function buildEditParams(starMap: StarMapRecord): URLSearchParams {
+  const params = new URLSearchParams({
+    title: starMap.title,
+    message: starMap.message ?? "",
+    location: starMap.locationName,
+    lat: starMap.latitude.toString(),
+    lon: starMap.longitude.toString(),
+    timezone: starMap.timezone,
+    date: starMap.eventDateUtc.toISOString(),
+    palette: starMap.palette,
+  });
+  const initialEntry = starMap.entries.find((entry) => entry.isInitial) ?? starMap.entries[0];
+  const photoUrls = (initialEntry?.photos ?? []).map((photo) => photo.url).filter((url): url is string => Boolean(url));
+  if (photoUrls.length > 0) params.set("photos", photoUrls.join(","));
+  if (starMap.voiceNoteUrl) params.set("voice", starMap.voiceNoteUrl);
+  return params;
+}
+
 export interface StarMapViewProps {
   starMap: StarMapRecord;
   /** Preview from the configurator: swaps the footer CTA and shows a corner banner, no real page exists yet. */
@@ -46,6 +70,7 @@ export function StarMapView({ starMap, isPreview = false, isOwner = false }: Sta
   const previewLabel = `${starMap.locationName} üzerinde ${dateLabel} anının gökyüzü`;
   const skyLog = buildSkyNarrative(sky);
   const palette = getSkyPalette(starMap.palette);
+  const editHref = `/create?${buildEditParams(starMap).toString()}`;
 
   return (
     <PageGate title={starMap.title} subtitle={`${dateLabel} · ${starMap.locationName}`} musicUrl={starMap.musicUrl}>
@@ -69,7 +94,7 @@ export function StarMapView({ starMap, isPreview = false, isOwner = false }: Sta
             <span className="font-mono text-[9px] uppercase tracking-[0.18em] text-amber">Önizleme</span>
             <span aria-hidden className="h-3 w-px bg-amber/30" />
             <Link
-              href="/create"
+              href={editHref}
               className="font-mono text-[9px] uppercase tracking-[0.18em] text-muted underline underline-offset-2 transition-colors hover:text-amber"
             >
               Düzenle
@@ -137,7 +162,7 @@ export function StarMapView({ starMap, isPreview = false, isOwner = false }: Sta
                 Devam edip bu anı sepete ekleyebilir, dilediğin zaman düzenlemeye dönebilirsin.
               </p>
               <Link
-                href="/create"
+                href={editHref}
                 className="rounded-full bg-gradient-to-br from-amber-light to-amber-deep px-7 py-3.5 font-mono text-xs uppercase tracking-widest text-ink shadow-[0_10px_40px_-12px_rgba(230,163,92,0.6)] transition-opacity hover:opacity-90 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-amber"
               >
                 Düzenlemeye Dön

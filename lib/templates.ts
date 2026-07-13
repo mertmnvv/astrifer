@@ -5,7 +5,8 @@ export interface TemplateOption {
   name: string;
   category: TemplateCategory;
   description: string;
-  defaultMessage: string;
+  /** Up to 3 example personal messages offered when this template is selected — see CreateForm.tsx. */
+  exampleMessages: string[];
 }
 
 /**
@@ -19,34 +20,54 @@ export const FALLBACK_TEMPLATES: TemplateOption[] = [
     name: "Doğum",
     category: "dogum",
     description: "Bir hayatın başladığı anın gökyüzü.",
-    defaultMessage: "Sen doğduğunda gökyüzü tam olarak böyleydi.",
+    exampleMessages: [
+      "Sen doğduğunda gökyüzü tam olarak böyleydi.",
+      "Dünyaya geldiğin an, yıldızlar da seninle doğdu.",
+      "Bu gökyüzü, senin ilk nefesine tanıklık etti.",
+    ],
   },
   {
     slug: "yildonumu",
     name: "Yıldönümü",
     category: "yildonumu",
     description: "Birlikte geçirdiğiniz o özel anın haritası.",
-    defaultMessage: "O gece gökyüzü buydu.",
+    exampleMessages: [
+      "O gece gökyüzü buydu.",
+      "Yıllar geçse de gökyüzü hep o geceyi hatırlıyor.",
+      "Birlikte geçirdiğimiz o an, gökyüzüne böyle yazıldı.",
+    ],
   },
   {
     slug: "teklif",
     name: "Evlilik Teklifi",
     category: "teklif",
     description: "Evet dediği anın gökyüzü.",
-    defaultMessage: "Bana evet dediğin an, gökyüzü buydu.",
+    exampleMessages: [
+      "Bana evet dediğin an, gökyüzü buydu.",
+      "Evet dediğin o saniye, gökyüzü de kutluyordu.",
+      "O gece gökyüzü de bizimle birlikte evet dedi.",
+    ],
   },
   {
     slug: "mezuniyet",
     name: "Mezuniyet",
     category: "mezuniyet",
     description: "Bir başarının kutlandığı anın haritası.",
-    defaultMessage: "Bu anın gökyüzü, senin başarının izi.",
+    exampleMessages: [
+      "Bu anın gökyüzü, senin başarının izi.",
+      "Emeğinin karşılığını aldığın an, gökyüzü buydu.",
+      "Bu gökyüzü, bugüne kadarki her adımının tanığı.",
+    ],
   },
   {
     slug: "anma",
     name: "Anma",
     category: "anma",
     description: "Anılmaya değer bir anın gökyüzü.",
-    defaultMessage: "Seni sonsuza dek bu gökyüzünde taşıyoruz.",
+    exampleMessages: [
+      "Seni sonsuza dek bu gökyüzünde taşıyoruz.",
+      "Bu gökyüzü, seni hatırladığımız her an burada.",
+      "Işığın, bu gökyüzündeki yıldızlar kadar kalıcı.",
+    ],
   },
 ];
