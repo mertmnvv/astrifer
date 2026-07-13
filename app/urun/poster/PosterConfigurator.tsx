@@ -9,6 +9,7 @@ import { getSkyPalette } from "@/components/astrolab/palettes";
 import { FrameMockup } from "@/components/ui/FrameMockup";
 import { RadioCardGroup } from "@/components/ui/RadioCardGroup";
 import type { ComputeSkyResult } from "@/lib/astronomy/computeSky";
+import { addToCart } from "@/lib/cart";
 import { DEFAULT_FRAME_OPTION, formatTRY, type FrameOption, type PosterSize } from "@/lib/pricing";
 
 const MOOD_OPTIONS: { value: NebulaMood; label: string }[] = [
@@ -28,6 +29,7 @@ export interface PosterConfiguratorProps {
   defaultMessage: string;
   photoUrl: string | null;
   qrUrl: string;
+  slug: string;
   posterSizes: { value: PosterSize; label: string; basePrice: number }[];
   frameOptions: { value: FrameOption; label: string; description: string; surcharge: number }[];
 }
@@ -41,6 +43,7 @@ export function PosterConfigurator({
   defaultMessage,
   photoUrl,
   qrUrl,
+  slug,
   posterSizes,
   frameOptions,
 }: PosterConfiguratorProps) {
@@ -58,16 +61,17 @@ export function PosterConfigurator({
   const sizeLabel = posterSizes.find((option) => option.value === size)?.label ?? size;
   const frameLabel = frameOptions.find((option) => option.value === frame)?.label ?? frame;
 
-  const handleOrder = () => {
-    const params = new URLSearchParams({
-      product: frame === "frameless" ? "poster" : "framed_poster",
-      size,
-      frame,
-      mood,
-      message,
-      price: price.toString(),
+  const handleAddToCart = () => {
+    const moodLabel = MOOD_OPTIONS.find((option) => option.value === mood)?.label ?? mood;
+    addToCart({
+      productType: frame === "frameless" ? "poster" : "framed_poster",
+      productLabel: frame === "frameless" ? "Poster" : "Çerçeveli Poster",
+      title: names,
+      price,
+      summary: [`${sizeLabel} · ${frameLabel}`, `${moodLabel} renk ruhu`],
+      slug,
     });
-    router.push(`/checkout?${params.toString()}`);
+    router.push("/sepet");
   };
 
   return (
@@ -187,10 +191,10 @@ export function PosterConfigurator({
 
         <button
           type="button"
-          onClick={handleOrder}
+          onClick={handleAddToCart}
           className="w-full rounded-full bg-gradient-to-br from-amber-light to-amber-deep px-6 py-3 font-mono text-xs uppercase tracking-widest text-ink transition-opacity hover:opacity-90 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-amber"
         >
-          Sipariş Ver
+          Sepete Ekle
         </button>
       </div>
     </div>

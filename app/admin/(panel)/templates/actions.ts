@@ -20,7 +20,11 @@ export async function createTemplateAction(formData: FormData) {
   const name = String(formData.get("name") ?? "").trim();
   const category = String(formData.get("category") ?? "");
   const description = String(formData.get("description") ?? "").trim();
-  const defaultMessage = String(formData.get("defaultMessage") ?? "").trim();
+  const exampleMessages = [
+    String(formData.get("exampleMessage1") ?? "").trim(),
+    String(formData.get("exampleMessage2") ?? "").trim(),
+    String(formData.get("exampleMessage3") ?? "").trim(),
+  ].filter(Boolean);
 
   if (!slug || !name || !VALID_CATEGORIES.includes(category as TemplateCategory)) {
     throw new Error("Geçersiz şablon bilgisi.");
@@ -42,7 +46,7 @@ export async function createTemplateAction(formData: FormData) {
       name,
       category,
       description: description || null,
-      defaultMessage: defaultMessage || null,
+      exampleMessages,
       sortOrder: countSnapshot.data().count,
       isActive: true,
       createdAt: new Date(),

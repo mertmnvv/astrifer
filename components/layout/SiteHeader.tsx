@@ -4,6 +4,7 @@ import Link from "next/link";
 import { motion, useScroll, useTransform } from "framer-motion";
 import { Logo } from "@/components/Logo";
 import { LogoMark } from "@/components/LogoMark";
+import { CartLink } from "@/components/layout/CartLink";
 import { MobileNav } from "@/components/layout/MobileNav";
 
 const NAV_LINKS = [
@@ -43,6 +44,7 @@ export function SiteHeader() {
               {link.label}
             </Link>
           ))}
+          <CartLink />
           <Link
             href="/create"
             className="rounded-full bg-gradient-to-br from-amber-light to-amber-deep px-3.5 py-1.5 font-mono text-[10px] uppercase tracking-widest text-ink transition-opacity hover:opacity-90 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-amber sm:px-5 sm:py-2 sm:text-xs"

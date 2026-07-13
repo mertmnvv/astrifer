@@ -4,6 +4,7 @@ import { useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { NightCoverPage } from "@/components/journal/night/NightCoverPage";
 import { BackCoverPage } from "@/components/journal/night/BackCoverPage";
+import { addToCart } from "@/lib/cart";
 import { formatTRY } from "@/lib/pricing";
 
 const LETTER_MAX_LENGTH = 2000;
@@ -17,9 +18,10 @@ function tomorrowIso(): string {
 export interface JournalConfiguratorProps {
   names: string;
   journalPrice: number;
+  slug: string;
 }
 
-export function JournalConfigurator({ names, journalPrice }: JournalConfiguratorProps) {
+export function JournalConfigurator({ names, journalPrice, slug }: JournalConfiguratorProps) {
   const router = useRouter();
   const [letterText, setLetterText] = useState(
     "Bu satırları okuduğunuzda aradan yıllar geçmiş olacak. O geceki hissi hiç unutmayın...",
@@ -27,14 +29,16 @@ export function JournalConfigurator({ names, journalPrice }: JournalConfigurator
   const [openingDate, setOpeningDate] = useState("");
   const minDate = useMemo(() => tomorrowIso(), []);
 
-  const handleOrder = () => {
-    const params = new URLSearchParams({
-      product: "journal",
-      price: journalPrice.toString(),
-      letterText,
+  const handleAddToCart = () => {
+    addToCart({
+      productType: "journal",
+      productLabel: "Deri Defter",
+      title: names,
+      price: journalPrice,
+      summary: openingDate ? [`Gelecek Mektubu açılış: ${openingDate}`] : [],
+      slug,
     });
-    if (openingDate) params.set("letterOpeningDate", openingDate);
-    router.push(`/checkout?${params.toString()}`);
+    router.push("/sepet");
   };
 
   return (
@@ -93,10 +97,10 @@ export function JournalConfigurator({ names, journalPrice }: JournalConfigurator
 
         <button
           type="button"
-          onClick={handleOrder}
+          onClick={handleAddToCart}
           className="w-full rounded-full bg-gradient-to-br from-amber-light to-amber-deep px-6 py-3 font-mono text-xs uppercase tracking-widest text-ink transition-opacity hover:opacity-90 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-amber"
         >
-          Sipariş Ver
+          Sepete Ekle
         </button>
       </div>
     </div>

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState, type ReactNode } from "react";
+import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import { useRouter } from "next/navigation";
 import { StarChart } from "@/components/astrolab/StarChart";
 import { LedgerRule } from "@/components/atlas/LedgerRule";
@@ -12,7 +12,8 @@ import { VoiceRecorder, type VoiceRecorderValue } from "@/components/ui/VoiceRec
 import { SkyPaletteSwatchPicker } from "@/components/ui/SkyPaletteSwatchPicker";
 import { SKY_PALETTES, DEFAULT_SKY_PALETTE, getSkyPalette } from "@/components/astrolab/palettes";
 import { BUILTIN_PLACES, type PlaceResult } from "@/lib/geocode/cities";
-import { zonedTimeToUtc } from "@/lib/geocode/timezone";
+import { zonedTimeToUtc, utcToZonedTime } from "@/lib/geocode/timezone";
+import { addToCart } from "@/lib/cart";
 import { DIGITAL_PRICE, formatTRY } from "@/lib/pricing";
 import { slugify } from "@/lib/slug";
 import type { TemplateOption } from "@/lib/templates";
@@ -82,12 +83,88 @@ export function CreateForm({ templates }: CreateFormProps) {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
 
+  // Guards the template auto-fill effect below against clobbering a message
+  // just restored by the "continue editing" hydration effect further down —
+  // holds the templateSlug value we're waiting to settle on, then lets one
+  // (suppressed) auto-fill cycle pass once state catches up to it.
+  const pendingTemplateMessageSkip = useRef<string | null>(null);
+  const didHydrateFromUrl = useRef(false);
+
   useEffect(() => {
-    if (message.trim().length > 0) return;
+    if (pendingTemplateMessageSkip.current !== null) {
+      if (pendingTemplateMessageSkip.current !== templateSlug) return;
+      pendingTemplateMessageSkip.current = null;
+      return;
+    }
     const template = templates.find((item) => item.slug === templateSlug);
-    if (template?.defaultMessage) setMessage(template.defaultMessage);
+    const firstExample = template?.exampleMessages[0];
+    if (firstExample) setMessage(firstExample);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [templateSlug]);
+
+  // "Düzenlemeye dön" from the digital-page preview (see StarMapView.tsx)
+  // carries every field back as query params so editing continues from the
+  // existing draft instead of starting a blank form. Reads window.location
+  // directly (not useSearchParams()) so /create can stay statically
+  // prerenderable; runs once, client-side only, after hydration.
+  useEffect(() => {
+    if (didHydrateFromUrl.current) return;
+    didHydrateFromUrl.current = true;
+
+    const params = new URLSearchParams(window.location.search);
+    const restoredTitle = params.get("title");
+    if (!restoredTitle) return;
+
+    setTitle(restoredTitle);
+    const restoredMessage = params.get("message");
+    if (restoredMessage) setMessage(restoredMessage);
+
+    const locationName = params.get("location");
+    const lat = params.get("lat");
+    const lon = params.get("lon");
+    const timezone = params.get("timezone");
+    if (locationName && lat && lon && timezone) {
+      setPlace({ name: locationName, country: "", latitude: Number(lat), longitude: Number(lon), timezone });
+      const dateIso = params.get("date");
+      if (dateIso) {
+        const zoned = utcToZonedTime(dateIso, timezone);
+        if (zoned.date) setDate(zoned.date);
+        if (zoned.time) setTime(zoned.time);
+      }
+    }
+
+    const templateParam = params.get("template") ?? templateSlug;
+    pendingTemplateMessageSkip.current = templateParam;
+    if (templateParam !== templateSlug && templates.some((item) => item.slug === templateParam)) {
+      setTemplateSlug(templateParam);
+    }
+
+    const paletteParam = params.get("palette");
+    if (paletteParam) setPaletteId(paletteParam);
+
+    const photosParam = params.get("photos");
+    if (photosParam) {
+      const urls = photosParam.split(",").filter(Boolean);
+      setPhotos(
+        urls.map((url, index) => ({
+          id: `restored-${index}`,
+          caption: "",
+          previewUrl: url,
+          status: "done" as const,
+          url,
+        })),
+      );
+    }
+
+    const voiceParam = params.get("voice");
+    if (voiceParam) setVoiceNote({ url: voiceParam, source: "upload", status: "done", remoteUrl: voiceParam });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  const currentTemplateExamples = useMemo(
+    () => templates.find((item) => item.slug === templateSlug)?.exampleMessages ?? [],
+    [templates, templateSlug],
+  );
 
   const eventDateUtc = useMemo(() => {
     if (!place || !date || !time) return null;
@@ -184,9 +261,16 @@ export function CreateForm({ templates }: CreateFormProps) {
         voiceNoteUrl: voiceNote?.status === "done" ? (voiceNote.remoteUrl ?? null) : null,
       });
 
-      const params = buildShareParams(place, eventDateUtc);
-      params.set("template", templateSlug);
-      const next = `/checkout?${params.toString()}`;
+      addToCart({
+        productType: "digital",
+        productLabel: "Dijital Sayfa",
+        title,
+        price: DIGITAL_PRICE,
+        summary: [posterDateLine],
+        slug,
+      });
+
+      const next = "/sepet";
       router.push(`/s/${slug}/claim?token=${encodeURIComponent(ownerToken)}&next=${encodeURIComponent(next)}`);
     } catch {
       setIsSubmitting(false);
@@ -306,6 +390,26 @@ export function CreateForm({ templates }: CreateFormProps) {
               onChange={(event) => setMessage(event.target.value)}
               className={`${FIELD_CLASS} resize-none font-display italic`}
             />
+            {currentTemplateExamples.length > 0 && (
+              <div className="mt-2 flex flex-wrap gap-1.5">
+                {currentTemplateExamples.map((example) => (
+                  <button
+                    key={example}
+                    type="button"
+                    onClick={() => setMessage(example)}
+                    aria-pressed={message === example}
+                    className={`max-w-full truncate rounded-full border px-3 py-1 text-left text-[11px] transition-colors ${
+                      message === example
+                        ? "border-amber/60 bg-amber/10 text-amber"
+                        : "border-text/[0.14] text-muted hover:border-amber/40 hover:text-amber"
+                    }`}
+                    title={example}
+                  >
+                    {example}
+                  </button>
+                ))}
+              </div>
+            )}
           </div>
         </div>
 

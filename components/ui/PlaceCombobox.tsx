@@ -36,6 +36,14 @@ export function PlaceCombobox({ label, placeholder, value, onChange, required }:
   const localResults = useMemo(() => searchBuiltinPlaces(query), [query]);
   const results = useMemo(() => dedupe([...localResults, ...apiResults]).slice(0, 8), [localResults, apiResults]);
 
+  // Keeps the visible text in sync when `value` is set from outside (e.g.
+  // CreateForm restoring a previous draft) after this component already
+  // mounted with no place selected — the initial useState above only
+  // covers the very first render.
+  useEffect(() => {
+    if (value?.name) setQuery(value.name);
+  }, [value?.name]);
+
   useEffect(() => {
     if (query.trim().length < 2) {
       setApiResults([]);

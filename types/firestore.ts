@@ -14,7 +14,8 @@ export interface TemplateDoc {
   name: string;
   category: TemplateCategory;
   description: string | null;
-  defaultMessage: string | null;
+  /** Up to 3 example personal messages offered when this template is selected — see CreateForm.tsx. */
+  exampleMessages: string[];
   sortOrder: number;
   isActive: boolean;
   createdAt: Timestamp;
