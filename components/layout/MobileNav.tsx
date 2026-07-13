@@ -4,16 +4,55 @@ import { useEffect, useId, useRef, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { AnimatePresence, motion } from "framer-motion";
+import { LogoMark } from "@/components/LogoMark";
 
 export interface NavLink {
   href: string;
   label: string;
 }
 
-const FOCUSABLE_SELECTOR =
-  'a[href], button:not([disabled]), [tabindex]:not([tabindex="-1"])';
+const FOCUSABLE_SELECTOR = 'a[href], button:not([disabled]), [tabindex]:not([tabindex="-1"])';
 
-/** Right-side drawer for the mobile/tablet nav — shares `links` with the desktop bar so there is one list to update. */
+/**
+ * Two asymmetric horizontal strokes — deliberately NOT star/crosshair-shaped
+ * (that mark is already the logo right next to this button) and NOT a
+ * generic three-line hamburger. Collapses into a single short dash when
+ * open, echoing the panel's own thin gold rule.
+ */
+function MenuGlyph({ open }: { open: boolean }) {
+  return (
+    <svg aria-hidden="true" width={18} height={14} viewBox="0 0 18 14" fill="none">
+      <line
+        x1="1"
+        y1="2"
+        x2="17"
+        y2="2"
+        stroke="currentColor"
+        strokeWidth={1.4}
+        strokeLinecap="round"
+        className="origin-left transition-all duration-300"
+        style={open ? { transform: "translateY(5px) scaleX(0.55)" } : undefined}
+      />
+      <line
+        x1="1"
+        y1="12"
+        x2="11"
+        y2="12"
+        stroke="currentColor"
+        strokeWidth={1.4}
+        strokeLinecap="round"
+        className="origin-left transition-all duration-300"
+        style={open ? { transform: "translateY(-5px) scaleX(1.5)" } : undefined}
+      />
+    </svg>
+  );
+}
+
+/**
+ * Left-side sliding panel for the mobile/tablet nav — shares `links` with
+ * the desktop bar so there is one list to update. Triggered by the thin-line
+ * star mark (brand-consistent) rather than a generic three-line hamburger.
+ */
 export function MobileNav({ links }: { links: NavLink[] }) {
   const [isOpen, setIsOpen] = useState(false);
   const pathname = usePathname();
@@ -67,15 +106,13 @@ export function MobileNav({ links }: { links: NavLink[] }) {
       <button
         ref={openButtonRef}
         type="button"
-        aria-label="Menü"
+        aria-label={isOpen ? "Menüyü kapat" : "Menüyü aç"}
         aria-expanded={isOpen}
         aria-controls={panelId}
-        onClick={() => setIsOpen(true)}
-        className="flex h-8 w-8 flex-col items-center justify-center gap-[5px] sm:hidden"
+        onClick={() => setIsOpen((value) => !value)}
+        className="flex h-9 w-9 items-center justify-center rounded-full border border-text/15 text-text/80 transition-colors hover:border-amber/50 hover:text-amber sm:hidden"
       >
-        <span className="h-px w-5 bg-text/80" />
-        <span className="h-px w-5 bg-text/80" />
-        <span className="h-px w-5 bg-text/80" />
+        <MenuGlyph open={isOpen} />
       </button>
 
       <AnimatePresence>
@@ -98,27 +135,15 @@ export function MobileNav({ links }: { links: NavLink[] }) {
               role="dialog"
               aria-modal="true"
               aria-label="Menü"
-              initial={{ x: "100%" }}
+              initial={{ x: "-100%" }}
               animate={{ x: 0 }}
-              exit={{ x: "100%" }}
+              exit={{ x: "-100%" }}
               transition={{ duration: 0.28, ease: "easeOut" }}
-              className="fixed inset-y-0 right-0 z-50 flex w-[78vw] max-w-xs flex-col border-l border-amber/20 bg-panel px-6 py-5 sm:hidden"
+              className="fixed inset-y-0 left-0 z-50 flex w-[78vw] max-w-xs flex-col border-r border-amber/20 bg-panel px-6 py-5 sm:hidden"
             >
-              <div className="flex items-center justify-between">
-                <span className="font-mono text-[10px] uppercase tracking-widest text-muted">
-                  Menü
-                </span>
-                <button
-                  type="button"
-                  aria-label="Menüyü kapat"
-                  onClick={() => setIsOpen(false)}
-                  className="flex h-8 w-8 items-center justify-center text-text/80 transition-colors hover:text-amber"
-                >
-                  <span aria-hidden="true" className="relative block h-4 w-4">
-                    <span className="absolute left-1/2 top-1/2 h-px w-4 -translate-x-1/2 -translate-y-1/2 rotate-45 bg-current" />
-                    <span className="absolute left-1/2 top-1/2 h-px w-4 -translate-x-1/2 -translate-y-1/2 -rotate-45 bg-current" />
-                  </span>
-                </button>
+              <div className="flex items-center gap-2.5">
+                <LogoMark size={18} />
+                <span className="font-mono text-[10px] uppercase tracking-widest text-muted">Astrifer</span>
               </div>
 
               <nav className="mt-8 flex flex-col">
@@ -138,6 +163,14 @@ export function MobileNav({ links }: { links: NavLink[] }) {
                   );
                 })}
               </nav>
+
+              <Link
+                href="/create"
+                onClick={() => setIsOpen(false)}
+                className="mt-auto rounded-full bg-gradient-to-br from-amber-light to-amber-deep px-5 py-3 text-center font-mono text-[10px] uppercase tracking-widest text-ink transition-opacity hover:opacity-90"
+              >
+                Oluştur
+              </Link>
             </motion.div>
           </>
         )}
