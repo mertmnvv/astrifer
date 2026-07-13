@@ -180,7 +180,8 @@ export function PosterConfigurator({
             <span className="font-display text-3xl italic text-amber">{formatTRY(price)}</span>
           </div>
           <p className="mt-1 text-[11px] text-dim">
-            300 DPI baskı, kargo dahil. Üretim süresi 3-5 iş günü.
+            300 DPI giclée fine-art baskı, mat kağıt (210-230gsm), pigment mürekkep, anti-reflektif akrilik koruma.
+            Kargo dahil. Üretim süresi 3-5 iş günü.
           </p>
         </div>
 
