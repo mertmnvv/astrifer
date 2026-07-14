@@ -16,6 +16,8 @@ import { NightCoverPage } from "@/components/journal/night/NightCoverPage";
 import { QrPage } from "@/components/journal/night/QrPage";
 import { StarKeyPage } from "@/components/journal/night/StarKeyPage";
 import { StarMapSpreadPage } from "@/components/journal/night/StarMapSpreadPage";
+import { getJournalTheme } from "@/components/journal/night/journalTheme";
+import { JournalThemeProvider } from "@/components/journal/JournalThemeContext";
 import { pickNumberedStars, splitSkyByAzimuth } from "@/components/journal/starMapSpread";
 import { ScaledPreview } from "@/components/ScaledPreview";
 import { computeSky } from "@/lib/astronomy/computeSky";
@@ -149,6 +151,7 @@ export default async function JournalProductPage() {
       <SiteHeader />
       <main className="min-h-screen px-4 pb-16 pt-28 sm:px-8 sm:pb-24 sm:pt-36">
         <div className="mx-auto max-w-5xl">
+          <JournalThemeProvider theme={getJournalTheme("gece-laciverti")}>
           <header className="mb-8 sm:mb-12">
             <div className="lg:grid lg:grid-cols-[1.05fr_0.95fr] lg:items-center lg:gap-12">
               <div className="flex flex-col items-center text-center lg:items-start lg:text-left">
@@ -317,6 +320,7 @@ export default async function JournalProductPage() {
               Yaşayan Sayfanızı Oluşturun →
             </Link>
           </div>
+          </JournalThemeProvider>
 
           <CrossSell exclude={["journal"]} />
         </div>

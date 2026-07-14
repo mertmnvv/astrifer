@@ -2,11 +2,13 @@ import { notFound } from "next/navigation";
 import { BackCoverPage } from "@/components/journal/night/BackCoverPage";
 import { BlankPage } from "@/components/journal/night/BlankPage";
 import { EssayPage } from "@/components/journal/night/EssayPage";
+import { getJournalTheme } from "@/components/journal/night/journalTheme";
 import { MemoryPage } from "@/components/journal/night/MemoryPage";
 import { NightCoverPage } from "@/components/journal/night/NightCoverPage";
 import { QrPage } from "@/components/journal/night/QrPage";
 import { StarKeyPage } from "@/components/journal/night/StarKeyPage";
 import { StarMapSpreadPage } from "@/components/journal/night/StarMapSpreadPage";
+import { JournalThemeProvider } from "@/components/journal/JournalThemeContext";
 import { pickNumberedStars, splitSkyByAzimuth } from "@/components/journal/starMapSpread";
 import { computeSky } from "@/lib/astronomy/computeSky";
 import { buildSkyEssay, buildSkyNarrative } from "@/lib/astronomy/skyNarrative";
@@ -56,16 +58,22 @@ export default async function JournalPrintPage({
   const memoryPhotos = initialEntry?.photos ?? [];
 
   const shared = { widthPx, heightPx };
+  const journalTheme = getJournalTheme(starMap.palette);
 
+  let content: React.ReactNode;
   switch (kind) {
     case "cover":
-      return <NightCoverPage names={starMap.title} {...shared} />;
+      content = <NightCoverPage names={starMap.title} {...shared} />;
+      break;
     case "starmap-1":
-      return <StarMapSpreadPage sky={sky} numberedStars={page1Stars} {...shared} />;
+      content = <StarMapSpreadPage sky={sky} numberedStars={page1Stars} {...shared} />;
+      break;
     case "starmap-2":
-      return <StarMapSpreadPage sky={sky} numberedStars={page2Stars} {...shared} />;
+      content = <StarMapSpreadPage sky={sky} numberedStars={page2Stars} {...shared} />;
+      break;
     case "star-key":
-      return <StarKeyPage numberedStars={[...page1Stars, ...page2Stars]} narrative={buildSkyNarrative(sky)} {...shared} />;
+      content = <StarKeyPage numberedStars={[...page1Stars, ...page2Stars]} narrative={buildSkyNarrative(sky)} {...shared} />;
+      break;
     case "memory-1":
     case "memory-2":
     case "memory-3":
@@ -73,17 +81,24 @@ export default async function JournalPrintPage({
       const index = Number(kind.split("-")[1]) - 1;
       const photo = memoryPhotos[index] ?? {};
       const caption = photo.caption ?? MEMORY_CAPTION_FALLBACK[index] ?? "";
-      return <MemoryPage photo={photo} caption={caption} {...shared} />;
+      content = <MemoryPage photo={photo} caption={caption} {...shared} />;
+      break;
     }
     case "essay":
-      return <EssayPage essay={buildSkyEssay(sky)} {...shared} />;
+      content = <EssayPage essay={buildSkyEssay(sky)} {...shared} />;
+      break;
     case "qr":
-      return <QrPage qrUrl={`${getSiteUrl()}/s/${params.slug}`} {...shared} />;
+      content = <QrPage qrUrl={`${getSiteUrl()}/s/${params.slug}`} {...shared} />;
+      break;
     case "blank":
-      return <BlankPage {...shared} />;
+      content = <BlankPage {...shared} />;
+      break;
     case "back-cover":
-      return <BackCoverPage {...shared} />;
+      content = <BackCoverPage {...shared} />;
+      break;
     default:
       notFound();
   }
+
+  return <JournalThemeProvider theme={journalTheme}>{content}</JournalThemeProvider>;
 }

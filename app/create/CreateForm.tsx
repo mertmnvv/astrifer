@@ -12,6 +12,10 @@ import { VoiceRecorder, type VoiceRecorderValue } from "@/components/ui/VoiceRec
 import { SkyPaletteSwatchPicker } from "@/components/ui/SkyPaletteSwatchPicker";
 import { SKY_PALETTES, DEFAULT_SKY_PALETTE, getSkyPalette } from "@/components/astrolab/palettes";
 import { NightCoverPage } from "@/components/journal/night/NightCoverPage";
+import { getJournalTheme } from "@/components/journal/night/journalTheme";
+import { JournalThemeProvider } from "@/components/journal/JournalThemeContext";
+import { CreateStepIndicator, type CreateStep } from "@/components/create/CreateStepIndicator";
+import { JournalThemeSwatch } from "@/components/create/JournalThemeSwatch";
 import { BUILTIN_PLACES, type PlaceResult } from "@/lib/geocode/cities";
 import { zonedTimeToUtc, utcToZonedTime } from "@/lib/geocode/timezone";
 import { formatCoords } from "@/lib/geo/formatCoords";
@@ -85,6 +89,19 @@ function SectionLabel({ n, children }: { n: string; children: ReactNode }) {
   );
 }
 
+const STEPS: CreateStep[] = [
+  { n: 1, label: "Anı Seçin" },
+  { n: 2, label: "Zaman & Konum" },
+  { n: 3, label: "Gökyüzü Rengi" },
+  { n: 4, label: "Kişiselleştir" },
+  { n: 5, label: "Fiziksel Olarak da Saklayın" },
+];
+
+const STEP_ERROR_MESSAGES: Record<number, string> = {
+  2: "Devam etmek için tarih, saat ve konum bilgilerini doldurun.",
+  4: "Devam etmek için bir başlık girin.",
+};
+
 function AddOnCheckbox({ checked }: { checked: boolean }) {
   return (
     <span
@@ -128,6 +145,10 @@ export function CreateForm({ templates, pricing }: CreateFormProps) {
   );
   const [journalOpeningDate, setJournalOpeningDate] = useState("");
   const minOpeningDate = useMemo(() => tomorrowIso(), []);
+
+  const [currentStep, setCurrentStep] = useState(1);
+  const [furthestStep, setFurthestStep] = useState(1);
+  const [touchedStep, setTouchedStep] = useState<number | null>(null);
 
   // Guards the template auto-fill effect below against clobbering a message
   // just restored by the "continue editing" hydration effect further down —
@@ -296,6 +317,36 @@ export function CreateForm({ templates, pricing }: CreateFormProps) {
   const uploadsFailed = photos.some((photo) => photo.status === "error") || voiceNote?.status === "error";
   const isValid = requiredFieldsValid && !uploadsPending && !uploadsFailed;
 
+  const stepValidity: Record<number, boolean> = {
+    1: Boolean(templateSlug),
+    2: Boolean(place && date && time),
+    3: true,
+    4: Boolean(title.trim()),
+    5: true,
+  };
+
+  const goToStep = (step: number) => {
+    setCurrentStep(step);
+    setFurthestStep((furthest) => Math.max(furthest, step));
+  };
+
+  const handleStepIndicatorClick = (step: number) => {
+    if (step <= furthestStep) setCurrentStep(step);
+  };
+
+  const handleNext = () => {
+    if (!stepValidity[currentStep]) {
+      setTouchedStep(currentStep);
+      return;
+    }
+    setTouchedStep(null);
+    goToStep(Math.min(STEPS.length, currentStep + 1));
+  };
+
+  const handleBack = () => {
+    setCurrentStep((step) => Math.max(1, step - 1));
+  };
+
   const buildShareParams = (currentPlace: PlaceResult, currentEventDateUtc: Date) => {
     const params = new URLSearchParams({
       title,
@@ -362,6 +413,7 @@ export function CreateForm({ templates, pricing }: CreateFormProps) {
 
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
+    if (currentStep !== STEPS.length) return;
     setTouchedSubmit(true);
     if (!isValid || !place || !eventDateUtc) return;
 
@@ -417,9 +469,19 @@ export function CreateForm({ templates, pricing }: CreateFormProps) {
 
   return (
     <form onSubmit={handleSubmit} className="grid gap-10 lg:grid-cols-[minmax(0,28rem)_1fr] lg:items-start" noValidate>
+      {/* STEP INDICATOR — always first: above the preview on mobile, spanning both columns on desktop */}
+      <div className="order-1 lg:order-1 lg:col-span-2">
+        <CreateStepIndicator
+          steps={STEPS}
+          currentStep={currentStep}
+          furthestStep={furthestStep}
+          onStepClick={handleStepIndicatorClick}
+        />
+      </div>
+
       {/* FORM */}
-      <div className="order-2 flex flex-col gap-9 lg:order-1">
-        <div>
+      <div className="order-3 flex flex-col gap-9 lg:order-2">
+        <div className={currentStep === 1 ? "block" : "hidden"}>
           <SectionLabel n="01">Anı Seçin</SectionLabel>
           <RadioCardGroup
             name="template"
@@ -436,7 +498,7 @@ export function CreateForm({ templates, pricing }: CreateFormProps) {
           />
         </div>
 
-        <div>
+        <div className={currentStep === 2 ? "block" : "hidden"}>
           <SectionLabel n="02">Zaman &amp; Konum</SectionLabel>
           <div className="grid grid-cols-2 gap-3">
             <div>
@@ -485,12 +547,13 @@ export function CreateForm({ templates, pricing }: CreateFormProps) {
           </div>
         </div>
 
-        <div>
+        <div className={currentStep === 3 ? "block" : "hidden"}>
           <SectionLabel n="03">Gökyüzü Rengi</SectionLabel>
           <SkyPaletteSwatchPicker name="palette" palettes={SKY_PALETTES} value={paletteId} onChange={setPaletteId} />
+          <JournalThemeSwatch paletteId={paletteId} />
         </div>
 
-        <div>
+        <div className={currentStep === 4 ? "block" : "hidden"}>
           <SectionLabel n="04">Kişiselleştir</SectionLabel>
 
           <p className="mb-2 text-xs text-dim">Fotoğraflar (en fazla 4)</p>
@@ -550,7 +613,7 @@ export function CreateForm({ templates, pricing }: CreateFormProps) {
           </div>
         </div>
 
-        <div>
+        <div className={currentStep === 5 ? "block" : "hidden"}>
           <SectionLabel n="05">Fiziksel Olarak da Saklayın</SectionLabel>
           <p className="mb-4 text-sm leading-relaxed text-subtle">
             Bu anı fiziksel olarak da saklamak ister misiniz?
@@ -568,8 +631,11 @@ export function CreateForm({ templates, pricing }: CreateFormProps) {
               onChange={(event) => setJournalEnabled(event.target.checked)}
             />
             <div className="mx-auto w-full max-w-[7rem]">
-              <NightCoverPage names={title.trim() || "İsim & İsim"} />
+              <JournalThemeProvider theme={getJournalTheme(paletteId)}>
+                <NightCoverPage names={title.trim() || "İsim & İsim"} />
+              </JournalThemeProvider>
             </div>
+            <p className="text-center text-[10px] text-dim">Renk: {getJournalTheme(paletteId).label} (03. adımda seçildi)</p>
             <div className="flex items-center justify-between gap-2">
               <span className="font-display text-base italic text-bright">Deri Defter</span>
               <AddOnCheckbox checked={journalEnabled} />
@@ -620,17 +686,43 @@ export function CreateForm({ templates, pricing }: CreateFormProps) {
           </div>
         </div>
 
-        {touchedSubmit && !requiredFieldsValid && (
+        <div className="flex items-center gap-3 border-t border-text/10 pt-6">
+          {currentStep > 1 && (
+            <button
+              type="button"
+              onClick={handleBack}
+              className="rounded-full border border-text/15 px-5 py-2.5 font-mono text-xs uppercase tracking-widest text-subtle transition-colors hover:border-amber/40 hover:text-amber"
+            >
+              Geri
+            </button>
+          )}
+          {currentStep < STEPS.length && (
+            <button
+              type="button"
+              onClick={handleNext}
+              className="ml-auto rounded-full bg-gradient-to-br from-amber-light to-amber-deep px-6 py-2.5 font-mono text-xs uppercase tracking-widest text-ink shadow-[0_12px_40px_-14px_rgba(230,163,92,0.6)] transition-opacity hover:opacity-90"
+            >
+              İleri
+            </button>
+          )}
+        </div>
+        {touchedStep === currentStep && !stepValidity[currentStep] && STEP_ERROR_MESSAGES[currentStep] && (
+          <p role="alert" className="text-sm text-red-300">
+            {STEP_ERROR_MESSAGES[currentStep]}
+          </p>
+        )}
+
+        {currentStep === STEPS.length && touchedSubmit && !requiredFieldsValid && (
           <p role="alert" className="text-sm text-red-300">
             Devam etmek için tarih, saat, konum ve isim alanlarını doldurun.
           </p>
         )}
-        {touchedSubmit && requiredFieldsValid && uploadsFailed && (
+        {currentStep === STEPS.length && touchedSubmit && requiredFieldsValid && uploadsFailed && (
           <p role="alert" className="text-sm text-red-300">
             Bazı yüklemeler başarısız oldu — devam etmeden önce kaldırın ya da tekrar deneyin.
           </p>
         )}
-        {submitError && (
+        {currentStep === STEPS.length && submitError && (
           <p role="alert" className="text-sm text-red-300">
             {submitError}
           </p>
@@ -638,7 +730,7 @@ export function CreateForm({ templates, pricing }: CreateFormProps) {
       </div>
 
       {/* LIVE PREVIEW */}
-      <div className="order-1 flex flex-col gap-4 lg:sticky lg:top-28 lg:order-2 lg:self-start">
+      <div className="order-2 flex flex-col gap-4 lg:sticky lg:top-28 lg:order-3 lg:self-start">
         <div className="mx-auto w-full max-w-[27rem]">
           <div className="relative aspect-[3/4] rounded-md border border-text/[0.08] bg-panel shadow-2xl shadow-black/65">
             <div className="pointer-events-none absolute inset-[13px] rounded-sm border border-amber/[0.18]" />
@@ -707,11 +799,14 @@ export function CreateForm({ templates, pricing }: CreateFormProps) {
 
         <button
           type="submit"
-          disabled={uploadsPending || isSubmitting}
+          disabled={uploadsPending || isSubmitting || currentStep !== STEPS.length}
           className="w-full rounded-full bg-gradient-to-br from-amber-light to-amber-deep px-6 py-3.5 font-mono text-xs uppercase tracking-widest text-ink shadow-[0_12px_40px_-14px_rgba(230,163,92,0.6)] transition-opacity hover:opacity-90 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-amber disabled:opacity-40"
         >
           {isSubmitting ? "Oluşturuluyor…" : uploadsPending ? "Yükleniyor…" : "Sepete Ekle"}
         </button>
+        {currentStep !== STEPS.length && (
+          <p className="text-center text-[11px] text-dim">Son adıma (05) gelince aktifleşir.</p>
+        )}
       </div>
     </form>
   );

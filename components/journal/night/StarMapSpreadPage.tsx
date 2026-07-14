@@ -4,6 +4,8 @@ import { useEffect, useRef, useState } from "react";
 import type { ComputeSkyResult } from "@/lib/astronomy/computeSky";
 import { drawJewelStar } from "@/components/astrolab/drawJewelStar";
 import { hash, project, starRadius } from "@/components/astrolab/drawStarChart";
+import { useJournalTheme } from "@/components/journal/JournalThemeContext";
+import type { JournalTheme } from "./journalTheme";
 import type { NumberedStar } from "../starMapSpread";
 import { NightPageShell } from "./NightPageShell";
 
@@ -16,17 +18,19 @@ export interface StarMapSpreadPageProps {
   heightPx?: number;
 }
 
-function drawBackground(ctx: CanvasRenderingContext2D, width: number, height: number) {
+function drawBackground(ctx: CanvasRenderingContext2D, width: number, height: number, theme: JournalTheme["starMap"]) {
+  const [stop0, stop1, stop2] = theme.bgGradientStops;
   const bg = ctx.createRadialGradient(width * 0.5, height * 0.4, 0, width * 0.5, height * 0.5, Math.max(width, height) * 0.75);
-  bg.addColorStop(0, "#152049");
-  bg.addColorStop(0.6, "#0d1533");
-  bg.addColorStop(1, "#080b20");
+  bg.addColorStop(0, stop0);
+  bg.addColorStop(0.6, stop1);
+  bg.addColorStop(1, stop2);
   ctx.fillStyle = bg;
   ctx.fillRect(0, 0, width, height);
 }
 
 /** Page 2-3 of the journal: real jewel-cut, numbered stars from one azimuth half of the actual sky. */
 export function StarMapSpreadPage({ sky, numberedStars, minAltitude = -2, widthPx, heightPx }: StarMapSpreadPageProps) {
+  const theme = useJournalTheme();
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const containerRef = useRef<HTMLDivElement | null>(null);
   const [ready, setReady] = useState(false);
@@ -53,7 +57,7 @@ export function StarMapSpreadPage({ sky, numberedStars, minAltitude = -2, widthP
       const cy = height / 2;
       const fieldRadius = Math.hypot(width, height) * 0.46;
 
-      drawBackground(ctx, width, height);
+      drawBackground(ctx, width, height, theme.starMap);
 
       const numberedNames = new Set(numberedStars.map((n) => n.star.name));
       for (const star of sky.stars) {
@@ -61,7 +65,7 @@ export function StarMapSpreadPage({ sky, numberedStars, minAltitude = -2, widthP
         const point = project(star.azimuth, star.altitude, cx, cy, fieldRadius);
         const r = starRadius(star.mag, scale) * 0.6;
         ctx.globalAlpha = 0.35 + (hash(star.name) % 100) / 200;
-        ctx.fillStyle = "#cfd6ee";
+        ctx.fillStyle = theme.starMap.dimStarColor;
         ctx.beginPath();
         ctx.arc(point.x, point.y, r, 0, Math.PI * 2);
         ctx.fill();
@@ -73,7 +77,7 @@ export function StarMapSpreadPage({ sky, numberedStars, minAltitude = -2, widthP
         point: project(star.azimuth, star.altitude, cx, cy, fieldRadius),
       }));
 
-      ctx.strokeStyle = "rgba(244,236,216,.18)";
+      ctx.strokeStyle = theme.starMap.connectorLineRgba;
       ctx.lineWidth = 0.6;
       for (let i = 0; i < points.length - 1; i++) {
         ctx.beginPath();
@@ -83,7 +87,7 @@ export function StarMapSpreadPage({ sky, numberedStars, minAltitude = -2, widthP
       }
 
       for (const { code, point } of points) {
-        drawJewelStar(ctx, point, Math.max(3.2, 5 * scale), { numberLabel: code });
+        drawJewelStar(ctx, point, Math.max(3.2, 5 * scale), { numberLabel: code, color: theme.accentMetal });
       }
 
       setReady(true);
@@ -98,7 +102,7 @@ export function StarMapSpreadPage({ sky, numberedStars, minAltitude = -2, widthP
     observer.observe(container);
     return () => observer.disconnect();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [sky, numberedStars, minAltitude, widthPx, heightPx]);
+  }, [sky, numberedStars, minAltitude, widthPx, heightPx, theme]);
 
   return (
     <NightPageShell widthPx={widthPx} heightPx={heightPx} printReady={ready}>

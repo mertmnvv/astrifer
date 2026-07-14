@@ -43,18 +43,22 @@ alanları) — Astrifer artık yalnızca iki ürün satıyor:
   (`starMaps/{slug}/entries` alt koleksiyonu, `components/starmap/Timeline.tsx`).
   Sayfa sahibi 6 ayda bir yeni bir an ekleyebilir; ekleme penceresi
   açıldığında sayfada rozet gösterilir.
-- **Deri Defter** (`/urun/defter`) — "Modern Gece + Altın": **suni/vegan
-  deri** (asla "hakiki deri" denmez), koyu lacivert kapak + ince-çizgi-yıldız
-  logo, altın yaldızlı sayfa kenarı, 26 sayfa (kapak, 2 sayfa mücevher
-  kesimi numaralı yıldız haritası, Yıldız Anahtarı + Günün Anlamı, 4 ayrı
-  "Birlikte Anılarımız" fotoğraf sayfası, Günün Anlamı ve Önemi, QR sayfası,
-  15 boş/çizgili sayfa, mühürlü cep arka kapak), altın renkli kalem
-  (`components/journal/night/`). Gelecek Mektubu metni + açılış tarihi
-  konfigüratörden girilir (`JournalConfigurator.tsx`) ve kitabın kendisinden
-  ayrı, mühürlü bir ek olarak basılır (`lib/journalPrintRender.ts`) —
-  26 fiziksel sayfa 13 farklı dosyaya render edilir (15 boş sayfa tekrar
-  kullanılır), mektup eki ayrı ve daha kısıtlı bir indirme aksiyonuna
-  bağlıdır.
+- **Deri Defter** (`/urun/defter`) — **suni/vegan deri** (asla "hakiki
+  deri" denmez), ince-çizgi-yıldız logo, yaldızlı sayfa kenarı, 26 sayfa
+  (kapak, 2 sayfa mücevher kesimi numaralı yıldız haritası, Yıldız
+  Anahtarı + Günün Anlamı, 4 ayrı "Birlikte Anılarımız" fotoğraf sayfası,
+  Günün Anlamı ve Önemi, QR sayfası, 15 boş/çizgili sayfa, mühürlü cep
+  arka kapak), yaldız renkli kalem (`components/journal/night/`). **3
+  sabit renk teması** — "Modern Gece + Altın" / "Sıcak Gece + Bakır" /
+  "Mürdüm Gece + Gül Altını" — `/create`'te seçilen Gökyüzü Rengi'ne göre
+  otomatik eşlenir, ayrıca saklanmaz (`getJournalTheme`,
+  `components/journal/night/journalTheme.ts`; dağıtım
+  `components/journal/JournalThemeContext.tsx` üzerinden). Gelecek
+  Mektubu metni + açılış tarihi `/create`'in 05. adımında girilir ve
+  kitabın kendisinden ayrı, mühürlü bir ek olarak basılır
+  (`lib/journalPrintRender.ts`) — 26 fiziksel sayfa 13 farklı dosyaya
+  render edilir (15 boş sayfa tekrar kullanılır), mektup eki ayrı ve daha
+  kısıtlı bir indirme aksiyonuna bağlıdır.
 
 Fiyatlar `config/pricing` Firestore dokümanından okunuyor
 (`lib/pricingConfig.ts`, `/admin/pricing`'den düzenlenebilir);
@@ -90,14 +94,16 @@ app/
   admin/(panel)/        Sipariş listesi+detayı, şablonlar, fiyat yönetimi — tek şifreli admin oturumu
   api/geocode/           Yer arama proxy'si (Nominatim + tz-lookup)
   api/upload/sign/         Cloudinary imzalı upload
-  create/                 Ürün konfigüratörü — CreateForm.tsx (client) + actions.ts (Firestore yazan Server Action)
+  create/                 Ürün konfigüratörü — CreateForm.tsx (5 adımlı sihirbaz, client) + actions.ts (Firestore yazan Server Action)
   s/[slug]/                Dijital Sayfa (public) — s/[slug]/claim/ sahiplik cookie'sini kurar
   urun/defter/               Fiziksel ürün satış sayfası
   print/journal/[slug]/[page]/   Puppeteer'ın fotoğrafladığı, token korumalı çıplak canvas — insan için değil
 components/
   astrolab/                framework-agnostic canvas çizimi (drawStarChart) + React sarmalayıcıları
   starmap/                  StarMapView, Timeline, AddEntryForm — Dijital Sayfa render'ı
-  journal/                  Deri Defter'e özgü görseller (kapak, deri doku, içerik önizlemeleri)
+  journal/                  Deri Defter'e özgü görseller (kapak, deri doku, içerik önizlemeleri),
+                             JournalThemeContext.tsx (3 renk temasının dağıtımı) + night/journalTheme.ts
+  create/                  /create sihirbazına özgü küçük bileşenler (CreateStepIndicator, JournalThemeSwatch)
   ui/                       Paylaşılan form bileşenleri (PhotoPicker, VoiceRecorder, ...)
 lib/
   starmaps.ts                StarMapRecord/TimelineEntry tipleri + Firestore okuma/yazma

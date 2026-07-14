@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { drawLogoThinStar } from "@/components/astrolab/drawLogoThinStar";
+import { useJournalTheme } from "@/components/journal/JournalThemeContext";
 import { drawNightLeatherTexture } from "./drawNightLeatherTexture";
 import { NightPageShell } from "./NightPageShell";
 
@@ -20,6 +21,7 @@ export interface NightCoverPageProps {
  * canvas-texture components (see CoverPanel.tsx).
  */
 export function NightCoverPage({ names, widthPx, heightPx }: NightCoverPageProps) {
+  const theme = useJournalTheme();
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const containerRef = useRef<HTMLDivElement | null>(null);
   const [ready, setReady] = useState(false);
@@ -40,8 +42,8 @@ export function NightCoverPage({ names, widthPx, heightPx }: NightCoverPageProps
       canvas.style.width = `${width}px`;
       canvas.style.height = `${height}px`;
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-      drawNightLeatherTexture(ctx, width, height);
-      drawLogoThinStar(ctx, width * 0.5, height * 0.14, Math.min(width, height) * 0.075);
+      drawNightLeatherTexture(ctx, width, height, theme.leather);
+      drawLogoThinStar(ctx, width * 0.5, height * 0.14, Math.min(width, height) * 0.075, theme.accentMetal);
       setReady(true);
     };
 
@@ -54,19 +56,29 @@ export function NightCoverPage({ names, widthPx, heightPx }: NightCoverPageProps
     observer.observe(container);
     return () => observer.disconnect();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [widthPx, heightPx]);
+  }, [widthPx, heightPx, theme]);
 
   return (
-    <NightPageShell widthPx={widthPx} heightPx={heightPx} printReady={ready} className="border border-amber/25">
+    <NightPageShell
+      widthPx={widthPx}
+      heightPx={heightPx}
+      printReady={ready}
+      className="border"
+      style={{ borderColor: `${theme.accentMetal}40` }}
+    >
       <div ref={containerRef} className="absolute inset-0">
         <canvas ref={canvasRef} className="absolute inset-0 h-full w-full" />
       </div>
       <div className="absolute inset-x-0 top-[24%] flex flex-col items-center gap-2">
-        <p className="font-mono text-base font-bold uppercase tracking-[0.4em] text-amber">Astrifer</p>
+        <p className="font-mono text-base font-bold uppercase tracking-[0.4em]" style={{ color: theme.accentMetal }}>
+          Astrifer
+        </p>
       </div>
       <div className="absolute inset-x-0 bottom-[18%] flex flex-col items-center gap-2">
-        <div className="h-px w-9 bg-amber/60" />
-        <p className="font-display text-lg italic text-amber/95">{names}</p>
+        <div className="h-px w-9" style={{ backgroundColor: `${theme.accentMetal}99` }} />
+        <p className="font-display text-lg italic" style={{ color: `${theme.accentMetal}f2` }}>
+          {names}
+        </p>
       </div>
     </NightPageShell>
   );

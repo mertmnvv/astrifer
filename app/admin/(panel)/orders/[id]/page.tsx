@@ -3,6 +3,8 @@ import { notFound } from "next/navigation";
 import { NightCoverPage } from "@/components/journal/night/NightCoverPage";
 import { MemoryPage } from "@/components/journal/night/MemoryPage";
 import { StarMapSpreadPage } from "@/components/journal/night/StarMapSpreadPage";
+import { getJournalTheme } from "@/components/journal/night/journalTheme";
+import { JournalThemeProvider } from "@/components/journal/JournalThemeContext";
 import { pickNumberedStars, splitSkyByAzimuth } from "@/components/journal/starMapSpread";
 import { computeSky } from "@/lib/astronomy/computeSky";
 import { getDb } from "@/lib/firebase/admin";
@@ -192,32 +194,34 @@ export default async function AdminOrderDetailPage({ params }: { params: { id: s
               const initialEntry = starMap.entries.find((entry) => entry.isInitial) ?? starMap.entries[0];
               const memoryPhotos = initialEntry?.photos ?? [];
               return (
-                <div className="grid gap-6 sm:grid-cols-2">
-                  <div className="w-full max-w-xs">
-                    <NightCoverPage names={starMap.title} />
-                  </div>
-                  <div className="flex flex-col gap-6">
-                    <div className="flex flex-col items-start gap-2 rounded-2xl border border-text/10 bg-text/[0.035] p-4">
-                      <p className="font-mono text-[10px] uppercase tracking-widest text-dim">
-                        Yıldız haritası — 2 sayfa, {JOURNAL_PAGE_ORDER.length} sayfalık kitabın parçası
-                      </p>
-                      <div className="grid grid-cols-2 gap-2">
-                        <StarMapSpreadPage sky={sky} numberedStars={page1Stars} />
-                        <StarMapSpreadPage sky={sky} numberedStars={page2Stars} />
-                      </div>
+                <JournalThemeProvider theme={getJournalTheme(starMap.palette)}>
+                  <div className="grid gap-6 sm:grid-cols-2">
+                    <div className="w-full max-w-xs">
+                      <NightCoverPage names={starMap.title} />
                     </div>
-                    {memoryPhotos.length > 0 && (
+                    <div className="flex flex-col gap-6">
                       <div className="flex flex-col items-start gap-2 rounded-2xl border border-text/10 bg-text/[0.035] p-4">
-                        <p className="font-mono text-[10px] uppercase tracking-widest text-dim">Birlikte Anılarımız</p>
-                        <div className="grid grid-cols-4 gap-2">
-                          {memoryPhotos.slice(0, 4).map((photo, index) => (
-                            <MemoryPage key={photo.caption ?? index} photo={photo} caption={photo.caption ?? ""} />
-                          ))}
+                        <p className="font-mono text-[10px] uppercase tracking-widest text-dim">
+                          Yıldız haritası — 2 sayfa, {JOURNAL_PAGE_ORDER.length} sayfalık kitabın parçası
+                        </p>
+                        <div className="grid grid-cols-2 gap-2">
+                          <StarMapSpreadPage sky={sky} numberedStars={page1Stars} />
+                          <StarMapSpreadPage sky={sky} numberedStars={page2Stars} />
                         </div>
                       </div>
-                    )}
+                      {memoryPhotos.length > 0 && (
+                        <div className="flex flex-col items-start gap-2 rounded-2xl border border-text/10 bg-text/[0.035] p-4">
+                          <p className="font-mono text-[10px] uppercase tracking-widest text-dim">Birlikte Anılarımız</p>
+                          <div className="grid grid-cols-4 gap-2">
+                            {memoryPhotos.slice(0, 4).map((photo, index) => (
+                              <MemoryPage key={photo.caption ?? index} photo={photo} caption={photo.caption ?? ""} />
+                            ))}
+                          </div>
+                        </div>
+                      )}
+                    </div>
                   </div>
-                </div>
+                </JournalThemeProvider>
               );
             })()
           )}
