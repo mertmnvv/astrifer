@@ -13,9 +13,9 @@ export interface QrCodeOptions {
 
 /**
  * Generates a real, scannable QR code as raw `<svg>...</svg>` markup —
- * resolution-independent, so one generated string renders crisply at both
- * the smallest and largest poster print sizes. Never decorative/fake: the
- * payload always encodes a real order's digital page URL.
+ * resolution-independent, so one generated string renders crisply at any
+ * print size. Never decorative/fake: the payload always encodes a real
+ * order's digital page URL.
  */
 export async function generateQrSvg(options: QrCodeOptions): Promise<string> {
   return QRCode.toString(options.url, {

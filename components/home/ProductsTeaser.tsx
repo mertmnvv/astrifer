@@ -1,9 +1,7 @@
 import Link from "next/link";
 import { RevealOnScroll } from "@/components/ui/RevealOnScroll";
 import { SectionHeading } from "@/components/atlas/SectionHeading";
-import { DIGITAL_PRICE, JOURNAL_PRICE, POSTER_SIZES, formatTRY } from "@/lib/pricing";
-
-const posterFrom = Math.min(...POSTER_SIZES.map((size) => size.basePrice));
+import { DIGITAL_PRICE, JOURNAL_PRICE, formatTRY } from "@/lib/pricing";
 
 interface ProductItem {
   title: string;
@@ -28,20 +26,6 @@ const PRODUCTS: ProductItem[] = [
     ],
     href: "/create",
     cta: "Hemen Oluştur",
-  },
-  {
-    title: "Poster & Çerçeve",
-    description: "300 DPI baskı kalitesinde, evinizin en güzel köşesi için sanatsal gökyüzü tablosu.",
-    price: `${formatTRY(posterFrom)}'den başlayan`,
-    features: [
-      "300 DPI Fine-Art müze kalitesi baskı",
-      "Mat premium dokulu sanatsal kağıt",
-      "Şık ahşap/metal çerçeve seçenekleri",
-      "Dijital sayfaya yönlendiren QR kod",
-    ],
-    href: "/urun/poster",
-    cta: "Seçenekleri İncele",
-    badge: "Çok Satan",
   },
   {
     title: "Deri Defter",
@@ -70,7 +54,7 @@ export function ProductsTeaser() {
           <SectionHeading eyebrow="Koleksiyon" title="Dijital, ya da elle tutulur." />
         </RevealOnScroll>
 
-        <div className="mt-14 grid gap-5 sm:grid-cols-3">
+        <div className="mx-auto mt-14 grid max-w-2xl gap-5 sm:grid-cols-2">
           {PRODUCTS.map((product, index) => (
             <RevealOnScroll key={product.title} delayMs={index * 100}>
               <div className="relative flex h-full flex-col rounded-[22px] border border-text/10 bg-text/[0.035] p-7 sm:p-8">

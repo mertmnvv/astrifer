@@ -1,28 +1,23 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { StarChart } from "@/components/astrolab/StarChart";
-import { getSkyPalette } from "@/components/astrolab/palettes";
 import { NightCoverPage } from "@/components/journal/night/NightCoverPage";
 import { MemoryPage } from "@/components/journal/night/MemoryPage";
 import { StarMapSpreadPage } from "@/components/journal/night/StarMapSpreadPage";
 import { pickNumberedStars, splitSkyByAzimuth } from "@/components/journal/starMapSpread";
-import { FrameMockup } from "@/components/ui/FrameMockup";
 import { computeSky } from "@/lib/astronomy/computeSky";
 import { getDb } from "@/lib/firebase/admin";
 import { isFirebaseConfigured } from "@/lib/firebase/isConfigured";
 import { JOURNAL_PAGE_ORDER } from "@/lib/journalPrintRender";
-import { formatTRY, type FrameOption } from "@/lib/pricing";
+import { formatTRY } from "@/lib/pricing";
 import { getStarMapBySlug } from "@/lib/starmaps";
 import type { OrderDoc } from "@/types/firestore";
 import {
   getLetterInsertDownloadUrlAction,
-  getPrintDownloadUrlAction,
   renderJournalPrintFilesAction,
   renderLetterInsertAction,
-  renderPrintFileAction,
   updateOrderAction,
 } from "../actions";
-import { POSTER_PRINTABLE_PRODUCTS, PRODUCT_LABELS, STATUS_LABELS, STATUS_OPTIONS } from "../shared";
+import { PRODUCT_LABELS, STATUS_LABELS, STATUS_OPTIONS } from "../shared";
 
 export const dynamic = "force-dynamic";
 
@@ -76,10 +71,6 @@ export default async function AdminOrderDetailPage({ params }: { params: { id: s
               <LedgerRow label="Müşteri" value={order.customerName ?? "—"} />
               <LedgerRow label="E-posta" value={order.customerEmail} />
               <LedgerRow label="Ürün" value={PRODUCT_LABELS[order.productType]} />
-              {order.size && <LedgerRow label="Boyut" value={order.size} />}
-              {order.frameOption && order.frameOption !== "frameless" && (
-                <LedgerRow label="Çerçeve" value={order.frameOption} />
-              )}
               <LedgerRow label="Tutar" value={formatTRY(order.priceAmount)} />
               <LedgerRow label="Tarih" value={formatDate(order.createdAt)} />
               {order.trackingNumber && <LedgerRow label="Takip No" value={order.trackingNumber} />}
@@ -119,32 +110,7 @@ export default async function AdminOrderDetailPage({ params }: { params: { id: s
 
           <div className="rounded-2xl border border-text/10 bg-text/[0.035] p-5">
             <p className="mb-3 font-mono text-[10px] uppercase tracking-[0.3em] text-dim">Baskı Dosyası</p>
-            {POSTER_PRINTABLE_PRODUCTS.includes(order.productType) && order.size ? (
-              <div className="flex flex-col items-start gap-2">
-                <form action={renderPrintFileAction}>
-                  <input type="hidden" name="orderId" value={order.id} />
-                  <button
-                    type="submit"
-                    className="rounded-full border border-text/20 px-3 py-1 font-mono text-[10px] uppercase tracking-widest text-subtle transition-colors hover:border-amber/50 hover:text-amber"
-                  >
-                    {order.printFilePath ? "Yeniden Oluştur" : "Baskı Dosyası Oluştur"}
-                  </button>
-                </form>
-                {order.printFilePath ? (
-                  <form action={getPrintDownloadUrlAction}>
-                    <input type="hidden" name="orderId" value={order.id} />
-                    <button
-                      type="submit"
-                      className="rounded-full border border-amber/40 px-3 py-1 font-mono text-[10px] uppercase tracking-widest text-amber transition-colors hover:bg-amber hover:text-ink"
-                    >
-                      İndirme Linki Al (300 DPI)
-                    </button>
-                  </form>
-                ) : (
-                  <p className="text-xs text-dim">Henüz baskı dosyası üretilmedi.</p>
-                )}
-              </div>
-            ) : order.productType === "journal" ? (
+            {order.productType === "journal" ? (
               <div className="flex flex-col items-start gap-4">
                 <div className="flex flex-col items-start gap-2">
                   <p className="font-mono text-[10px] uppercase tracking-widest text-dim">
@@ -218,19 +184,6 @@ export default async function AdminOrderDetailPage({ params }: { params: { id: s
               >
                 Yeni sekmede aç
               </Link>
-            </div>
-          ) : order.productType === "poster" || order.productType === "framed_poster" ? (
-            <div className="w-full max-w-md">
-              <FrameMockup frame={(order.frameOption ?? "frameless") as FrameOption} className="w-full">
-                <div className="aspect-square w-full">
-                  <StarChart
-                    sky={sky}
-                    label={`${starMap.locationName} önizleme`}
-                    className="h-full w-full"
-                    palette={getSkyPalette(starMap.palette)}
-                  />
-                </div>
-              </FrameMockup>
             </div>
           ) : (
             (() => {

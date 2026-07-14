@@ -21,7 +21,7 @@ const STEPS = [
   {
     number: "04",
     title: "Sonsuza Dek Saklayın",
-    description: "Kalıcı dijital sayfanız hazır — dilerseniz poster veya deri defter ürünüyle taçlandırın.",
+    description: "Kalıcı dijital sayfanız hazır — dilerseniz deri defter ürünüyle taçlandırın.",
   },
 ];
 

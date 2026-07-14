@@ -3,7 +3,7 @@
 Kişiye özel yıldız haritası + zaman kapsülü ürünü. Kullanıcı bir tarih,
 saat ve konum girer; o anın gerçek astronomik gökyüzü (yıldızlar, Ay
 evresi, gezegen konumları) hesaplanır ve kalıcı bir dijital sayfa +
-(opsiyonel) fiziksel ürün olarak sunulur.
+(opsiyonel) Deri Defter fiziksel ürünü olarak sunulur.
 
 ## Tech stack
 
@@ -23,7 +23,9 @@ evresi, gezegen konumları) hesaplanır ve kalıcı bir dijital sayfa +
   değişkenleri var ama kod tarafında kullanılmıyor.
 - **300 DPI baskı render:** Puppeteer + `@sparticuz/chromium`, ayrı bir
   worker servisi değil — mevcut Next.js server action'ları içinde
-  çalışıyor (`lib/printRender.ts`, token korumalı `/print/[slug]`).
+  çalışıyor (`lib/journalPrintRender.ts`, token korumalı
+  `/print/journal/[slug]/[page]`). Yalnızca Deri Defter için var —
+  Poster ürünü kaldırıldı (aşağıya bkz.).
 - Admin oturumu: hesap sistemi yok, tek paylaşılan şifre + imzalı HMAC
   session cookie (`lib/adminAuth.ts`, `middleware.ts`).
 - Sayfa sahipliği (Dijital Sayfa): hesap sistemi yok, slug'a bağlı
@@ -31,21 +33,16 @@ evresi, gezegen konumları) hesaplanır ve kalıcı bir dijital sayfa +
 
 ## Ürünler
 
+**Poster & Çerçeve ürünü tamamen kaldırıldı** (tanıtım sayfası, "Derin
+Gökyüzü" render motoru, 300 DPI baskı pipeline'ı, `/create`'teki
+boyut/çerçeve/renk ruhu adımı, sepet/checkout/admin'deki tüm poster
+alanları) — Astrifer artık yalnızca iki ürün satıyor:
+
 - **Dijital Sayfa** (`/s/[slug]`) — kalıcı paylaşım sayfası. Statik tek
   "an" değil, **zamanla büyüyen bir fotoğraf zaman çizelgesi**
   (`starMaps/{slug}/entries` alt koleksiyonu, `components/starmap/Timeline.tsx`).
   Sayfa sahibi 6 ayda bir yeni bir an ekleyebilir; ekleme penceresi
   açıldığında sayfada rozet gösterilir.
-- **Poster & Çerçeve** (`/urun/poster`) — "Derin Gökyüzü": tarih+konum+anı
-  türünden seeded/procedural nebula + Samanyolu + gerçek renk çeşitliliğinde
-  yoğun yıldız alanı (`components/astrolab/drawNebulaSky.ts`,
-  `drawDeepSkyField.ts`), tek fotoğraf vinyeti, siparişin gerçek dijital
-  sayfa URL'ine kodlanan QR (`lib/qrcode.ts`). Yazı bandı ayrı bir HTML
-  bileşeni (`PosterTextBand.tsx`, canlı güncellenir, canvas'a gömülü
-  değil); baskı dosyası üretilirken (`lib/printRender.ts`) sanat alanı +
-  bant Puppeteer ile tek görüntüde birleştirilir. Boyut × çerçeve
-  (çerçevesiz / siyah ahşap+beyaz paspartu / ince siyah metal, varsayılan)
-  × Sıcak/Soğuk/Nötr renk ruhu konfigüratörü.
 - **Deri Defter** (`/urun/defter`) — "Modern Gece + Altın": **suni/vegan
   deri** (asla "hakiki deri" denmez), koyu lacivert kapak + ince-çizgi-yıldız
   logo, altın yaldızlı sayfa kenarı, 26 sayfa (kapak, 2 sayfa mücevher
@@ -69,7 +66,7 @@ Fiyatlar `config/pricing` Firestore dokümanından okunuyor
 URL'i üzerinden erişilebilir olmamalı. İndirme yalnızca admin oturumu
 doğrulanmış bir server action/API route üzerinden, sunucu tarafında
 kısa ömürlü (5 dk) imzalı bir Storage URL mint edilerek çalışır
-(`app/admin/(panel)/orders/actions.ts` → `getPrintDownloadUrlAction`,
+(`app/admin/(panel)/orders/actions.ts` → `getLetterInsertDownloadUrlAction`,
 `storage.rules`'ta `starmaps-print/**` herkese kapalı). Müşteri
 tarafında bu dosyalara giden hiçbir link/route olmamalı. Bu kural her
 zaman geçerli — aksini isteyen bir talep gelse bile önce kullanıcıya
@@ -95,8 +92,8 @@ app/
   api/upload/sign/         Cloudinary imzalı upload
   create/                 Ürün konfigüratörü — CreateForm.tsx (client) + actions.ts (Firestore yazan Server Action)
   s/[slug]/                Dijital Sayfa (public) — s/[slug]/claim/ sahiplik cookie'sini kurar
-  urun/poster/, urun/defter/   Fiziksel ürün satış sayfaları
-  print/[slug]/              Puppeteer'ın fotoğrafladığı, token korumalı çıplak canvas — insan için değil
+  urun/defter/               Fiziksel ürün satış sayfası
+  print/journal/[slug]/[page]/   Puppeteer'ın fotoğrafladığı, token korumalı çıplak canvas — insan için değil
 components/
   astrolab/                framework-agnostic canvas çizimi (drawStarChart) + React sarmalayıcıları
   starmap/                  StarMapView, Timeline, AddEntryForm — Dijital Sayfa render'ı
@@ -106,7 +103,7 @@ lib/
   starmaps.ts                StarMapRecord/TimelineEntry tipleri + Firestore okuma/yazma
   starmapOwnerToken.ts, starmapTimeline.ts   Sahiplik token'ı + 6 aylık pencere mantığı
   pricingConfig.ts             Canlı, admin-düzenlenebilir fiyat kaynağı
-  printRender.ts, printRenderToken.ts   300 DPI render pipeline'ı
+  journalPrintRender.ts, printRenderToken.ts   300 DPI render pipeline'ı
   firebase/                    Admin SDK istemcisi + isFirebaseConfigured()
   astronomy/                   computeSky.ts — saf astronomi hesaplaması
 types/firestore.ts            Elle yazılmış tüm Firestore doküman tipleri — şema değişince elle güncelle

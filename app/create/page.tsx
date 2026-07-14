@@ -1,8 +1,8 @@
 import type { Metadata } from "next";
-import { CrossSell } from "@/components/CrossSell";
 import { CreateForm } from "./CreateForm";
 import { FALLBACK_TEMPLATES, type TemplateOption } from "@/lib/templates";
 import { isFirebaseConfigured } from "@/lib/firebase/isConfigured";
+import { getPricingConfig } from "@/lib/pricingConfig";
 import type { TemplateDoc } from "@/types/firestore";
 import { SiteHeader } from "@/components/layout/SiteHeader";
 import { SiteFooter } from "@/components/layout/SiteFooter";
@@ -46,7 +46,7 @@ async function loadTemplates(): Promise<TemplateOption[]> {
 }
 
 export default async function CreatePage() {
-  const templates = await loadTemplates();
+  const [templates, pricing] = await Promise.all([loadTemplates(), getPricingConfig()]);
 
   return (
     <>
@@ -60,9 +60,8 @@ export default async function CreatePage() {
             </h1>
           </RevealOnScroll>
           <RevealOnScroll delayMs={120}>
-            <CreateForm templates={templates} />
+            <CreateForm templates={templates} pricing={pricing} />
           </RevealOnScroll>
-          <CrossSell exclude="digital" />
         </div>
       </main>
       <SiteFooter />

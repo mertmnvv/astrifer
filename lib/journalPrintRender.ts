@@ -57,8 +57,8 @@ export interface RenderJournalPrintFilesResult {
 /**
  * Renders every distinct journal page kind exactly once (not all 26 physical
  * slots — the 15 "blank" pages are identical, so rendering/uploading 15
- * copies would be pure waste) and uploads each to the same locked-down
- * `starmaps-print/` Storage prefix the poster pipeline uses. The 26-entry
+ * copies would be pure waste) and uploads each to the locked-down
+ * `starmaps-print/` Storage prefix (see storage.rules). The 26-entry
  * manifest then just repeats the "blank" storage path for every blank slot.
  */
 export async function renderJournalPrintFiles(slug: string): Promise<RenderJournalPrintFilesResult> {

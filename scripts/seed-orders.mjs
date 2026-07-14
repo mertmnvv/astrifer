@@ -9,7 +9,7 @@
 import { cert, initializeApp } from "firebase-admin/app";
 import { getFirestore, Timestamp } from "firebase-admin/firestore";
 
-const ORDER_IDS = ["seed-order-digital", "seed-order-poster", "seed-order-journal"];
+const ORDER_IDS = ["seed-order-digital", "seed-order-journal"];
 const STAR_MAP_SLUG = "ornek";
 
 function requireEnv(name) {
@@ -84,19 +84,7 @@ async function seed() {
       customerEmail: "test-digital@example.com",
       customerName: "Test Müşteri — Dijital",
       productType: "digital",
-      size: null,
-      frameOption: null,
       priceAmount: 299,
-    },
-    {
-      id: "seed-order-poster",
-      starMapSlug: STAR_MAP_SLUG,
-      customerEmail: "test-poster@example.com",
-      customerName: "Test Müşteri — Poster",
-      productType: "framed_poster",
-      size: "50x50",
-      frameOption: "black",
-      priceAmount: 1335,
     },
     {
       id: "seed-order-journal",
@@ -104,8 +92,6 @@ async function seed() {
       customerEmail: "test-journal@example.com",
       customerName: "Test Müşteri — Defter",
       productType: "journal",
-      size: null,
-      frameOption: null,
       priceAmount: 2400,
     },
   ];
@@ -121,8 +107,6 @@ async function seed() {
       iyzicoConversationId: null,
       shippingAddress: null,
       trackingNumber: null,
-      printFilePath: null,
-      printFileRenderedAt: null,
       createdAt: now,
       updatedAt: now,
     });

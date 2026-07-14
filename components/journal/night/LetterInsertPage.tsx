@@ -11,7 +11,7 @@ export interface LetterInsertPageProps {
  * styled as its own physical card (cream paper, not the navy book theme)
  * since it's meant to be slipped into the back-cover pocket, not bound into
  * the book. Never reachable except through the same admin-gated,
- * short-lived signed URL pattern as the 300 DPI poster file.
+ * short-lived signed URL pattern as the rest of the book's print files.
  */
 export function LetterInsertPage({ letterText, openingDateLabel, widthPx, heightPx }: LetterInsertPageProps) {
   return (

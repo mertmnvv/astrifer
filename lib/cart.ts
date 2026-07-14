@@ -4,7 +4,13 @@
 // can be called from any client component; see lib/useCart.ts for the React
 // hook that watches it.
 
-export type CartProductType = "digital" | "poster" | "framed_poster" | "journal";
+export type CartProductType = "digital" | "journal";
+
+/** Structured journal config — mirrors OrderDoc.journalLetterText/journalLetterOpeningDate. */
+export interface CartJournalConfig {
+  letterText: string;
+  openingDate: string | null;
+}
 
 export interface CartItem {
   id: string;
@@ -17,6 +23,7 @@ export interface CartItem {
   summary: string[];
   /** The digital page slug this item is tied to, if any — lets the cart line deep-link to /s/[slug]. */
   slug?: string;
+  journalConfig?: CartJournalConfig;
   addedAt: string;
 }
 

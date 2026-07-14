@@ -17,11 +17,11 @@ const FAQ_ITEMS: FaqItemData[] = [
   },
   {
     question: "Dijital ve fiziksel ürün arasındaki fark nedir?",
-    answer: "Dijital Sayfa, size özel kalıcı bir web adresi ve paylaşılabilir bir zaman kapsülü sayfasıdır. Poster ve Deri Defter ise bu dijital sayfanın fiziksel bir uzantısıdır — her ikisinde de dijital sayfanıza götüren bir QR kod bulunur, yani fiziksel ürünü alanlar dijital deneyimi de otomatik olarak elde eder.",
+    answer: "Dijital Sayfa, size özel kalıcı bir web adresi ve paylaşılabilir bir zaman kapsülü sayfasıdır. Deri Defter ise bu dijital sayfanın fiziksel bir uzantısıdır — dijital sayfanıza götüren bir QR kod içerir, yani Deri Defter'i alanlar dijital deneyimi de otomatik olarak elde eder.",
   },
   {
     question: "Kargo süresi nedir?",
-    answer: "Poster siparişleri 3-5 iş günü, Deri Defter siparişleri 5-7 iş günü içinde kargoya verilir. Kargo ücreti fiyata dahildir.",
+    answer: "Deri Defter siparişleri 5-7 iş günü içinde kargoya verilir. Kargo ücreti fiyata dahildir.",
   },
   {
     question: "Fotoğraf ve ses kaydı eklemek zorunlu mu?",

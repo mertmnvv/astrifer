@@ -13,9 +13,7 @@ import { AtlasPanel } from "@/components/atlas/AtlasPanel";
 export default function CheckoutPage() {
   const items = useCart();
   const total = cartTotal(items);
-  const ownedProducts: CrossSellProduct[] = items.map((item) =>
-    item.productType === "framed_poster" ? "poster" : item.productType,
-  );
+  const ownedProducts: CrossSellProduct[] = items.map((item) => item.productType);
 
   return (
     <>

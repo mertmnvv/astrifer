@@ -175,7 +175,7 @@ export function StarMapView({ starMap, isPreview = false, isOwner = false }: Sta
                 Anını fiziksel bir ürüne dönüştür.
               </p>
               <p className="text-sm leading-relaxed text-subtle">
-                Bu gökyüzünü bir posterde ya da deri defterde sonsuza dek sakla.
+                Bu gökyüzünü deri defterde sonsuza dek sakla.
               </p>
             </>
           ) : (

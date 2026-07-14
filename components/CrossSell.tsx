@@ -1,17 +1,12 @@
 import Link from "next/link";
 
-export type CrossSellProduct = "digital" | "poster" | "journal";
+export type CrossSellProduct = "digital" | "journal";
 
 const PRODUCTS: Record<CrossSellProduct, { title: string; description: string; href: string }> = {
   digital: {
     title: "Dijital Sayfa",
     description: "Kalıcı bağlantı, gerçek gökyüzü ve zamanla büyüyen bir zaman çizelgesi.",
     href: "/create",
-  },
-  poster: {
-    title: "Poster & Çerçeve",
-    description: "300 DPI baskı kalitesinde, duvarınızda sonsuza dek duran bir sanat eseri.",
-    href: "/urun/poster",
   },
   journal: {
     title: "Deri Defter",

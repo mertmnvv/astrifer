@@ -22,8 +22,8 @@ const MEMORY_CAPTION_FALLBACK = ["İlk “Merhaba”", "O Gece", "Yüzük", "Ail
 /**
  * Bare, chrome-less, exact-pixel-size render for ONE distinct journal page
  * kind — a headless-browser screenshot target only (see
- * lib/journalPrintRender.ts), gated by the same per-slug token as the
- * poster's /print/[slug] route.
+ * lib/journalPrintRender.ts), gated by a short-lived signed per-slug token
+ * (lib/printRenderToken.ts).
  */
 export default async function JournalPrintPage({
   params,

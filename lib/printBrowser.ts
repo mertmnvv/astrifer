@@ -1,9 +1,8 @@
 import "server-only";
 
 /**
- * Launches the single headless-Chromium browser instance used by every
- * server-side print render (poster and journal alike). Shared so both
- * pipelines agree on the exact same production/dev launch strategy.
+ * Launches the single headless-Chromium browser instance used by the
+ * journal's server-side print render (lib/journalPrintRender.ts).
  */
 export async function launchPrintBrowser() {
   const puppeteer = await import("puppeteer-core");

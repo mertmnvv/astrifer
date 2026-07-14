@@ -17,62 +17,16 @@ export default async function AdminPricingPage() {
     );
   }
 
-  const { posterSizes, frameOptions, journalPrice, digitalPrice } = await getPricingConfig();
+  const { journalPrice, digitalPrice } = await getPricingConfig();
 
   return (
     <div className="space-y-6">
       <h1 className="font-display text-2xl italic text-bright">Fiyatlar</h1>
       <p className="text-sm text-subtle">
-        Buradaki değerler kaydedildiği anda /urun/poster, /urun/defter ve /checkout sayfalarına yansır.
+        Buradaki değerler kaydedildiği anda /urun/defter ve /checkout sayfalarına yansır.
       </p>
 
       <form action={savePricingAction} className="space-y-8">
-        <div className="space-y-4">
-          <h2 className="font-mono text-xs uppercase tracking-widest text-amber">Poster boyutları</h2>
-          <div className="grid gap-4 sm:grid-cols-2">
-            {posterSizes.map((option) => (
-              <div key={option.value} className="space-y-1.5">
-                <label htmlFor={`posterSize_${option.value}`} className={FIELD_LABEL_CLASS}>
-                  {option.label} (₺)
-                </label>
-                <input
-                  id={`posterSize_${option.value}`}
-                  name={`posterSize_${option.value}`}
-                  type="number"
-                  min={0}
-                  step={1}
-                  required
-                  defaultValue={option.basePrice}
-                  className={FIELD_CLASS}
-                />
-              </div>
-            ))}
-          </div>
-        </div>
-
-        <div className="space-y-4">
-          <h2 className="font-mono text-xs uppercase tracking-widest text-amber">Çerçeve ek ücretleri</h2>
-          <div className="grid gap-4 sm:grid-cols-2">
-            {frameOptions.map((option) => (
-              <div key={option.value} className="space-y-1.5">
-                <label htmlFor={`frameSurcharge_${option.value}`} className={FIELD_LABEL_CLASS}>
-                  {option.label} (₺)
-                </label>
-                <input
-                  id={`frameSurcharge_${option.value}`}
-                  name={`frameSurcharge_${option.value}`}
-                  type="number"
-                  min={0}
-                  step={1}
-                  required
-                  defaultValue={option.surcharge}
-                  className={FIELD_CLASS}
-                />
-              </div>
-            ))}
-          </div>
-        </div>
-
         <div className="space-y-4">
           <h2 className="font-mono text-xs uppercase tracking-widest text-amber">Diğer ürünler</h2>
           <div className="grid gap-4 sm:grid-cols-2">

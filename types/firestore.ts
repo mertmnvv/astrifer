@@ -6,7 +6,7 @@ import type { Timestamp } from "firebase-admin/firestore";
 
 export type TemplateCategory = "dogum" | "yildonumu" | "teklif" | "mezuniyet" | "anma";
 export type OrderStatus = "pending" | "paid" | "failed" | "refunded" | "fulfilled" | "shipped";
-export type ProductType = "digital" | "poster" | "framed_poster" | "journal";
+export type ProductType = "digital" | "journal";
 
 /** Collection `templates`, doc id = slug. */
 export interface TemplateDoc {
@@ -63,8 +63,6 @@ export interface OrderDoc {
   customerEmail: string;
   customerName: string | null;
   productType: ProductType;
-  size: string | null;
-  frameOption: string | null;
   priceAmount: number;
   currency: string;
   status: OrderStatus;
@@ -72,13 +70,6 @@ export interface OrderDoc {
   iyzicoConversationId: string | null;
   shippingAddress: Record<string, unknown> | null;
   trackingNumber: string | null;
-  /** Storage path under `starmaps-print/`, set once an admin renders the print file. Never a direct URL — see lib/printRender.ts. */
-  printFilePath: string | null;
-  printFileRenderedAt: Timestamp | null;
-  /** Poster-only: the free-text line printed on the art band — distinct from StarMapDoc.message (the digital page's own message). */
-  posterPersonalMessage: string | null;
-  /** Poster-only: nebula hue mood override; null means "use the memory-type default". */
-  posterColorMood: "warm" | "cool" | "neutral" | null;
   /** Journal-only: user-authored letter for the sealed back-cover insert. */
   journalLetterText: string | null;
   /** Journal-only: the date the sealed letter insert is meant to be opened. */
@@ -89,7 +80,7 @@ export interface OrderDoc {
    * same path rather than storing 15 redundant renders. Never a direct URL.
    */
   printFilePaths: string[] | null;
-  /** Journal-only: the sealed letter insert's own print file — same locked-down security rule as printFilePath, kept separate since it's more sensitive than the rest of the book. */
+  /** Journal-only: the sealed letter insert's own print file — same locked-down security rule as printFilePaths, kept separate since it's more sensitive than the rest of the book. */
   letterInsertPrintPath: string | null;
   createdAt: Timestamp;
   updatedAt: Timestamp;
@@ -101,8 +92,6 @@ export interface OrderDoc {
  * merge. Never read/written by client code — server-only via Admin SDK.
  */
 export interface PricingConfigDoc {
-  posterSizes: { value: string; label: string; basePrice: number }[];
-  frameOptions: { value: string; label: string; description: string; surcharge: number }[];
   journalPrice: number;
   digitalPrice: number;
   updatedAt: Timestamp;

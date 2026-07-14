@@ -15,9 +15,7 @@ export default function CartPage() {
   const router = useRouter();
   const items = useCart();
   const total = cartTotal(items);
-  const ownedProducts: CrossSellProduct[] = items.map((item) =>
-    item.productType === "framed_poster" ? "poster" : item.productType,
-  );
+  const ownedProducts: CrossSellProduct[] = items.map((item) => item.productType);
 
   return (
     <>
@@ -29,8 +27,8 @@ export default function CartPage() {
           {items.length === 0 ? (
             <>
               <p className="mx-auto mt-4 max-w-md text-center text-sm leading-relaxed text-subtle">
-                Sepetiniz henüz boş. Bir zaman kapsülü oluşturarak ya da poster/defter konfigüratörlerinden
-                birini keşfederek başlayabilirsiniz.
+                Sepetiniz henüz boş. Bir zaman kapsülü oluşturarak ya da Deri Defter konfigüratörünü keşfederek
+                başlayabilirsiniz.
               </p>
               <div className="mt-8 flex flex-wrap justify-center gap-3">
                 <Link
@@ -38,12 +36,6 @@ export default function CartPage() {
                   className="rounded-full bg-gradient-to-br from-amber-light to-amber-deep px-6 py-3 font-mono text-xs uppercase tracking-widest text-ink transition-opacity hover:opacity-90"
                 >
                   Dijital Sayfa Oluştur
-                </Link>
-                <Link
-                  href="/urun/poster"
-                  className="rounded-full border border-amber/40 px-6 py-3 font-mono text-xs uppercase tracking-widest text-amber transition-colors hover:bg-amber/10"
-                >
-                  Poster İncele
                 </Link>
                 <Link
                   href="/urun/defter"

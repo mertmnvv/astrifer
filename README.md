@@ -2,7 +2,7 @@
 
 Kişiye özel yıldız haritası: kullanıcı bir tarih/saat/konum girer, o anın
 astronomik olarak doğru gökyüzü render edilir. Dijital paylaşılabilir sayfa +
-fiziksel poster/çerçeve olarak satılır.
+(opsiyonel) fiziksel Deri Defter olarak satılır.
 
 ## Yığın
 
@@ -20,26 +20,25 @@ fiziksel poster/çerçeve olarak satılır.
 ```
 app/                    route'lar (App Router)
   create/               ürün konfigüratörü (/create)
-  s/[slug]/             paylaşılan yıldız haritası sayfası (iskelet)
-  urun/poster/          fiziksel ürün satış sayfası (iskelet)
+  s/[slug]/             paylaşılan yıldız haritası sayfası
+  urun/defter/          Deri Defter satış sayfası
   admin/                sipariş/şablon yönetim paneli (/admin) — bkz. aşağıda
   api/geocode/          yer arama proxy'si (Nominatim + tz-lookup)
   api/upload/sign/      Cloudinary imzalı upload için kısa ömürlü imza üretir
-  print/[slug]/         baskı render'ının Puppeteer ile fotoğrafladığı, token'la
-                         korunan çıplak canvas sayfası — insan için değil
+  print/journal/[slug]/[page]/   baskı render'ının Puppeteer ile fotoğrafladığı,
+                         token'la korunan çıplak canvas sayfası — insan için değil
 components/
   astrolab/             framework-agnostic canvas çizim katmanı (drawStarChart)
-                         + React sarmalayıcıları (StarChart canlı önizleme,
-                         PrintStarChart tek kare/yüksek çözünürlük baskı)
+                         + React sarmalayıcıları (StarChart canlı önizleme)
   ui/                   paylaşılan form bileşenleri
 lib/
   astronomy/            computeSky.ts — saf astronomi hesaplaması, render'dan bağımsız
   geocode/               yerleşik şehir listesi, saat dilimi dönüşümü
   firebase/              Admin SDK istemcisi (lib/firebase/admin.ts) + isFirebaseConfigured()
   cloudinary/            imzalı upload config + client helper (uploadFile.ts)
-  printRender.ts          Puppeteer ile /print/[slug]'ı fotoğraflayıp
+  journalPrintRender.ts   Puppeteer ile /print/journal/[slug]/[page]'ı fotoğraflayıp
                          starmaps-print/'e yükleyen sunucu-taraflı render pipeline'ı
-  printRenderToken.ts     /print/[slug]'a erişimi kısıtlayan kısa ömürlü imzalı token
+  printRenderToken.ts     baskı render sayfalarına erişimi kısıtlayan kısa ömürlü imzalı token
   templates.ts           Firestore erişilemediğinde kullanılan yedek şablon listesi
 scripts/
   seed-firestore.mjs     varsayılan şablonları Firestore'a yazan tek seferlik script
@@ -122,27 +121,28 @@ kuralları etkilenmez.
 çalışan sunucu taraflı kod kısa ömürlü bir signed URL üreterek erişebilir; bu
 URL asla client'a kalıcı olarak saklanmamalıdır.
 
-Render pipeline'ı (`lib/printRender.ts`) şöyle çalışır:
+Render pipeline'ı (`lib/journalPrintRender.ts`) şöyle çalışır:
 
-1. `/admin/orders`'ta bir sipariş satırındaki "Baskı Dosyası Oluştur" butonu
-   `renderPrintFileAction`'ı tetikler (server action, `/admin/:path*`
-   middleware'i tarafından oturum kontrolüyle korunur).
+1. `/admin/orders/[id]`'de "26 Sayfayı Oluştur" butonu
+   `renderJournalPrintFilesAction`'ı tetikler (server action, `/admin/:path*`
+   middleware'i tarafından oturum kontrolüyle korunur); mühürlü Gelecek
+   Mektubu eki ayrı ve daha kısıtlı bir `renderLetterInsertAction`'a bağlıdır.
 2. Sunucu, headless Chromium'u (üründe `@sparticuz/chromium`, yerelde
-   `PUPPETEER_EXECUTABLE_PATH`) başlatıp `/print/[slug]` sayfasını hedef
-   baskı boyutunda (300 DPI, çok büyük boyutlarda güvenlik payı için
-   `lib/printRender.ts:MAX_PRINT_SIDE_PX`'e kadar ölçeklenir) tam piksel
+   `PUPPETEER_EXECUTABLE_PATH`) başlatıp `/print/journal/[slug]/[page]`
+   sayfasını hedef baskı boyutunda (300 DPI, aşırı büyük render'lara karşı
+   `lib/printSizing.ts`'teki bir üst sınıra kadar ölçeklenir) tam piksel
    viewport'unda açar.
-3. `/print/[slug]` kendisi, `lib/printRenderToken.ts` ile üretilmiş ~60
-   saniyelik imzalı bir token olmadan hiçbir şey döndürmez (`notFound()`) —
-   bu sayede o çıplak, tam çözünürlüklü canvas'ı hiçbir tarayıcı doğrudan
-   ziyaret ederek göremez.
-4. Alınan ekran görüntüsü doğrudan `starmaps-print/{slug}/...png`'ye
-   yüklenir; dosyanın Storage path'i sipariş dokümanına yazılır, dosyanın
-   kendisi hiçbir zaman bir HTTP response body'si olarak admin'in
+3. `/print/journal/[slug]/[page]` kendisi, `lib/printRenderToken.ts` ile
+   üretilmiş ~60 saniyelik imzalı bir token olmadan hiçbir şey döndürmez
+   (`notFound()`) — bu sayede o çıplak, tam çözünürlüklü canvas'ı hiçbir
+   tarayıcı doğrudan ziyaret ederek göremez.
+4. Alınan ekran görüntüleri doğrudan `starmaps-print/{slug}/...png`'ye
+   yüklenir; dosyaların Storage path'leri sipariş dokümanına yazılır,
+   dosyaların kendisi hiçbir zaman bir HTTP response body'si olarak admin'in
    tarayıcısına gönderilmez.
-5. "İndirme Linki Al" butonu (`getPrintDownloadUrlAction`) her tıklamada
-   5 dakikalık taze bir signed URL üretip admin'in tarayıcısını oraya
-   yönlendirir — link hiçbir yerde kalıcı olarak saklanmaz.
+5. "İndirme Linki Al" butonu (`getLetterInsertDownloadUrlAction`) her
+   tıklamada 5 dakikalık taze bir signed URL üretip admin'in tarayıcısını
+   oraya yönlendirir — link hiçbir yerde kalıcı olarak saklanmaz.
 
 Canlı önizleme (`components/astrolab/StarChart.tsx`) tamamen ayrı bir
 bileşendir: ekran boyutu × `devicePixelRatio` çözünürlüğünde çalışır ve asla

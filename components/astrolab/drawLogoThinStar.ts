@@ -1,8 +1,8 @@
 /**
  * Astrifer's thin-line, unfilled 8-point star mark with a small center dot
- * — the poster/journal print mark. Kept as a standalone canvas function
- * (not merged into the site-wide LogoMark SVG component) since it's used
- * from print-target canvases as well as React previews.
+ * — the journal's print mark. Kept as a standalone canvas function (not
+ * merged into the site-wide LogoMark SVG component) since it's used from
+ * print-target canvases as well as React previews.
  */
 export function drawLogoThinStar(
   ctx: CanvasRenderingContext2D,
