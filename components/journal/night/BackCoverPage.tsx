@@ -1,3 +1,5 @@
+"use client";
+
 import { useJournalTheme } from "@/components/journal/JournalThemeContext";
 import { NightPageShell } from "./NightPageShell";
 
