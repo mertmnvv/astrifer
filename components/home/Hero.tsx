@@ -28,7 +28,7 @@ export function Hero({ sky }: HeroProps) {
   const palette = DEFAULT_SKY_PALETTE;
 
   return (
-    <section className="relative flex min-h-screen flex-col items-center justify-center overflow-hidden px-4 pt-20 text-center sm:px-8">
+    <section className="relative flex min-h-screen flex-col items-center justify-center overflow-hidden px-4 pt-28 text-center sm:px-8 sm:pt-20">
       <div className="absolute inset-0">
         <StarChart
           sky={sky}
