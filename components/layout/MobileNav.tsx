@@ -14,44 +14,30 @@ export interface NavLink {
 const FOCUSABLE_SELECTOR = 'a[href], button:not([disabled]), [tabindex]:not([tabindex="-1"])';
 
 /**
- * Two asymmetric horizontal strokes — deliberately NOT star/crosshair-shaped
- * (that mark is already the logo right next to this button) and NOT a
- * generic three-line hamburger. Collapses into a single short dash when
- * open, echoing the panel's own thin gold rule.
+ * A crosshair (+) that rotates 45° into a close mark (×) — the same two
+ * perpendicular strokes as the spinning LogoMark next to it, just static
+ * and interactive instead of animated. Ties the trigger to the brand mark
+ * rather than reading as a generic hamburger icon.
  */
 function MenuGlyph({ open }: { open: boolean }) {
   return (
-    <svg aria-hidden="true" width={18} height={14} viewBox="0 0 18 14" fill="none">
-      <line
-        x1="1"
-        y1="2"
-        x2="17"
-        y2="2"
-        stroke="currentColor"
-        strokeWidth={1.4}
-        strokeLinecap="round"
-        className="origin-left transition-all duration-300"
-        style={open ? { transform: "translateY(5px) scaleX(0.55)" } : undefined}
-      />
-      <line
-        x1="1"
-        y1="12"
-        x2="11"
-        y2="12"
-        stroke="currentColor"
-        strokeWidth={1.4}
-        strokeLinecap="round"
-        className="origin-left transition-all duration-300"
-        style={open ? { transform: "translateY(-5px) scaleX(1.5)" } : undefined}
-      />
+    <svg aria-hidden="true" width={16} height={16} viewBox="0 0 16 16" fill="none">
+      <g
+        className="origin-center transition-transform duration-300 ease-out"
+        style={{ transform: open ? "rotate(45deg)" : "rotate(0deg)" }}
+      >
+        <line x1="8" y1="1" x2="8" y2="15" stroke="currentColor" strokeWidth={1.4} strokeLinecap="round" />
+        <line x1="1" y1="8" x2="15" y2="8" stroke="currentColor" strokeWidth={1.4} strokeLinecap="round" />
+      </g>
     </svg>
   );
 }
 
 /**
  * Left-side sliding panel for the mobile/tablet nav — shares `links` with
- * the desktop bar so there is one list to update. Triggered by the thin-line
- * star mark (brand-consistent) rather than a generic three-line hamburger.
+ * the desktop bar so there is one list to update. Trigger and panel both
+ * use the site's shared glass-card language (hairline `border-text/10`,
+ * translucent surface) rather than a boxed hamburger button.
  */
 export function MobileNav({ links }: { links: NavLink[] }) {
   const [isOpen, setIsOpen] = useState(false);
@@ -110,7 +96,7 @@ export function MobileNav({ links }: { links: NavLink[] }) {
         aria-expanded={isOpen}
         aria-controls={panelId}
         onClick={() => setIsOpen((value) => !value)}
-        className="flex h-9 w-9 items-center justify-center rounded-full border border-text/15 text-text/80 transition-colors hover:border-amber/50 hover:text-amber sm:hidden"
+        className="flex h-9 w-9 items-center justify-center text-text/70 transition-colors hover:text-amber sm:hidden"
       >
         <MenuGlyph open={isOpen} />
       </button>
@@ -139,11 +125,21 @@ export function MobileNav({ links }: { links: NavLink[] }) {
               animate={{ x: 0 }}
               exit={{ x: "-100%" }}
               transition={{ duration: 0.28, ease: "easeOut" }}
-              className="fixed inset-y-0 left-0 z-50 flex w-[78vw] max-w-xs flex-col border-r border-amber/20 bg-panel px-6 py-5 sm:hidden"
+              className="fixed inset-y-0 left-0 z-50 flex w-[78vw] max-w-xs flex-col border-r border-text/10 bg-void/95 px-6 py-5 shadow-2xl shadow-black/50 backdrop-blur-xl sm:hidden"
             >
-              <div className="flex items-center gap-2.5">
-                <LogoMark size={18} />
-                <span className="font-mono text-[10px] uppercase tracking-widest text-muted">Astrifer</span>
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2.5">
+                  <LogoMark size={18} />
+                  <span className="font-mono text-[10px] uppercase tracking-widest text-muted">Astrifer</span>
+                </div>
+                <button
+                  type="button"
+                  aria-label="Menüyü kapat"
+                  onClick={() => setIsOpen(false)}
+                  className="flex h-8 w-8 items-center justify-center text-text/60 transition-colors hover:text-amber"
+                >
+                  <MenuGlyph open />
+                </button>
               </div>
 
               <nav className="mt-8 flex flex-col">
