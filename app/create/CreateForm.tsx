@@ -17,6 +17,7 @@ import { getJournalTheme } from "@/components/journal/night/journalTheme";
 import { JournalThemeProvider } from "@/components/journal/JournalThemeContext";
 import { CreateStepIndicator, type CreateStep } from "@/components/create/CreateStepIndicator";
 import { JournalThemeSwatch } from "@/components/create/JournalThemeSwatch";
+import { PageLinkCard } from "@/components/create/PageLinkCard";
 import { BUILTIN_PLACES, type PlaceResult } from "@/lib/geocode/cities";
 import { zonedTimeToUtc, utcToZonedTime } from "@/lib/geocode/timezone";
 import { formatCoords } from "@/lib/geo/formatCoords";
@@ -309,7 +310,6 @@ export function CreateForm({ templates, pricing }: CreateFormProps) {
   const coordsLabel = place ? formatCoords(place.latitude, place.longitude) : "";
 
   const previewSlug = slugify(title) || "senin-sayfan";
-  const previewUrl = `${SITE_HOST}/s/${previewSlug}`;
 
   const totalPrice = pricing.digitalPrice + (journalEnabled ? pricing.journalPrice : 0);
 
@@ -762,9 +762,8 @@ export function CreateForm({ templates, pricing }: CreateFormProps) {
           className="border-t border-text/10 pt-4"
         />
 
-        <div className="flex flex-col gap-1 border-t border-text/10 pt-4">
-          <span className="font-mono text-[9.5px] uppercase tracking-[0.14em] text-dim">Sayfanın Linki</span>
-          <span className="break-all font-mono text-xs text-muted">{previewUrl}</span>
+        <div className="border-t border-text/10 pt-4">
+          <PageLinkCard host={SITE_HOST} slug={previewSlug} />
         </div>
 
         <div className="flex flex-col gap-2 border-t border-text/10 pt-4">
