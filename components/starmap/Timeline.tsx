@@ -8,7 +8,7 @@ import type { TimelineEntry } from "@/lib/starmaps";
 import { isAddWindowOpen } from "@/lib/starmapTimeline";
 import { AddEntryForm } from "./AddEntryForm";
 
-const PHOTO_ROTATIONS = [-2.5, 2, 1.5, -2];
+export const PHOTO_ROTATIONS = [-2.5, 2, 1.5, -2];
 
 export interface TimelineProps {
   slug: string;

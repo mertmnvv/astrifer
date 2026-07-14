@@ -10,10 +10,12 @@ import { PageGate } from "@/components/journal/PageGate";
 import { VoiceNote } from "@/components/journal/VoiceNote";
 import { MusicToggle } from "@/components/ui/MusicToggle";
 import { RevealOnScroll } from "@/components/ui/RevealOnScroll";
-import { ScrollCue } from "@/components/ui/ScrollCue";
 import { computeSky } from "@/lib/astronomy/computeSky";
 import { buildSkyNarrative } from "@/lib/astronomy/skyNarrative";
 import type { StarMapRecord } from "@/lib/starmaps";
+import { FirstMomentSection } from "./FirstMomentSection";
+import { SkyFocusSection } from "./SkyFocusSection";
+import { TitleReveal } from "./TitleReveal";
 import { Timeline } from "./Timeline";
 
 function formatEventDate(date: Date, timezone: string): string {
@@ -75,16 +77,18 @@ export function StarMapView({ starMap, isPreview = false, isOwner = false }: Sta
   const palette = getSkyPalette(starMap.palette);
   const hasStarKey = buildSkyLabels(sky).length > 0;
   const editHref = `/create?${buildEditParams(starMap).toString()}`;
+  const initialEntry = starMap.entries.find((entry) => entry.isInitial) ?? starMap.entries[0];
+  const periodicEntries = starMap.entries.filter((entry) => entry !== initialEntry);
 
   return (
     <PageGate title={starMap.title} subtitle={`${dateLabel} · ${starMap.locationName}`} musicUrl={starMap.musicUrl}>
-      {/* Gökyüzü animasyonu — tüm sayfayı kaplayan sabit arka plan */}
-      <div className="fixed inset-0 -z-10">
-        <StarChart sky={sky} label={previewLabel} className="h-full w-full" palette={palette} />
+      {/* Gökyüzü animasyonu — tüm sayfayı kaplayan sabit arka plan, atmosfer için soluk/bulanık; net "harita" aşağıdaki madalyonda */}
+      <div aria-hidden className="fixed inset-0 -z-10 opacity-75 blur-[1.5px]">
+        <StarChart sky={sky} label={previewLabel} className="h-full w-full" palette={palette} showLabels={false} />
       </div>
       <div
         aria-hidden
-        className="pointer-events-none fixed inset-0 -z-10 bg-[radial-gradient(circle_at_50%_40%,transparent_0%,rgba(11,8,16,0.55)_66%,#0b0810_100%)]"
+        className="pointer-events-none fixed inset-0 -z-10 bg-[radial-gradient(circle_at_50%_40%,rgba(11,8,16,0.25)_0%,rgba(11,8,16,0.6)_66%,#0b0810_100%)]"
       />
 
       <div className="fixed bottom-4 left-4 z-30 sm:bottom-6 sm:left-6">
@@ -108,40 +112,18 @@ export function StarMapView({ starMap, isPreview = false, isOwner = false }: Sta
       )}
 
       <main className="relative flex flex-col items-center px-4 py-12 sm:px-8 sm:py-16">
-        <div className="flex min-h-[100dvh] w-full max-w-2xl flex-col items-center justify-center text-center">
-          <p className="font-mono text-[10px] uppercase tracking-[0.35em] text-dim">Astrifer Zaman Kapsülü</p>
-          <h1 className="mt-5 font-display text-4xl italic leading-tight text-bright sm:text-6xl">{starMap.title}</h1>
-          <LedgerRule className="mx-auto mt-6 max-w-[8rem]" />
-          <p className="mt-6 font-mono text-xs uppercase tracking-widest text-amber">
-            {dateLabel} · {starMap.locationName}
-          </p>
-          <div className="mt-12">
-            <ScrollCue />
-          </div>
-        </div>
+        {/* Sahne 1 — İsim ve an, gökyüzü henüz atmosferik arka planda */}
+        <TitleReveal title={starMap.title} dateLabel={dateLabel} locationName={starMap.locationName} />
 
-        {/* O Günün Önemi */}
-        <RevealOnScroll durationMs={1000} className="mt-24 w-full max-w-xl">
-          <AtlasPanel padding="lg" className="text-center">
-            <p className="font-mono text-[10px] uppercase tracking-[0.3em] text-dim">O Günün Önemi</p>
-            <LedgerRule className="mx-auto mt-4 max-w-[8rem]" />
-            <p className="mt-5 font-mono text-[11px] uppercase tracking-widest text-subtle">
-              {formatCoordinates(starMap.latitude, starMap.longitude)} · {starMap.locationName.toUpperCase()}
-            </p>
-            {starMap.message && (
-              <p className="mt-7 font-display text-lg italic leading-relaxed text-text sm:text-xl">
-                &ldquo;{starMap.message}&rdquo;
-              </p>
-            )}
-            {skyLog && (
-              <>
-                <LedgerRule className="mx-auto mt-8 max-w-[10rem]" />
-                <p className="mt-6 font-mono text-[9px] uppercase tracking-[0.25em] text-dim">Gökyüzü Kaydı</p>
-                <p className="mt-2 font-display text-sm italic leading-relaxed text-subtle">{skyLog}</p>
-              </>
-            )}
-          </AtlasPanel>
-        </RevealOnScroll>
+        {/* Sahne 2 — kaydırdıkça netleşen/yakınlaşan gökyüzü madalyonu + o anın mesajı */}
+        <SkyFocusSection
+          sky={sky}
+          previewLabel={previewLabel}
+          palette={palette}
+          coordsLabel={`${formatCoordinates(starMap.latitude, starMap.longitude)} · ${starMap.locationName.toUpperCase()}`}
+          message={starMap.message}
+          skyLog={skyLog}
+        />
 
         {/* Yıldız Anahtarı — haritadaki numaralı yıldız/gezegen işaretlerini gerçek adlarına bağlar */}
         {hasStarKey && (
@@ -152,10 +134,17 @@ export function StarMapView({ starMap, isPreview = false, isOwner = false }: Sta
           </RevealOnScroll>
         )}
 
-        {/* Zaman Çizelgesi — büyüyen fotoğraf koleksiyonu, sahibiyse ekleme kontrolleriyle */}
-        {(starMap.entries.length > 0 || isOwner) && (
+        {/* İlk An — kurucu andaki fotoğraflar, aşağıdaki büyüyen çizelgeden ayrı bir sahne */}
+        {initialEntry && initialEntry.photos.length > 0 && (
+          <RevealOnScroll durationMs={1000} className="mt-24 w-full max-w-xl">
+            <FirstMomentSection photos={initialEntry.photos} />
+          </RevealOnScroll>
+        )}
+
+        {/* Zaman Çizelgesi — kurucu an sonrası eklenen, büyüyen fotoğraf koleksiyonu, sahibiyse ekleme kontrolleriyle */}
+        {(periodicEntries.length > 0 || isOwner) && (
           <div className="mt-24 w-full max-w-2xl">
-            <Timeline slug={starMap.slug} createdAt={starMap.createdAt} entries={starMap.entries} isOwner={isOwner} />
+            <Timeline slug={starMap.slug} createdAt={starMap.createdAt} entries={periodicEntries} isOwner={isOwner} />
           </div>
         )}
 
