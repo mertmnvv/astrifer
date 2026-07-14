@@ -1,6 +1,10 @@
 export interface JewelStarOptions {
   numberLabel?: string;
   color?: string;
+  /** Font family for the number badge. Defaults to the journal's print font. */
+  fontFamily?: string;
+  /** Overrides the badge's auto-scaled (size * 3.2) font size. */
+  numberFontPx?: number;
 }
 
 /**
@@ -51,7 +55,9 @@ export function drawJewelStar(
   if (options.numberLabel) {
     const lx = x + size + 6;
     const ly = y - size - 6;
-    ctx.font = `600 ${Math.max(9, size * 3.2)}px "Space Mono", monospace`;
+    const fontPx = options.numberFontPx ?? Math.max(9, size * 3.2);
+    const fontFamily = options.fontFamily ?? '"Space Mono", monospace';
+    ctx.font = `600 ${fontPx}px ${fontFamily}`;
     ctx.textBaseline = "middle";
     const tw = ctx.measureText(options.numberLabel).width;
     ctx.fillStyle = "rgba(8,11,32,.6)";

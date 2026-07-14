@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import { useRouter } from "next/navigation";
 import { StarChart } from "@/components/astrolab/StarChart";
+import { StarKeyLegend } from "@/components/astrolab/StarKeyLegend";
 import { LedgerRule } from "@/components/atlas/LedgerRule";
 import { computeSky } from "@/lib/astronomy/computeSky";
 import { PlaceCombobox } from "@/components/ui/PlaceCombobox";
@@ -754,6 +755,12 @@ export function CreateForm({ templates, pricing }: CreateFormProps) {
             </div>
           </div>
         </div>
+
+        <StarKeyLegend
+          sky={sky}
+          palette={getSkyPalette(paletteId)}
+          className="border-t border-text/10 pt-4"
+        />
 
         <div className="flex flex-col gap-1 border-t border-text/10 pt-4">
           <span className="font-mono text-[9.5px] uppercase tracking-[0.14em] text-dim">Sayfanın Linki</span>

@@ -1,6 +1,8 @@
 import Link from "next/link";
 import { CrossSell } from "@/components/CrossSell";
 import { StarChart } from "@/components/astrolab/StarChart";
+import { StarKeyLegend } from "@/components/astrolab/StarKeyLegend";
+import { buildSkyLabels } from "@/components/astrolab/drawStarChart";
 import { getSkyPalette } from "@/components/astrolab/palettes";
 import { AtlasPanel } from "@/components/atlas/AtlasPanel";
 import { LedgerRule } from "@/components/atlas/LedgerRule";
@@ -71,6 +73,7 @@ export function StarMapView({ starMap, isPreview = false, isOwner = false }: Sta
   const previewLabel = `${starMap.locationName} üzerinde ${dateLabel} anının gökyüzü`;
   const skyLog = buildSkyNarrative(sky);
   const palette = getSkyPalette(starMap.palette);
+  const hasStarKey = buildSkyLabels(sky).length > 0;
   const editHref = `/create?${buildEditParams(starMap).toString()}`;
 
   return (
@@ -139,6 +142,15 @@ export function StarMapView({ starMap, isPreview = false, isOwner = false }: Sta
             )}
           </AtlasPanel>
         </RevealOnScroll>
+
+        {/* Yıldız Anahtarı — haritadaki numaralı yıldız/gezegen işaretlerini gerçek adlarına bağlar */}
+        {hasStarKey && (
+          <RevealOnScroll durationMs={1000} className="mt-24 w-full max-w-xl">
+            <AtlasPanel padding="lg" className="text-center">
+              <StarKeyLegend sky={sky} palette={palette} className="mx-auto max-w-sm" />
+            </AtlasPanel>
+          </RevealOnScroll>
+        )}
 
         {/* Zaman Çizelgesi — büyüyen fotoğraf koleksiyonu, sahibiyse ekleme kontrolleriyle */}
         {(starMap.entries.length > 0 || isOwner) && (

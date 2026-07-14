@@ -1,4 +1,5 @@
 import type { ComputeSkyResult } from "@/lib/astronomy/computeSky";
+import { drawJewelStar } from "./drawJewelStar";
 import { DEFAULT_SKY_PALETTE, type SkyPalette } from "./palettes";
 
 export interface DrawStarChartOptions {
@@ -29,6 +30,41 @@ const DRIFT_DEG_PER_SEC = 0.6;
 
 /** Named stars/bodies at or brighter than this magnitude get a label. */
 const LABEL_MAG_THRESHOLD = 1.6;
+
+export interface SkyLabelEntry {
+  /** Sequential "1", "2", "3"... assigned brightest-first — ties a chart mark to a Yıldız Anahtarı-style key entry. */
+  code: string;
+  name: string;
+  kind: "star" | "sun" | "moon" | "planet";
+}
+
+/**
+ * Picks every object the chart would label (bright stars + visible Sun/Moon/
+ * planets) and assigns each a brightest-first "1", "2", "3"... code — the
+ * same numbered-key idea as the physical journal's Yıldız Anahtarı page
+ * (see components/journal/starMapSpread.ts), reused here so the live/public
+ * chart can mark stars with a number instead of burning their real name
+ * directly onto the sky. Exported so a legend UI can render the same list
+ * the canvas actually drew, with matching codes.
+ */
+export function buildSkyLabels(
+  sky: ComputeSkyResult | null,
+  minAltitude = -2,
+  magThreshold = LABEL_MAG_THRESHOLD,
+): SkyLabelEntry[] {
+  if (!sky) return [];
+  const candidates: { name: string; kind: SkyLabelEntry["kind"]; mag: number }[] = [];
+  for (const star of sky.stars) {
+    if (star.altitude < minAltitude || star.mag >= magThreshold) continue;
+    candidates.push({ name: star.name, kind: "star", mag: star.mag });
+  }
+  for (const body of sky.bodies) {
+    if (body.altitude < minAltitude) continue;
+    candidates.push({ name: body.name, kind: body.kind, mag: body.mag });
+  }
+  candidates.sort((a, b) => a.mag - b.mag);
+  return candidates.map((c, index) => ({ code: String(index + 1), name: c.name, kind: c.kind }));
+}
 
 const METEOR_CYCLE_SECONDS = 9;
 const METEOR_DURATION_SECONDS = 1.1;
@@ -120,22 +156,33 @@ function drawStar(
   ctx.fill();
 }
 
-/** Skips labels too close to the edge, where text would run off-canvas. */
-function drawLabel(
+/**
+ * Small pill badge carrying a Yıldız Anahtarı-style number — used next to
+ * Sun/Moon/planet icons, which already read as themselves and just need a
+ * key reference rather than the full jewel-mark treatment given to stars.
+ * Skips marks too close to the edge, where the badge would run off-canvas.
+ */
+function drawNumberChip(
   ctx: CanvasRenderingContext2D,
   point: { x: number; y: number; rNorm: number },
-  text: string,
+  code: string,
   scale: number,
   palette: SkyPalette,
 ) {
   if (point.rNorm > 0.94) return;
   ctx.save();
-  ctx.globalAlpha = 0.8;
-  ctx.fillStyle = palette.label;
-  ctx.font = `400 ${9 * scale}px var(--font-mono, monospace)`;
-  ctx.textAlign = "left";
+  const fontPx = Math.max(8, 8 * scale);
+  ctx.font = `600 ${fontPx}px var(--font-mono, monospace)`;
   ctx.textBaseline = "middle";
-  ctx.fillText(text, point.x + 5 * scale, point.y);
+  ctx.textAlign = "left";
+  const textWidth = ctx.measureText(code).width;
+  const bx = point.x + 6 * scale;
+  const padX = 4 * scale;
+  const padY = 3 * scale;
+  ctx.fillStyle = "rgba(6,4,10,0.55)";
+  ctx.fillRect(bx - padX / 2, point.y - fontPx / 2 - padY / 2, textWidth + padX, fontPx + padY);
+  ctx.fillStyle = palette.sun;
+  ctx.fillText(code, bx, point.y);
   ctx.restore();
 }
 
@@ -306,12 +353,24 @@ export function drawStarChart(
 
   if (!sky) return;
 
+  const codeByName = showLabels
+    ? new Map(buildSkyLabels(sky, minAltitude, LABEL_MAG_THRESHOLD).map((entry) => [entry.name, entry.code]))
+    : null;
+
   for (const star of sky.stars) {
     if (star.altitude < minAltitude) continue;
     const point = project(star.azimuth + driftDeg, star.altitude, cx, cy, fieldRadius);
-    drawStar(ctx, point, star.mag, scale, time, reducedMotion, hash(star.name), palette);
-    if (showLabels && star.mag < LABEL_MAG_THRESHOLD) {
-      drawLabel(ctx, point, star.name, scale, palette);
+    const code = codeByName?.get(star.name);
+    if (code) {
+      const size = Math.max(2.2 * scale, starRadius(star.mag, scale) * 1.9);
+      drawJewelStar(ctx, point, size, {
+        numberLabel: code,
+        color: palette.sun,
+        fontFamily: "var(--font-mono, monospace)",
+        numberFontPx: Math.max(8, 8 * scale),
+      });
+    } else {
+      drawStar(ctx, point, star.mag, scale, time, reducedMotion, hash(star.name), palette);
     }
   }
 
@@ -325,8 +384,9 @@ export function drawStarChart(
     } else {
       drawPlanet(ctx, point, body.mag, scale, palette);
     }
-    if (showLabels) {
-      drawLabel(ctx, point, body.name, scale, palette);
+    const code = codeByName?.get(body.name);
+    if (code) {
+      drawNumberChip(ctx, point, code, scale, palette);
     }
   }
 
