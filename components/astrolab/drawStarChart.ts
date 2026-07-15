@@ -186,6 +186,78 @@ function drawSkyBackground(ctx: CanvasRenderingContext2D, width: number, height:
   ctx.fillRect(0, 0, width, height);
 }
 
+/**
+ * Renders 3 overlapping organic elliptical gas cloud layers on the sky background.
+ * Uses blending composite operations to achieve a realistic cosmic glow,
+ * with colors matched to the active theme palette and positioned deterministically.
+ */
+function drawNebulaClouds(
+  ctx: CanvasRenderingContext2D,
+  width: number,
+  height: number,
+  palette: SkyPalette,
+  seed: number,
+) {
+  let color1 = "rgba(79, 70, 229, 0.11)"; // Default Indigo
+  let color2 = "rgba(37, 99, 235, 0.08)"; // Default Blue
+  let color3 = "rgba(168, 85, 247, 0.04)"; // Default Purple
+
+  if (palette.id === "kehribar") {
+    color1 = "rgba(217, 119, 6, 0.09)"; // Amber
+    color2 = "rgba(146, 64, 14, 0.07)"; // Deep Rust
+    color3 = "rgba(251, 191, 36, 0.03)"; // Gold glow
+  } else if (palette.id === "gul-safagi") {
+    color1 = "rgba(190, 24, 74, 0.09)"; // Rose pink
+    color2 = "rgba(107, 33, 168, 0.08)"; // Indigo purple
+    color3 = "rgba(219, 39, 119, 0.03)"; // Magenta glow
+  } else if (palette.id === "gece-laciverti") {
+    color1 = "rgba(37, 99, 235, 0.11)"; // Blue
+    color2 = "rgba(79, 70, 229, 0.09)"; // Indigo
+    color3 = "rgba(129, 140, 248, 0.04)"; // Light steel blue
+  } else if (palette.id === "komur") {
+    color1 = "rgba(71, 85, 105, 0.09)"; // Slate gray
+    color2 = "rgba(217, 119, 6, 0.04)"; // Soft amber/bronze
+    color3 = "rgba(241, 245, 249, 0.03)"; // Off-white dust
+  }
+
+  const cx = width * 0.5;
+  const cy = height * 0.5;
+  const fieldRadius = Math.hypot(width, height) * 0.46;
+
+  ctx.save();
+  // Blends colored layers like real light, creating organic glows
+  ctx.globalCompositeOperation = "screen";
+
+  const numBlobs = 3;
+  const colors = [color1, color2, color3];
+
+  for (let i = 0; i < numBlobs; i++) {
+    const blobSeed = hash(`${seed}-nebula-${i}`);
+    const angle = ((blobSeed % 360) * Math.PI) / 180;
+    const distance = ((blobSeed >> 2) % 35) * 0.01 * fieldRadius; // Offset from center
+    
+    const bx = cx + Math.cos(angle) * distance;
+    const by = cy + Math.sin(angle) * distance;
+    
+    // Stretch and rotate the gas cloud ellipse
+    const rx = fieldRadius * (0.42 + ((blobSeed >> 4) % 25) * 0.01);
+    const ry = fieldRadius * (0.28 + ((blobSeed >> 6) % 15) * 0.01);
+    const blobAngle = ((blobSeed >> 8) % 180) * (Math.PI / 180);
+
+    const grad = ctx.createRadialGradient(bx, by, 0, bx, by, rx);
+    grad.addColorStop(0, colors[i % colors.length]);
+    grad.addColorStop(0.4, colors[i % colors.length].replace(/[\d\.]+\)$/, "0.04)")); // Soft fade
+    grad.addColorStop(1, "rgba(0,0,0,0)"); // Fully transparent
+
+    ctx.fillStyle = grad;
+    ctx.beginPath();
+    ctx.ellipse(bx, by, rx, ry, blobAngle, 0, Math.PI * 2);
+    ctx.fill();
+  }
+
+  ctx.restore();
+}
+
 function drawStar(
   ctx: CanvasRenderingContext2D,
   point: { x: number; y: number },
@@ -418,6 +490,11 @@ export function drawStarChart(
 
   ctx.clearRect(0, 0, width, height);
   drawSkyBackground(ctx, width, height, palette);
+
+  if (sky) {
+    const nebulaSeed = hash(sky.stars[0]?.name || "nebula");
+    drawNebulaClouds(ctx, width, height, palette, nebulaSeed);
+  }
 
   if (!sky) return;
 
