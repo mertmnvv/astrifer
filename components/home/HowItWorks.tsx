@@ -38,9 +38,9 @@ export function HowItWorks() {
         {STEPS.map((step, index) => (
           <RevealOnScroll key={step.number} delayMs={index * 100}>
             <AtlasPanel padding="lg" className="h-full">
-              <span className="font-mono text-xs text-amber">{step.number}</span>
-              <h3 className="mt-3.5 font-display text-xl italic text-text">{step.title}</h3>
-              <p className="mt-2 text-sm leading-relaxed text-subtle">{step.description}</p>
+              <span className="font-mono text-[10px] font-medium tracking-widest text-amber">{step.number}</span>
+              <h3 className="mt-3.5 font-display text-lg italic text-text">{step.title}</h3>
+              <p className="mt-2 text-xs leading-relaxed text-subtle">{step.description}</p>
             </AtlasPanel>
           </RevealOnScroll>
         ))}

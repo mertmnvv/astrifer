@@ -3,7 +3,7 @@ import { isFirebaseConfigured } from "@/lib/firebase/isConfigured";
 import { formatTRY } from "@/lib/pricing";
 import type { OrderDoc } from "@/types/firestore";
 import { updateOrderAction } from "./actions";
-import { PRODUCT_FILTERS, STATUS_LABELS, STATUS_OPTIONS, type ProductFilter } from "./shared";
+import { PAYMENT_METHOD_LABELS, PRODUCT_FILTERS, PRODUCT_LABELS, STATUS_LABELS, STATUS_OPTIONS, type ProductFilter } from "./shared";
 
 export const dynamic = "force-dynamic";
 
@@ -77,32 +77,63 @@ export default async function AdminOrdersPage({
         <p className="text-sm text-subtle">Henüz sipariş yok.</p>
       ) : (
         <div className="overflow-x-auto rounded-2xl border border-text/10">
-          <table className="w-full min-w-[1080px] text-left text-sm">
+          <table className="w-full min-w-[1280px] text-left text-sm">
             <thead className="bg-panel font-mono text-[10px] uppercase tracking-widest text-dim">
               <tr>
+                <th className="px-4 py-3">Sipariş No</th>
                 <th className="px-4 py-3">Tarih</th>
                 <th className="px-4 py-3">Müşteri</th>
                 <th className="px-4 py-3">Ürün</th>
                 <th className="px-4 py-3">Tutar</th>
+                <th className="px-4 py-3">Ödeme</th>
+                <th className="px-4 py-3">Baskı</th>
                 <th className="px-4 py-3">Durum / Takip No</th>
               </tr>
             </thead>
             <tbody>
               {orders.map((order) => (
                 <tr key={order.id} className="border-t border-text/10">
+                  <td className="px-4 py-3 align-top">
+                    <Link href={`/admin/orders/${order.id}`} className="font-mono text-xs text-amber hover:underline">
+                      {order.orderNumber ?? "—"}
+                    </Link>
+                  </td>
                   <td className="px-4 py-3 align-top text-subtle">{formatDate(order.createdAt)}</td>
                   <td className="px-4 py-3 align-top">
                     <Link href={`/admin/orders/${order.id}`} className="text-text hover:text-amber hover:underline">
                       {order.customerName ?? "—"}
                     </Link>
                     <div className="text-xs text-subtle">{order.customerEmail}</div>
+                    {order.customerPhone && (
+                      <div className="text-xs text-subtle">{order.customerPhone}</div>
+                    )}
                   </td>
                   <td className="px-4 py-3 align-top text-text">
                     <Link href={`/admin/orders/${order.id}`} className="hover:text-amber hover:underline">
-                      {order.productType}
+                      {PRODUCT_LABELS[order.productType] ?? order.productType}
                     </Link>
                   </td>
-                  <td className="px-4 py-3 align-top text-text">{formatTRY(order.priceAmount)}</td>
+                  <td className="px-4 py-3 align-top text-text">
+                    {formatTRY(order.totalAmount ?? order.priceAmount)}
+                  </td>
+                  <td className="px-4 py-3 align-top text-xs text-subtle">
+                    {order.paymentMethod
+                      ? (PAYMENT_METHOD_LABELS[order.paymentMethod] ?? order.paymentMethod)
+                      : "—"}
+                  </td>
+                  <td className="px-4 py-3 align-top">
+                    {order.productType === "journal" || order.productType === "bundle" ? (
+                      <span
+                        className={`rounded-full px-2 py-0.5 font-mono text-[10px] uppercase tracking-widest ${
+                          order.printPdfPath ? "bg-amber/20 text-amber" : "bg-text/10 text-subtle"
+                        }`}
+                      >
+                        {order.printPdfPath ? "PDF Hazır" : "Bekliyor"}
+                      </span>
+                    ) : (
+                      <span className="text-xs text-dim">—</span>
+                    )}
+                  </td>
                   <td className="px-4 py-3 align-top">
                     <form action={updateOrderAction} className="flex flex-wrap items-center gap-2">
                       <input type="hidden" name="orderId" value={order.id} />
@@ -141,3 +172,4 @@ export default async function AdminOrdersPage({
     </div>
   );
 }
+

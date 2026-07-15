@@ -1,4 +1,5 @@
 import "server-only";
+import { assembleJournalPdf } from "@/lib/journalPrintPdf";
 import { cmToPrintPixelSize, type PrintPixelSize } from "@/lib/printSizing";
 import { launchPrintBrowser } from "@/lib/printBrowser";
 import { createPrintRenderToken } from "@/lib/printRenderToken";
@@ -52,6 +53,8 @@ export interface JournalManifestEntry {
 
 export interface RenderJournalPrintFilesResult {
   manifest: JournalManifestEntry[];
+  /** Storage path of the single, full-bleed 26-page PDF assembled from the manifest — the file handed to the print shop. */
+  pdfStoragePath: string;
 }
 
 /**
@@ -60,11 +63,14 @@ export interface RenderJournalPrintFilesResult {
  * copies would be pure waste) and uploads each to the locked-down
  * `starmaps-print/` Storage prefix (see storage.rules). The 26-entry
  * manifest then just repeats the "blank" storage path for every blank slot.
+ * The same in-memory buffers are also assembled into a single print-ready
+ * PDF (lib/journalPrintPdf.ts) covering all 26 physical pages in order.
  */
 export async function renderJournalPrintFiles(slug: string): Promise<RenderJournalPrintFilesResult> {
   const { widthPx, heightPx } = computeJournalPagePixelSize();
   const browser = await launchPrintBrowser();
   const pathByKind = new Map<JournalPageKind, string>();
+  const bufferByKind = new Map<JournalPageKind, Buffer>();
 
   try {
     const { getBucket } = await import("@/lib/firebase/admin");
@@ -86,21 +92,27 @@ export async function renderJournalPrintFiles(slug: string): Promise<RenderJourn
         const storagePath = `starmaps-print/${slug}/journal-${kind}-${timestamp}.png`;
         await bucket.file(storagePath).save(buffer, { metadata: { contentType: "image/png" } });
         pathByKind.set(kind, storagePath);
+        bufferByKind.set(kind, buffer);
       } finally {
         await page.close();
       }
     }
+
+    const manifest: JournalManifestEntry[] = JOURNAL_PAGE_ORDER.map((kind, index) => ({
+      page: index + 1,
+      kind,
+      storagePath: pathByKind.get(kind) as string,
+    }));
+
+    const orderedBuffers = JOURNAL_PAGE_ORDER.map((kind) => bufferByKind.get(kind) as Buffer);
+    const pdfBuffer = await assembleJournalPdf(orderedBuffers, JOURNAL_TRIM_CM);
+    const pdfStoragePath = `starmaps-print/${slug}/journal-book-${timestamp}.pdf`;
+    await bucket.file(pdfStoragePath).save(pdfBuffer, { metadata: { contentType: "application/pdf" } });
+
+    return { manifest, pdfStoragePath };
   } finally {
     await browser.close();
   }
-
-  const manifest: JournalManifestEntry[] = JOURNAL_PAGE_ORDER.map((kind, index) => ({
-    page: index + 1,
-    kind,
-    storagePath: pathByKind.get(kind) as string,
-  }));
-
-  return { manifest };
 }
 
 export interface RenderLetterInsertResult {
@@ -111,7 +123,9 @@ export interface RenderLetterInsertResult {
  * Renders the sealed letter insert as its OWN, separate print file — never
  * part of the 26-page manifest above. Takes the letter's text/opening date
  * directly (they live on the order, not the shared star map record) rather
- * than reading them back out of Firestore.
+ * than reading them back out of Firestore. Uploaded as a single-page PDF
+ * (not a raw PNG) so the print shop always receives the same file format
+ * as the main book.
  */
 export async function renderLetterInsert(
   slug: string,
@@ -137,10 +151,11 @@ export async function renderLetterInsert(
     const targetHandle = await page.waitForSelector('[data-print-ready="true"]', { timeout: 30_000 });
     if (!targetHandle) throw new Error("Mektup eki zamanında hazır olmadı.");
     const buffer = (await targetHandle.screenshot({ type: "png" })) as Buffer;
+    const pdfBuffer = await assembleJournalPdf([buffer], JOURNAL_TRIM_CM);
 
     const { getBucket } = await import("@/lib/firebase/admin");
-    const storagePath = `starmaps-print/${slug}/journal-letter-insert-${Date.now()}.png`;
-    await getBucket().file(storagePath).save(buffer, { metadata: { contentType: "image/png" } });
+    const storagePath = `starmaps-print/${slug}/journal-letter-insert-${Date.now()}.pdf`;
+    await getBucket().file(storagePath).save(pdfBuffer, { metadata: { contentType: "application/pdf" } });
 
     return { storagePath };
   } finally {

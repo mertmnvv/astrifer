@@ -10,6 +10,7 @@
     "seed:firebase": "node scripts/seed-firestore.mjs"
   },
   "dependencies": {
+    "@distube/ytdl-core": "^4.16.12",
     "@sparticuz/chromium": "^149.0.0",
     "astronomy-engine": "^2.1.19",
     "cloudinary": "^2.10.0",
@@ -17,6 +18,7 @@
     "firebase-admin": "^14.1.0",
     "framer-motion": "^12.42.2",
     "next": "14.2.35",
+    "pdf-lib": "^1.17.1",
     "puppeteer-core": "^25.3.0",
     "qrcode": "^1.5.4",
     "react": "^18",

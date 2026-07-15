@@ -12,12 +12,12 @@ export function LedgerEntry({ number, title, description, isLast, className }: L
   return (
     <div className={`relative flex gap-5 pb-10 ${className ?? ""}`}>
       <div className="flex flex-col items-center">
-        <span className="font-mono text-xs font-bold tracking-wider text-amber">{number}</span>
+        <span className="font-mono text-[10px] font-medium tracking-widest text-amber">{number}</span>
         {!isLast && <span className="mt-2 w-px flex-1 bg-text/10" aria-hidden />}
       </div>
       <div className="flex-1">
-        <h3 className="font-display text-xl italic text-text">{title}</h3>
-        <p className="mt-2 text-sm leading-relaxed text-muted">{description}</p>
+        <h3 className="font-display text-lg italic text-text">{title}</h3>
+        <p className="mt-2 text-xs leading-relaxed text-muted">{description}</p>
       </div>
     </div>
   );

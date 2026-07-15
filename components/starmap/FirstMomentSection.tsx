@@ -1,13 +1,16 @@
 "use client";
 
+import { useState } from "react";
 import { motion } from "framer-motion";
 import { PhotoSlot } from "@/components/journal/PhotoSlot";
+import { Lightbox } from "@/components/ui/Lightbox";
 import { usePrefersReducedMotion } from "@/lib/hooks/usePrefersReducedMotion";
 import type { StarMapPhoto } from "@/lib/starmaps";
 import { PHOTO_ROTATIONS } from "./Timeline";
 
 export interface FirstMomentSectionProps {
   photos: StarMapPhoto[];
+  isPreviewMode?: boolean;
 }
 
 const cluster = {
@@ -26,7 +29,8 @@ const photoItem = {
  * whatever gets added every six months after it, so the timeline below
  * reads purely as ongoing growth rather than a mix of founding + later.
  */
-export function FirstMomentSection({ photos }: FirstMomentSectionProps) {
+export function FirstMomentSection({ photos, isPreviewMode = false }: FirstMomentSectionProps) {
+  const [activePhoto, setActivePhoto] = useState<{ url: string; caption: string } | null>(null);
   const reducedMotion = usePrefersReducedMotion();
   if (photos.length === 0) return null;
 
@@ -41,14 +45,25 @@ export function FirstMomentSection({ photos }: FirstMomentSectionProps) {
         initial={reducedMotion ? "show" : "hidden"}
         whileInView="show"
         viewport={{ once: true, margin: "-60px" }}
-        className="mt-9 flex flex-wrap items-start justify-center gap-x-3 gap-y-8 sm:gap-x-5"
+        className="mt-9 flex flex-col items-center gap-y-8"
       >
         {photos.map((photo, index) => (
-          <motion.div key={photo.url ?? index} variants={photoItem} className="w-28 sm:w-36">
-            <PhotoSlot photo={photo} rotateDeg={PHOTO_ROTATIONS[index % PHOTO_ROTATIONS.length]} />
+          <motion.div key={photo.url ?? index} variants={photoItem} className="w-44 sm:w-56">
+            <PhotoSlot
+              photo={photo}
+              rotateDeg={PHOTO_ROTATIONS[index % PHOTO_ROTATIONS.length]}
+              isPreviewMode={isPreviewMode}
+              onImageClick={(url, caption) => setActivePhoto({ url, caption })}
+            />
           </motion.div>
         ))}
       </motion.div>
+
+      <Lightbox
+        url={activePhoto?.url ?? null}
+        caption={activePhoto?.caption}
+        onClose={() => setActivePhoto(null)}
+      />
     </div>
   );
 }

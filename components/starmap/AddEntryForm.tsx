@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { PhotoPicker, type PickedPhoto } from "@/components/ui/PhotoPicker";
 import { addTimelineEntryAction } from "@/app/s/actions";
@@ -8,6 +8,7 @@ import { addTimelineEntryAction } from "@/app/s/actions";
 export interface AddEntryFormProps {
   slug: string;
   onDone: () => void;
+  initialNote?: string;
 }
 
 function todayDateInputValue(): string {
@@ -15,13 +16,19 @@ function todayDateInputValue(): string {
   return `${now.getFullYear()}-${(now.getMonth() + 1).toString().padStart(2, "0")}-${now.getDate().toString().padStart(2, "0")}`;
 }
 
-export function AddEntryForm({ slug, onDone }: AddEntryFormProps) {
+export function AddEntryForm({ slug, onDone, initialNote }: AddEntryFormProps) {
   const router = useRouter();
   const [date, setDate] = useState(todayDateInputValue());
   const [photos, setPhotos] = useState<PickedPhoto[]>([]);
-  const [note, setNote] = useState("");
+  const [note, setNote] = useState(initialNote ?? "");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (initialNote) {
+      setNote(initialNote);
+    }
+  }, [initialNote]);
 
   const uploadsPending = photos.some((photo) => photo.status === "uploading");
   const photoUrls = photos.filter((photo) => photo.status === "done" && photo.url).map((photo) => photo.url as string);
@@ -49,7 +56,11 @@ export function AddEntryForm({ slug, onDone }: AddEntryFormProps) {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="flex flex-col gap-3 rounded-2xl border border-amber/20 bg-void/60 p-4">
+    <form
+      id="add-entry-form"
+      onSubmit={handleSubmit}
+      className="flex flex-col gap-3 rounded-2xl border border-amber/20 bg-void/60 p-4"
+    >
       <div>
         <label htmlFor="entry-date" className="mb-1 block font-mono text-[9px] uppercase tracking-widest text-dim">
           Tarih

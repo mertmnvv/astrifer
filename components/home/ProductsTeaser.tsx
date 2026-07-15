@@ -24,8 +24,8 @@ const PRODUCTS: ProductItem[] = [
       "Arka plan müzik desteği",
       "Canlı yıldız haritası simülasyonu",
     ],
-    href: "/create",
-    cta: "Hemen Oluştur",
+    href: "/urun/dijital",
+    cta: "Detayları Gör",
   },
   {
     title: "Deri Defter",

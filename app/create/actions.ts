@@ -14,6 +14,7 @@ export interface CreateStarMapActionInput {
   paletteId: string;
   photoUrls: string[];
   voiceNoteUrl: string | null;
+  musicUrl: string | null;
 }
 
 /**
@@ -29,6 +30,9 @@ export async function createStarMapAction(input: CreateStarMapActionInput): Prom
   if (Number.isNaN(new Date(input.eventDateIso).getTime())) {
     throw new Error("Geçersiz tarih.");
   }
+  if (input.photoUrls.length > 4) {
+    throw new Error("En fazla 4 fotoğraf ekleyebilirsiniz.");
+  }
 
   return createStarMap({
     title: input.title.trim(),
@@ -42,5 +46,6 @@ export async function createStarMapAction(input: CreateStarMapActionInput): Prom
     paletteId: input.paletteId || null,
     photoUrls: input.photoUrls,
     voiceNoteUrl: input.voiceNoteUrl,
+    musicUrl: input.musicUrl,
   });
 }

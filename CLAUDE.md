@@ -5,6 +5,11 @@ saat ve konum girer; o anın gerçek astronomik gökyüzü (yıldızlar, Ay
 evresi, gezegen konumları) hesaplanır ve kalıcı bir dijital sayfa +
 (opsiyonel) Deri Defter fiziksel ürünü olarak sunulur.
 
+## İletişim dili
+
+Bu projede kullanıcıyla **her zaman Türkçe** konuş — yanıtlar, ilerleme
+güncellemeleri, özetler, hepsi Türkçe olacak.
+
 ## Tech stack
 
 - **Next.js 14 (App Router), TypeScript, Tailwind CSS**
@@ -38,11 +43,23 @@ Gökyüzü" render motoru, 300 DPI baskı pipeline'ı, `/create`'teki
 boyut/çerçeve/renk ruhu adımı, sepet/checkout/admin'deki tüm poster
 alanları) — Astrifer artık yalnızca iki ürün satıyor:
 
-- **Dijital Sayfa** (`/s/[slug]`) — kalıcı paylaşım sayfası. Statik tek
-  "an" değil, **zamanla büyüyen bir fotoğraf zaman çizelgesi**
-  (`starMaps/{slug}/entries` alt koleksiyonu, `components/starmap/Timeline.tsx`).
-  Sayfa sahibi 6 ayda bir yeni bir an ekleyebilir; ekleme penceresi
-  açıldığında sayfada rozet gösterilir.
+- **Dijital Sayfa** (`/s/[slug]`) — kalıcı paylaşım sayfası, **sinematik
+  kaydırma deneyimi** olarak kurgulanmış tam ekran sahnelerden oluşuyor
+  (`components/starmap/StarMapView.tsx`): isim + an (`TitleReveal.tsx`) →
+  scroll'a bağlı bulanıklık/yakınlaşmayla netleşen gökyüzü madalyonu +
+  o anın mesajı (`SkyFocusSection.tsx`) → parlaklık sırasına göre
+  numaralandırılmış yıldız/gezegen işaretlerini gerçek adlarına bağlayan
+  **Yıldız Anahtarı** (`components/astrolab/StarKeyLegend.tsx`,
+  `buildSkyLabels`/`drawJewelStar` — Deri Defter'in Yıldız Anahtarı
+  sayfasıyla aynı mücevher-kesim tasarım dili) → kurucu andaki
+  fotoğrafları ayıran kendi sahnesi (`FirstMomentSection.tsx`) → **zamanla
+  büyüyen fotoğraf zaman çizelgesi** (`starMaps/{slug}/entries` alt
+  koleksiyonu, `components/starmap/Timeline.tsx`). Sayfa sahibi 6 ayda bir
+  yeni bir an ekleyebilir; ekleme penceresi açıldığında sayfada rozet
+  gösterilir. Aynı numaralı Yıldız Anahtarı tasarımı `/create`'in canlı
+  önizlemesinde de kullanılıyor; oradaki "Sayfanın Linki" satırı da artık
+  amber çerçeveli, tek dokunuşla kopyalanabilir bir levha kartı
+  (`components/create/PageLinkCard.tsx`).
 - **Deri Defter** (`/urun/defter`) — **suni/vegan deri** (asla "hakiki
   deri" denmez), ince-çizgi-yıldız logo, yaldızlı sayfa kenarı, 26 sayfa
   (kapak, 2 sayfa mücevher kesimi numaralı yıldız haritası, Yıldız
@@ -99,11 +116,12 @@ app/
   urun/defter/               Fiziksel ürün satış sayfası
   print/journal/[slug]/[page]/   Puppeteer'ın fotoğrafladığı, token korumalı çıplak canvas — insan için değil
 components/
-  astrolab/                framework-agnostic canvas çizimi (drawStarChart) + React sarmalayıcıları
-  starmap/                  StarMapView, Timeline, AddEntryForm — Dijital Sayfa render'ı
+  astrolab/                framework-agnostic canvas çizimi (drawStarChart, drawJewelStar) + StarKeyLegend + React sarmalayıcıları
+  starmap/                  StarMapView (sinematik sahne akışı) — TitleReveal, SkyFocusSection,
+                             FirstMomentSection, Timeline, AddEntryForm — Dijital Sayfa render'ı
   journal/                  Deri Defter'e özgü görseller (kapak, deri doku, içerik önizlemeleri),
                              JournalThemeContext.tsx (3 renk temasının dağıtımı) + night/journalTheme.ts
-  create/                  /create sihirbazına özgü küçük bileşenler (CreateStepIndicator, JournalThemeSwatch)
+  create/                  /create sihirbazına özgü küçük bileşenler (CreateStepIndicator, JournalThemeSwatch, PageLinkCard)
   ui/                       Paylaşılan form bileşenleri (PhotoPicker, VoiceRecorder, ...)
 lib/
   starmaps.ts                StarMapRecord/TimelineEntry tipleri + Firestore okuma/yazma

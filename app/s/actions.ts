@@ -30,6 +30,21 @@ export async function addTimelineEntryAction(input: AddTimelineEntryInput): Prom
   if (input.photoUrls.length === 0) {
     throw new Error("En az bir fotoğraf gerekli.");
   }
+  if (input.photoUrls.length > 4) {
+    throw new Error("En fazla 4 fotoğraf ekleyebilirsiniz.");
+  }
+
+  const { getStarMapBySlug } = await import("@/lib/starmaps");
+  const { isAddWindowOpen } = await import("@/lib/starmapTimeline");
+
+  const starMap = await getStarMapBySlug(input.slug);
+  if (!starMap) {
+    throw new Error("Yıldız haritası bulunamadı.");
+  }
+
+  if (!isAddWindowOpen(starMap.createdAt, starMap.entries)) {
+    throw new Error("Yeni bir an eklemek için henüz zamanı gelmedi (Ayda bir kez ekleyebilirsiniz).");
+  }
 
   const { getDb } = await import("@/lib/firebase/admin");
   const now = new Date();

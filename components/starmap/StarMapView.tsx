@@ -1,3 +1,5 @@
+"use client";
+
 import Link from "next/link";
 import { CrossSell } from "@/components/CrossSell";
 import { StarChart } from "@/components/astrolab/StarChart";
@@ -96,22 +98,47 @@ export function StarMapView({ starMap, isPreview = false, isOwner = false }: Sta
       </div>
 
       {isPreview && (
-        <div className="fixed right-4 top-4 z-40 sm:right-6 sm:top-6">
-          <div className="flex items-center gap-2.5 rounded-full border border-amber/40 bg-void/80 px-3.5 py-2 shadow-lg shadow-black/40 backdrop-blur-sm">
-            <span aria-hidden className="h-1.5 w-1.5 shrink-0 animate-pulse rounded-full bg-amber motion-reduce:animate-none" />
-            <span className="font-mono text-[9px] uppercase tracking-[0.18em] text-amber">Önizleme</span>
-            <span aria-hidden className="h-3 w-px bg-amber/30" />
-            <Link
-              href={editHref}
-              className="font-mono text-[9px] uppercase tracking-[0.18em] text-muted underline underline-offset-2 transition-colors hover:text-amber"
-            >
-              Düzenle
-            </Link>
+        <>
+          <div className="watermark-overlay" />
+          <div className="fixed inset-x-0 top-0 z-50 border-b border-amber/20 bg-void/90 px-4 py-3 backdrop-blur-md">
+            <div className="mx-auto flex max-w-5xl flex-wrap items-center justify-between gap-3 text-center sm:text-left">
+              <div className="flex items-center gap-2.5">
+                <span aria-hidden className="h-1.5 w-1.5 shrink-0 animate-pulse rounded-full bg-amber motion-reduce:animate-none" />
+                <p className="font-mono text-[10px] uppercase tracking-wider text-amber font-semibold">
+                  Tasarım Önizleme Modu
+                </p>
+                <span aria-hidden className="hidden h-3 w-px bg-amber/30 sm:inline" />
+                <p className="hidden text-xs text-subtle sm:inline">
+                  Sayfanızı kaydetmek için yan sekmedeki tasarım ekranına dönebilirsiniz.
+                </p>
+              </div>
+              <div className="flex items-center gap-3">
+                <Link
+                  href={editHref}
+                  className="rounded-full border border-amber/40 px-3.5 py-1.5 font-mono text-[9.5px] uppercase tracking-widest text-amber transition-colors hover:bg-amber hover:text-ink"
+                >
+                  Düzenle
+                </Link>
+                <button
+                  type="button"
+                  onClick={() => {
+                    try {
+                      window.close();
+                    } catch {
+                      // Fallback: window.close might be blocked
+                    }
+                  }}
+                  className="rounded-full bg-amber/[0.08] px-3.5 py-1.5 font-mono text-[9.5px] uppercase tracking-widest text-muted transition-colors hover:bg-amber/15 hover:text-bright"
+                >
+                  Kapat
+                </button>
+              </div>
+            </div>
           </div>
-        </div>
+        </>
       )}
 
-      <main className="relative flex flex-col items-center px-4 py-12 sm:px-8 sm:py-16">
+      <main className={`relative flex flex-col items-center px-4 py-12 sm:px-8 sm:py-16 ${isPreview ? "pt-24 sm:pt-28" : ""}`}>
         {/* Sahne 1 — İsim ve an, gökyüzü henüz atmosferik arka planda */}
         <TitleReveal title={starMap.title} dateLabel={dateLabel} locationName={starMap.locationName} />
 
@@ -123,28 +150,58 @@ export function StarMapView({ starMap, isPreview = false, isOwner = false }: Sta
           coordsLabel={`${formatCoordinates(starMap.latitude, starMap.longitude)} · ${starMap.locationName.toUpperCase()}`}
           message={starMap.message}
           skyLog={skyLog}
+          interactive={isPreview}
+          isPreviewMode={isPreview}
         />
 
         {/* Yıldız Anahtarı — haritadaki numaralı yıldız/gezegen işaretlerini gerçek adlarına bağlar */}
         {hasStarKey && (
           <RevealOnScroll durationMs={1000} className="mt-24 w-full max-w-xl">
-            <AtlasPanel padding="lg" className="text-center">
-              <StarKeyLegend sky={sky} palette={palette} className="mx-auto max-w-sm" />
-            </AtlasPanel>
+            <div className="relative">
+              <AtlasPanel padding="lg" className="text-center">
+                <StarKeyLegend sky={sky} palette={palette} className="mx-auto max-w-sm" />
+              </AtlasPanel>
+              {isPreview && (
+                <div className="absolute inset-0 z-20 flex flex-col items-center justify-center rounded-2xl border border-amber/20 bg-void/80 px-6 text-center backdrop-blur-[2px]">
+                  <svg
+                    className="mb-3 h-7 w-7 text-amber/80"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="1.8"
+                  >
+                    <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
+                    <path d="M7 11V7a5 5 0 0 1 10 0v4" />
+                  </svg>
+                  <p className="font-mono text-[10px] font-bold uppercase tracking-[0.25em] text-amber">
+                    Yıldız Anahtarı Önizlemesi
+                  </p>
+                  <p className="mt-2 max-w-xs text-xs text-subtle leading-relaxed">
+                    Haritadaki yıldızların tam listesi satın aldığınızda aktif olacaktır.
+                  </p>
+                </div>
+              )}
+            </div>
           </RevealOnScroll>
         )}
 
         {/* İlk An — kurucu andaki fotoğraflar, aşağıdaki büyüyen çizelgeden ayrı bir sahne */}
         {initialEntry && initialEntry.photos.length > 0 && (
           <RevealOnScroll durationMs={1000} className="mt-24 w-full max-w-xl">
-            <FirstMomentSection photos={initialEntry.photos} />
+            <FirstMomentSection photos={initialEntry.photos} isPreviewMode={isPreview} />
           </RevealOnScroll>
         )}
 
         {/* Zaman Çizelgesi — kurucu an sonrası eklenen, büyüyen fotoğraf koleksiyonu, sahibiyse ekleme kontrolleriyle */}
         {(periodicEntries.length > 0 || isOwner) && (
           <div className="mt-24 w-full max-w-2xl">
-            <Timeline slug={starMap.slug} createdAt={starMap.createdAt} entries={periodicEntries} isOwner={isOwner} />
+            <Timeline
+              slug={starMap.slug}
+              createdAt={starMap.createdAt}
+              entries={periodicEntries}
+              isOwner={isOwner}
+              isPreviewMode={isPreview}
+            />
           </div>
         )}
 

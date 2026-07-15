@@ -11,8 +11,8 @@ export function SectionHeading({ eyebrow, title, align = "center", className }: 
 
   return (
     <div className={`${alignClass} ${className ?? ""}`}>
-      <p className="font-mono text-[11px] uppercase tracking-[0.34em] text-amber">{eyebrow}</p>
-      <h2 className="mt-4 font-display text-3xl italic text-text sm:text-4xl">{title}</h2>
+      <p className="font-mono text-[9.5px] font-medium uppercase tracking-[0.38em] text-amber">{eyebrow}</p>
+      <h2 className="mt-4 font-display text-2xl font-light italic text-text sm:text-3xl">{title}</h2>
     </div>
   );
 }

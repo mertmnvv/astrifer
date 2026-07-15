@@ -1,7 +1,7 @@
 import type { TimelineEntry } from "./starmaps";
 
 /** Fixed cadence, anchored at the page's own creation date — not the last entry's date, so a late add never pushes later windows out. */
-const WINDOW_MONTHS = 6;
+const WINDOW_MONTHS = 1;
 
 function addMonthsUtc(date: Date, months: number): Date {
   const result = new Date(date.getTime());

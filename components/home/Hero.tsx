@@ -46,13 +46,13 @@ export function Hero({ sky }: HeroProps) {
         animate="show"
         className="relative z-10 flex max-w-2xl flex-col items-center"
       >
-        <motion.p variants={item} className="font-mono text-[10px] uppercase tracking-[0.35em] text-amber">
+        <motion.p variants={item} className="font-mono text-[9px] font-medium uppercase tracking-[0.4em] text-amber">
           Zaman Kapsülü
         </motion.p>
-        <motion.h1 variants={item} className="mt-5 font-display text-4xl italic leading-tight text-bright sm:text-6xl">
+        <motion.h1 variants={item} className="mt-5 font-display text-3xl font-light italic leading-tight text-bright sm:text-4xl lg:text-5xl">
           Gökyüzü o an, sonsuza dek sizin.
         </motion.h1>
-        <motion.p variants={item} className="mt-5 max-w-md text-sm leading-relaxed text-muted sm:text-base">
+        <motion.p variants={item} className="mt-5 max-w-md text-xs leading-relaxed text-muted sm:text-sm">
           Doğduğunuz, aşık olduğunuz ya da hayatınızı değiştiren o anın gerçek gökyüzünü kaydedin. Kişisel bir
           sayfa ve kalıcı bir adres olarak, yıllar sonra bile aynı ışıkla karşınızda.
         </motion.p>

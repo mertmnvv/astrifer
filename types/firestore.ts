@@ -6,7 +6,8 @@ import type { Timestamp } from "firebase-admin/firestore";
 
 export type TemplateCategory = "dogum" | "yildonumu" | "teklif" | "mezuniyet" | "anma";
 export type OrderStatus = "pending" | "paid" | "failed" | "refunded" | "fulfilled" | "shipped";
-export type ProductType = "digital" | "journal";
+export type ProductType = "digital" | "journal" | "bundle";
+export type PaymentMethod = "manual" | "iyzico";
 
 /** Collection `templates`, doc id = slug. */
 export interface TemplateDoc {
@@ -57,15 +58,39 @@ export interface TimelineEntryDoc {
   createdAt: Timestamp;
 }
 
+/** Individual line item within an order — one per product (digital page, journal). */
+export interface OrderItemDoc {
+  productType: "digital" | "journal";
+  label: string;
+  price: number;
+  starMapSlug: string;
+  journalLetterText?: string | null;
+  journalLetterOpeningDate?: string | null;
+}
+
 /** Collection `orders`, doc id = auto. Never read/written by client code — server-only via Admin SDK. */
 export interface OrderDoc {
+  /** Human-readable order number, e.g. AST-20260715-A3K8. */
+  orderNumber: string;
   starMapSlug: string;
   customerEmail: string;
   customerName: string | null;
+  customerPhone: string | null;
+  /**
+   * Legacy single-product type kept for backward compat — new orders with
+   * both digital + journal use `"bundle"`. The canonical source is `items`.
+   */
   productType: ProductType;
+  /** Legacy single price — the canonical source is now `totalAmount`. */
   priceAmount: number;
+  /** Total order amount (sum of all items). */
+  totalAmount: number;
   currency: string;
+  /** Itemised product list — each entry is a product in the order. */
+  items: OrderItemDoc[];
   status: OrderStatus;
+  /** `"manual"` for the temporary bank-transfer flow; `"iyzico"` once integrated. */
+  paymentMethod: PaymentMethod;
   iyzicoPaymentId: string | null;
   iyzicoConversationId: string | null;
   shippingAddress: Record<string, unknown> | null;
@@ -80,7 +105,15 @@ export interface OrderDoc {
    * same path rather than storing 15 redundant renders. Never a direct URL.
    */
   printFilePaths: string[] | null;
-  /** Journal-only: the sealed letter insert's own print file — same locked-down security rule as printFilePaths, kept separate since it's more sensitive than the rest of the book. */
+  /**
+   * Journal-only: the single, full-bleed 26-page PDF assembled from
+   * printFilePaths (see lib/journalPrintPdf.ts) — the one file handed to
+   * the print shop. Same locked-down Storage prefix as printFilePaths.
+   */
+  printPdfPath: string | null;
+  /** Journal-only: when printFilePaths/printPdfPath were last (re-)rendered — shown in the admin production panel so a stale render is obvious. */
+  printFileRenderedAt: Timestamp | null;
+  /** Journal-only: the sealed letter insert's own print file (a single-page PDF, not a PNG) — same locked-down security rule as printFilePaths, kept separate since it's more sensitive than the rest of the book. */
   letterInsertPrintPath: string | null;
   createdAt: Timestamp;
   updatedAt: Timestamp;
@@ -96,3 +129,4 @@ export interface PricingConfigDoc {
   digitalPrice: number;
   updatedAt: Timestamp;
 }
+

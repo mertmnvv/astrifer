@@ -32,17 +32,17 @@ export function TitleReveal({ title, dateLabel, locationName }: TitleRevealProps
       animate="show"
       className="flex min-h-screen w-full max-w-2xl flex-col items-center justify-center text-center"
     >
-      <motion.p variants={item} className="font-mono text-[10px] uppercase tracking-[0.35em] text-dim">
-        Astrifer Zaman Kapsülü
+      <motion.p variants={item} className="font-mono text-[9px] font-medium uppercase tracking-[0.4em] text-dim">
+        {locationName}
       </motion.p>
-      <motion.h1 variants={item} className="mt-5 font-display text-4xl italic leading-tight text-bright sm:text-6xl">
+      <motion.h1 variants={item} className="mt-5 font-display text-3xl font-light italic leading-tight text-bright sm:text-4xl lg:text-5xl">
         {title}
       </motion.h1>
       <motion.div variants={item}>
         <LedgerRule className="mx-auto mt-6 max-w-[8rem]" />
       </motion.div>
-      <motion.p variants={item} className="mt-6 font-mono text-xs uppercase tracking-widest text-amber">
-        {dateLabel} · {locationName}
+      <motion.p variants={item} className="mt-6 font-mono text-[10.5px] font-medium uppercase tracking-[0.25em] text-amber">
+        {dateLabel}
       </motion.p>
       <motion.div variants={item} className="mt-12">
         <ScrollCue />

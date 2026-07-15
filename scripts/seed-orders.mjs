@@ -9,7 +9,7 @@
 import { cert, initializeApp } from "firebase-admin/app";
 import { getFirestore, Timestamp } from "firebase-admin/firestore";
 
-const ORDER_IDS = ["seed-order-digital", "seed-order-journal"];
+const ORDER_IDS = ["seed-order-digital", "seed-order-journal", "seed-order-bundle"];
 const STAR_MAP_SLUG = "ornek";
 
 function requireEnv(name) {
@@ -77,6 +77,9 @@ async function seed() {
     console.log(`starMaps/${STAR_MAP_SLUG} already exists — leaving it as-is.`);
   }
 
+  const openingDate = Timestamp.fromDate(new Date("2027-06-21T00:00:00.000Z"));
+  const letterText = "Bu satırları okuduğunda aradan yıllar geçmiş olacak — o geceki gökyüzü hâlâ orada, tıpkı bizim gibi.";
+
   const orders = [
     {
       id: "seed-order-digital",
@@ -85,6 +88,14 @@ async function seed() {
       customerName: "Test Müşteri — Dijital",
       productType: "digital",
       priceAmount: 299,
+      totalAmount: 299,
+      items: [{ productType: "digital", label: "Dijital Sayfa", price: 299, starMapSlug: STAR_MAP_SLUG }],
+      printFilePaths: null,
+      printPdfPath: null,
+      printFileRenderedAt: null,
+      letterInsertPrintPath: null,
+      journalLetterText: null,
+      journalLetterOpeningDate: null,
     },
     {
       id: "seed-order-journal",
@@ -93,6 +104,49 @@ async function seed() {
       customerName: "Test Müşteri — Defter",
       productType: "journal",
       priceAmount: 2400,
+      totalAmount: 2400,
+      items: [
+        {
+          productType: "journal",
+          label: "Deri Defter",
+          price: 2400,
+          starMapSlug: STAR_MAP_SLUG,
+          journalLetterText: letterText,
+          journalLetterOpeningDate: "2027-06-21",
+        },
+      ],
+      printFilePaths: null,
+      printPdfPath: null,
+      printFileRenderedAt: null,
+      letterInsertPrintPath: null,
+      journalLetterText: letterText,
+      journalLetterOpeningDate: openingDate,
+    },
+    {
+      id: "seed-order-bundle",
+      starMapSlug: STAR_MAP_SLUG,
+      customerEmail: "test-bundle@example.com",
+      customerName: "Test Müşteri — Paket",
+      productType: "bundle",
+      priceAmount: 2699,
+      totalAmount: 2699,
+      items: [
+        { productType: "digital", label: "Dijital Sayfa", price: 299, starMapSlug: STAR_MAP_SLUG },
+        {
+          productType: "journal",
+          label: "Deri Defter",
+          price: 2400,
+          starMapSlug: STAR_MAP_SLUG,
+          journalLetterText: letterText,
+          journalLetterOpeningDate: "2027-06-21",
+        },
+      ],
+      printFilePaths: null,
+      printPdfPath: null,
+      printFileRenderedAt: null,
+      letterInsertPrintPath: null,
+      journalLetterText: letterText,
+      journalLetterOpeningDate: openingDate,
     },
   ];
 

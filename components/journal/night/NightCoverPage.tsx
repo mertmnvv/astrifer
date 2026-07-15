@@ -25,6 +25,12 @@ export function NightCoverPage({ names, widthPx, heightPx }: NightCoverPageProps
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const containerRef = useRef<HTMLDivElement | null>(null);
   const [ready, setReady] = useState(false);
+  // Fixed-size renders are the 300 DPI print pipeline (lib/journalPrintRender.ts) —
+  // its Tailwind text sizes are tuned for that exact pixel canvas and must stay
+  // untouched. Only the auto-sized live previews (product page, İçindekiler grid,
+  // /create thumbnail) need to shrink the wordmark to the container they're given.
+  const isFixedSize = widthPx !== undefined && heightPx !== undefined;
+  const [previewWidth, setPreviewWidth] = useState(0);
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -45,6 +51,7 @@ export function NightCoverPage({ names, widthPx, heightPx }: NightCoverPageProps
       drawNightLeatherTexture(ctx, width, height, theme.leather);
       drawLogoThinStar(ctx, width * 0.5, height * 0.14, Math.min(width, height) * 0.075, theme.accentMetal);
       setReady(true);
+      if (!isFixedSize) setPreviewWidth(width);
     };
 
     if (widthPx && heightPx) {
@@ -58,6 +65,9 @@ export function NightCoverPage({ names, widthPx, heightPx }: NightCoverPageProps
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [widthPx, heightPx, theme]);
 
+  const wordmarkFontSize = isFixedSize ? undefined : Math.max(8, Math.min(previewWidth * 0.045, 18));
+  const namesFontSize = isFixedSize ? undefined : Math.max(9, Math.min(previewWidth * 0.052, 15));
+
   return (
     <NightPageShell
       widthPx={widthPx}
@@ -69,14 +79,24 @@ export function NightCoverPage({ names, widthPx, heightPx }: NightCoverPageProps
       <div ref={containerRef} className="absolute inset-0">
         <canvas ref={canvasRef} className="absolute inset-0 h-full w-full" />
       </div>
-      <div className="absolute inset-x-0 top-[24%] flex flex-col items-center gap-2">
-        <p className="font-mono text-base font-bold uppercase tracking-[0.4em]" style={{ color: theme.accentMetal }}>
+      <div className="absolute inset-x-0 top-[24%] flex flex-col items-center gap-2 px-2">
+        <p
+          className={`font-mono text-center font-bold uppercase ${isFixedSize ? "text-base tracking-[0.4em]" : ""}`}
+          style={{
+            color: theme.accentMetal,
+            fontSize: wordmarkFontSize,
+            letterSpacing: wordmarkFontSize ? wordmarkFontSize * 0.3 : undefined,
+          }}
+        >
           Astrifer
         </p>
       </div>
-      <div className="absolute inset-x-0 bottom-[18%] flex flex-col items-center gap-2">
+      <div className="absolute inset-x-0 bottom-[18%] flex flex-col items-center gap-2 px-3">
         <div className="h-px w-9" style={{ backgroundColor: `${theme.accentMetal}99` }} />
-        <p className="font-display text-lg italic" style={{ color: `${theme.accentMetal}f2` }}>
+        <p
+          className={`font-display text-center italic ${isFixedSize ? "text-lg" : ""}`}
+          style={{ color: `${theme.accentMetal}f2`, fontSize: namesFontSize }}
+        >
           {names}
         </p>
       </div>

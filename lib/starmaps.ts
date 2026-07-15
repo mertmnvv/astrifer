@@ -150,6 +150,7 @@ export interface CreateStarMapInput {
   paletteId: string | null;
   photoUrls: string[];
   voiceNoteUrl: string | null;
+  musicUrl: string | null;
 }
 
 export interface CreateStarMapResult {
@@ -164,6 +165,10 @@ export interface CreateStarMapResult {
  * physical-product checkout/payment flow.
  */
 export async function createStarMap(input: CreateStarMapInput): Promise<CreateStarMapResult> {
+  if (input.photoUrls.length > 4) {
+    throw new Error("En fazla 4 fotoğraf ekleyebilirsiniz.");
+  }
+
   const { getDb } = await import("@/lib/firebase/admin");
   const { createOwnerToken } = await import("@/lib/starmapOwnerToken");
   const db = getDb();
@@ -192,7 +197,7 @@ export async function createStarMap(input: CreateStarMapInput): Promise<CreateSt
       latitude: input.latitude,
       longitude: input.longitude,
       locationName: input.locationName,
-      musicUrl: null,
+      musicUrl: input.musicUrl,
       voiceNoteUrl: input.voiceNoteUrl,
       palette: input.paletteId,
       isPublic: true,

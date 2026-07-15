@@ -2,24 +2,18 @@ import { notFound } from "next/navigation";
 import { BackCoverPage } from "@/components/journal/night/BackCoverPage";
 import { BlankPage } from "@/components/journal/night/BlankPage";
 import { EssayPage } from "@/components/journal/night/EssayPage";
-import { getJournalTheme } from "@/components/journal/night/journalTheme";
 import { MemoryPage } from "@/components/journal/night/MemoryPage";
 import { NightCoverPage } from "@/components/journal/night/NightCoverPage";
 import { QrPage } from "@/components/journal/night/QrPage";
 import { StarKeyPage } from "@/components/journal/night/StarKeyPage";
 import { StarMapSpreadPage } from "@/components/journal/night/StarMapSpreadPage";
 import { JournalThemeProvider } from "@/components/journal/JournalThemeContext";
-import { pickNumberedStars, splitSkyByAzimuth } from "@/components/journal/starMapSpread";
-import { computeSky } from "@/lib/astronomy/computeSky";
-import { buildSkyEssay, buildSkyNarrative } from "@/lib/astronomy/skyNarrative";
-import { getSiteUrl } from "@/lib/siteUrl";
+import { buildJournalPreviewData, MEMORY_CAPTION_FALLBACK } from "@/lib/journalPreviewData";
 import { getStarMapBySlug } from "@/lib/starmaps";
 import { verifyPrintRenderToken } from "@/lib/printRenderToken";
 import { JOURNAL_PAGE_KINDS, type JournalPageKind } from "@/lib/journalPrintRender";
 
 export const dynamic = "force-dynamic";
-
-const MEMORY_CAPTION_FALLBACK = ["İlk “Merhaba”", "O Gece", "Yüzük", "Ailece"];
 
 /**
  * Bare, chrome-less, exact-pixel-size render for ONE distinct journal page
@@ -49,16 +43,8 @@ export default async function JournalPrintPage({
   const starMap = await getStarMapBySlug(params.slug);
   if (!starMap) notFound();
 
-  const sky = computeSky({ date: starMap.eventDateUtc, latitude: starMap.latitude, longitude: starMap.longitude });
-  const westHalf = splitSkyByAzimuth(sky, 0, 180);
-  const eastHalf = splitSkyByAzimuth(sky, 180, 360);
-  const page1Stars = pickNumberedStars(westHalf, 6, 1);
-  const page2Stars = pickNumberedStars(eastHalf, 6, 7);
-  const initialEntry = starMap.entries.find((entry) => entry.isInitial) ?? starMap.entries[0];
-  const memoryPhotos = initialEntry?.photos ?? [];
-
+  const { theme, sky, page1Stars, page2Stars, narrative, essay, memoryPhotos, qrUrl } = buildJournalPreviewData(starMap);
   const shared = { widthPx, heightPx };
-  const journalTheme = getJournalTheme(starMap.palette);
 
   let content: React.ReactNode;
   switch (kind) {
@@ -72,7 +58,7 @@ export default async function JournalPrintPage({
       content = <StarMapSpreadPage sky={sky} numberedStars={page2Stars} {...shared} />;
       break;
     case "star-key":
-      content = <StarKeyPage numberedStars={[...page1Stars, ...page2Stars]} narrative={buildSkyNarrative(sky)} {...shared} />;
+      content = <StarKeyPage numberedStars={[...page1Stars, ...page2Stars]} narrative={narrative} {...shared} />;
       break;
     case "memory-1":
     case "memory-2":
@@ -85,10 +71,10 @@ export default async function JournalPrintPage({
       break;
     }
     case "essay":
-      content = <EssayPage essay={buildSkyEssay(sky)} {...shared} />;
+      content = <EssayPage essay={essay} {...shared} />;
       break;
     case "qr":
-      content = <QrPage qrUrl={`${getSiteUrl()}/s/${params.slug}`} {...shared} />;
+      content = <QrPage qrUrl={qrUrl} {...shared} />;
       break;
     case "blank":
       content = <BlankPage {...shared} />;
@@ -100,5 +86,5 @@ export default async function JournalPrintPage({
       notFound();
   }
 
-  return <JournalThemeProvider theme={journalTheme}>{content}</JournalThemeProvider>;
+  return <JournalThemeProvider theme={theme}>{content}</JournalThemeProvider>;
 }

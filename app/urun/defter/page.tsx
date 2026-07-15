@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { CrossSell } from "@/components/CrossSell";
+import { JournalShowcase } from "@/components/journal/JournalShowcase";
 import { SiteHeader } from "@/components/layout/SiteHeader";
 import { SiteFooter } from "@/components/layout/SiteFooter";
 import { SectionHeading } from "@/components/atlas/SectionHeading";
@@ -8,20 +9,13 @@ import { AtlasPanel } from "@/components/atlas/AtlasPanel";
 import { RevealOnScroll } from "@/components/ui/RevealOnScroll";
 import { LazyMount } from "@/components/ui/LazyMount";
 import { BackCoverPage } from "@/components/journal/night/BackCoverPage";
-import { BlankPage } from "@/components/journal/night/BlankPage";
-import { EssayPage } from "@/components/journal/night/EssayPage";
 import { LetterInsertPage } from "@/components/journal/night/LetterInsertPage";
-import { MemoryPage } from "@/components/journal/night/MemoryPage";
 import { NightCoverPage } from "@/components/journal/night/NightCoverPage";
 import { QrPage } from "@/components/journal/night/QrPage";
-import { StarKeyPage } from "@/components/journal/night/StarKeyPage";
-import { StarMapSpreadPage } from "@/components/journal/night/StarMapSpreadPage";
 import { getJournalTheme } from "@/components/journal/night/journalTheme";
 import { JournalThemeProvider } from "@/components/journal/JournalThemeContext";
-import { pickNumberedStars, splitSkyByAzimuth } from "@/components/journal/starMapSpread";
 import { ScaledPreview } from "@/components/ScaledPreview";
 import { computeSky } from "@/lib/astronomy/computeSky";
-import { buildSkyEssay, buildSkyNarrative } from "@/lib/astronomy/skyNarrative";
 import { getSiteUrl } from "@/lib/siteUrl";
 import { formatTRY } from "@/lib/pricing";
 import { getPricingConfig } from "@/lib/pricingConfig";
@@ -34,7 +28,7 @@ export const metadata: Metadata = {
   description: "Kapağında adın, içinde o anın gerçek gökyüzü — premium suni deri ciltli, 26 sayfalık kişiye özel bir defter.",
 };
 
-const MEMORY_CAPTIONS = ["İlk “Merhaba”", "O Gece", "Yüzük", "Ailece"];
+
 
 const CTA_CLASS =
   "inline-block rounded-full bg-gradient-to-br from-amber-light to-amber-deep px-7 py-3.5 text-center font-mono text-xs uppercase tracking-widest text-ink shadow-[0_12px_40px_-14px_rgba(230,163,92,0.6)] transition-opacity hover:opacity-90 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-amber";
@@ -111,40 +105,14 @@ export default async function JournalProductPage() {
     latitude: source.latitude,
     longitude: source.longitude,
   });
-  const page1Stars = pickNumberedStars(splitSkyByAzimuth(sky, 0, 180), 6, 1);
-  const page2Stars = pickNumberedStars(splitSkyByAzimuth(sky, 180, 360), 6, 7);
+
   const initialEntry = source.entries.find((entry) => entry.isInitial) ?? source.entries[0];
   const memoryPhotos = initialEntry?.photos ?? [];
   const qrUrl = `${getSiteUrl()}/s/${source.slug}`;
   const { journalPrice } = await getPricingConfig();
   const openingDateLabel = new Intl.DateTimeFormat("tr-TR", { dateStyle: "long" }).format(SAMPLE_OPENING_DATE);
 
-  const CONTENTS: { title: string; preview: React.ReactNode }[] = [
-    { title: "Kapak — suni deri, altın yaldız ince-çizgi-yıldız logo ve isimler", preview: <NightCoverPage names={source.title} /> },
-    { title: "Büyük Yıldız Haritası — 1. sayfa, mücevher kesimi numaralı yıldızlar", preview: <StarMapSpreadPage sky={sky} numberedStars={page1Stars} /> },
-    { title: "Büyük Yıldız Haritası — 2. sayfa", preview: <StarMapSpreadPage sky={sky} numberedStars={page2Stars} /> },
-    {
-      title: "Yıldız Anahtarı + Günün Anlamı",
-      preview: (
-        <ScaledPreview designWidth={600} designHeight={800} className="h-full w-full">
-          <StarKeyPage numberedStars={[...page1Stars, ...page2Stars]} narrative={buildSkyNarrative(sky)} widthPx={600} heightPx={800} />
-        </ScaledPreview>
-      ),
-    },
-    ...MEMORY_CAPTIONS.map((caption, index) => ({
-      title: `Birlikte Anılarımız — ${caption}`,
-      preview: <MemoryPage photo={memoryPhotos[index] ?? {}} caption={memoryPhotos[index]?.caption ?? caption} />,
-    })),
-    {
-      title: "Günün Anlamı ve Önemi — uzun, düzyazı formatında",
-      preview: (
-        <ScaledPreview designWidth={600} designHeight={800} className="h-full w-full">
-          <EssayPage essay={buildSkyEssay(sky)} widthPx={600} heightPx={800} />
-        </ScaledPreview>
-      ),
-    },
-    { title: "15 boş / çizgili sayfa — kendi sözleriniz için", preview: <BlankPage /> },
-  ];
+
 
   return (
     <>
@@ -189,26 +157,16 @@ export default async function JournalProductPage() {
 
           <div id="icindekiler" className="mb-10">
             <RevealOnScroll>
-              <SectionHeading eyebrow="İçindekiler" title="26 sayfanın her biri, sizin için." />
+              <SectionHeading eyebrow="Keşfedin" title="Defterin sayfalarını çevirerek inceleyin." />
             </RevealOnScroll>
-            <div className="mt-10 grid grid-cols-2 gap-4 sm:grid-cols-3">
-              {CONTENTS.map((item, index) => (
-                <RevealOnScroll key={item.title} delayMs={(index % 5) * 60}>
-                  <div className="flex flex-col gap-2 rounded-2xl border border-text/10 bg-text/[0.035] p-2.5">
-                    <div className="aspect-[3/4] w-full overflow-hidden rounded-md">
-                      <LazyMount placeholderClassName="h-full w-full">{item.preview}</LazyMount>
-                    </div>
-                    <p className="flex gap-1.5 text-[11px] leading-snug text-text">
-                      <span className="shrink-0 font-mono text-[10px] text-amber">{(index + 1).toString().padStart(2, "0")}</span>
-                      <span>{item.title}</span>
-                    </p>
-                  </div>
-                </RevealOnScroll>
-              ))}
-            </div>
-            <p className="mt-6 text-center font-mono text-[10px] uppercase tracking-widest text-amber">
-              + Gelecek Mektubu ve dijital bağlantı sayfası — aşağıda ↓
-            </p>
+            <RevealOnScroll delayMs={100}>
+              <JournalShowcase
+                sky={sky}
+                title={source.title}
+                memoryPhotos={memoryPhotos}
+                journalPrice={journalPrice}
+              />
+            </RevealOnScroll>
           </div>
 
           <div className="mt-16 border-t border-text/10 pt-10">

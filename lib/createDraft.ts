@@ -31,6 +31,7 @@ export interface CreateDraft {
   journalEnabled: boolean;
   journalLetterText: string;
   journalOpeningDate: string;
+  musicUrl: string | null;
   savedAt: string;
 }
 

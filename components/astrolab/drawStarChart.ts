@@ -1,4 +1,4 @@
-import type { ComputeSkyResult } from "@/lib/astronomy/computeSky";
+import type { ComputeSkyResult, StarPoint } from "@/lib/astronomy/computeSky";
 import { drawJewelStar } from "./drawJewelStar";
 import { DEFAULT_SKY_PALETTE, type SkyPalette } from "./palettes";
 
@@ -17,7 +17,74 @@ export interface DrawStarChartOptions {
   showLabels?: boolean;
   /** Color scheme. Defaults to "Gece Mavisi". */
   palette?: SkyPalette;
+  /** When true, overlays a lock icon and 'GEÇİCİ ÖNİZLEME' watermark in the center. */
+  isPreviewMode?: boolean;
+  /** Extra rotation degree adjusted interactively by dragging. */
+  manualRotationDeg?: number;
 }
+
+const CONSTELLATION_LINES = [
+  // Ursa Major (Büyük Ayı)
+  ["Dubhe", "Merak"],
+  ["Merak", "Phecda"],
+  ["Phecda", "Megrez"],
+  ["Megrez", "Alioth"],
+  ["Alioth", "Mizar"],
+  ["Mizar", "Alkaid"],
+  ["Megrez", "Dubhe"],
+
+  // Ursa Minor (Küçük Ayı)
+  ["Polaris", "Kochab"],
+  ["Kochab", "Pherkad"],
+
+  // Orion (Avcı)
+  ["Betelgeuse", "Alnitak"],
+  ["Rigel", "Saiph"],
+  ["Rigel", "Mintaka"],
+  ["Betelgeuse", "Bellatrix"],
+  ["Alnitak", "Alnilam"],
+  ["Alnilam", "Mintaka"],
+  ["Alnitak", "Saiph"],
+  ["Mintaka", "Bellatrix"],
+
+  // Cassiopeia
+  ["Caph", "Schedar"],
+  ["Schedar", "Navi"],
+  ["Navi", "Ruchbah"],
+  ["Ruchbah", "Segin"],
+
+  // Crux (Güney Haçı)
+  ["Acrux", "Gacrux"],
+  ["Mimosa", "Imai"],
+
+  // Cygnus (Kuğu)
+  ["Deneb", "Sadr"],
+  ["Sadr", "Albireo"],
+  ["Sadr", "Aljanah"],
+
+  // Lyra (Lir)
+  ["Vega", "Sheliak"],
+  ["Sheliak", "Sulafat"],
+  ["Sulafat", "Vega"],
+
+  // Gemini (İkizler)
+  ["Castor", "Pollux"],
+  ["Castor", "Mebsuta"],
+  ["Pollux", "Alhena"],
+  ["Mebsuta", "Tejat"],
+
+  // Taurus (Boğa)
+  ["Aldebaran", "Elnath"],
+
+  // Canis Major (Büyük Köpek)
+  ["Sirius", "Adhara"],
+  ["Sirius", "Mirzam"],
+  ["Adhara", "Wezen"],
+  ["Wezen", "Aludra"],
+
+  // Southern Cross Pointer
+  ["Rigil Kentaurus", "Hadar"],
+];
 
 const DEG2RAD = Math.PI / 180;
 
@@ -342,7 +409,8 @@ export function drawStarChart(
   const minAltitude = options.minAltitude ?? -2;
   const showLabels = options.showLabels ?? true;
   const palette = options.palette ?? DEFAULT_SKY_PALETTE;
-  const driftDeg = reducedMotion ? 0 : (time * DRIFT_DEG_PER_SEC) % 360;
+  const manualRot = options.manualRotationDeg ?? 0;
+  const driftDeg = (reducedMotion ? 0 : (time * DRIFT_DEG_PER_SEC) % 360) + manualRot;
   const scale = Math.min(width, height) / 640;
   const cx = width / 2;
   const cy = height / 2;
@@ -357,9 +425,33 @@ export function drawStarChart(
     ? new Map(buildSkyLabels(sky, minAltitude, LABEL_MAG_THRESHOLD).map((entry) => [entry.name, entry.code]))
     : null;
 
+  const starPoints = new Map<string, { x: number; y: number; star: StarPoint }>();
   for (const star of sky.stars) {
     if (star.altitude < minAltitude) continue;
     const point = project(star.azimuth + driftDeg, star.altitude, cx, cy, fieldRadius);
+    starPoints.set(star.name, { x: point.x, y: point.y, star });
+  }
+
+  // Draw constellation lines
+  ctx.save();
+  ctx.strokeStyle = palette.star;
+  ctx.globalAlpha = 0.12;
+  ctx.lineWidth = 0.8 * scale;
+  for (const [starA, starB] of CONSTELLATION_LINES) {
+    const ptA = starPoints.get(starA);
+    const ptB = starPoints.get(starB);
+    if (ptA && ptB) {
+      ctx.beginPath();
+      ctx.moveTo(ptA.x, ptA.y);
+      ctx.lineTo(ptB.x, ptB.y);
+      ctx.stroke();
+    }
+  }
+  ctx.restore();
+
+  // Draw stars
+  for (const { x, y, star } of Array.from(starPoints.values())) {
+    const point = { x, y };
     const code = codeByName?.get(star.name);
     if (code) {
       const size = Math.max(2.2 * scale, starRadius(star.mag, scale) * 1.9);
@@ -392,5 +484,30 @@ export function drawStarChart(
 
   if (!reducedMotion) {
     drawMeteor(ctx, width, height, time, palette);
+  }
+
+  // Draw Lock and preview watermark in the center if preview mode is active
+  if (options.isPreviewMode) {
+    ctx.save();
+    ctx.fillStyle = palette.sun;
+    ctx.strokeStyle = palette.sun;
+    ctx.lineWidth = 1.6 * scale;
+    ctx.globalAlpha = 0.42;
+
+    // Draw Lock Icon
+    ctx.beginPath();
+    ctx.rect(cx - 7 * scale, cy - 3 * scale, 14 * scale, 10 * scale);
+    ctx.stroke();
+
+    ctx.beginPath();
+    ctx.arc(cx, cy - 3 * scale, 5 * scale, Math.PI, 0);
+    ctx.stroke();
+
+    // Draw "GEÇİCİ ÖNİZLEME" text
+    ctx.font = `600 ${Math.max(9, 9 * scale)}px var(--font-mono, monospace)`;
+    ctx.textAlign = "center";
+    ctx.textBaseline = "middle";
+    ctx.fillText("GEÇİCİ ÖNİZLEME", cx, cy + 22 * scale);
+    ctx.restore();
   }
 }
