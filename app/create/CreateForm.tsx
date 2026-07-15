@@ -610,7 +610,7 @@ export function CreateForm({ templates, pricing }: CreateFormProps) {
       </div>
 
       {/* FORM */}
-      <div className="order-3 flex flex-col gap-9 lg:order-2">
+      <div className="order-2 flex flex-col gap-9">
         <div className={currentStep === 1 ? "block" : "hidden"}>
           <SectionLabel n="01">Anı Seçin</SectionLabel>
           <RadioCardGroup
@@ -919,7 +919,7 @@ export function CreateForm({ templates, pricing }: CreateFormProps) {
       </div>
 
       {/* LIVE PREVIEW */}
-      <div className="order-2 flex flex-col gap-4 lg:sticky lg:top-28 lg:order-3 lg:self-start">
+      <div className="order-3 flex flex-col gap-4 lg:sticky lg:top-28 lg:self-start">
         <div className="mx-auto w-full flex justify-center">
           <div className="relative">
             {/* Glowing background */}
