@@ -122,7 +122,7 @@ export function BookFlip({ pages, onPageChange, className = "" }: BookFlipProps)
   return (
     <div className={`flex flex-col items-center justify-center select-none ${className}`}>
       {/* Book Container */}
-      <div className="relative flex w-full max-w-4xl aspect-[1.5/1] md:aspect-[1.5/1] items-center justify-center px-4">
+      <div className="relative flex w-full max-w-4xl aspect-[3/4] md:aspect-[1.5/1] items-center justify-center px-4">
         
         {/* Leather Hardback Backing - creates the physical book border */}
         <div 
