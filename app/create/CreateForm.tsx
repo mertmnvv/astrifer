@@ -1124,12 +1124,11 @@ export function CreateForm({ templates, pricing }: CreateFormProps) {
             className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/85 backdrop-blur-md"
             onClick={() => setShowBookModal(false)}
           >
-            {/* Modal Body */}
             <motion.div
               initial={{ scale: 0.95, y: 20 }}
               animate={{ scale: 1, y: 0 }}
               exit={{ scale: 0.95, y: 20 }}
-              className="relative w-full max-w-5xl bg-neutral-950 border border-white/10 rounded-3xl p-6 md:p-8 flex flex-col items-center gap-6 shadow-2xl"
+              className="relative w-full max-w-5xl max-h-[90vh] overflow-y-auto bg-neutral-950 border border-white/10 rounded-3xl p-6 md:p-8 flex flex-col items-center gap-6 shadow-2xl"
               onClick={(e) => e.stopPropagation()}
             >
               {/* Close Button */}

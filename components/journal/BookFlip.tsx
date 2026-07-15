@@ -21,6 +21,16 @@ export function BookFlip({ pages, onPageChange, className = "" }: BookFlipProps)
     onPageChange?.(currentPage);
   }, [currentPage, onPageChange]);
 
+  // Reset animating state as a fallback to prevent button locks
+  useEffect(() => {
+    if (isAnimating) {
+      const timer = setTimeout(() => {
+        setIsAnimating(false);
+      }, 450);
+      return () => clearTimeout(timer);
+    }
+  }, [isAnimating]);
+
   const totalPages = pages.length;
 
   const handleNext = () => {
@@ -122,7 +132,7 @@ export function BookFlip({ pages, onPageChange, className = "" }: BookFlipProps)
   return (
     <div className={`flex flex-col items-center justify-center select-none ${className}`}>
       {/* Book Container */}
-      <div className="relative flex w-full max-w-4xl aspect-[3/4] md:aspect-[1.5/1] items-center justify-center px-4">
+      <div className="relative w-full max-w-4xl aspect-[3/4] md:aspect-[3/2] mx-auto">
         
         {/* Leather Hardback Backing - creates the physical book border */}
         <div 
@@ -130,13 +140,20 @@ export function BookFlip({ pages, onPageChange, className = "" }: BookFlipProps)
           style={{
             background: `linear-gradient(to right, ${theme.leather.gradientStops.join(", ")})`,
             border: `1px solid ${theme.accentMetal}33`,
-            padding: "8px 12px 12px 12px",
             boxShadow: `0 25px 50px -12px rgba(0, 0, 0, 0.7), inset 0 1px 1px ${theme.accentMetal}1a`,
           }}
         />
 
         {/* Dynamic Pages Area */}
-        <div className="relative w-full h-full overflow-hidden rounded-lg flex bg-void/40">
+        <div 
+          className="absolute overflow-hidden rounded-lg flex bg-void/40"
+          style={{
+            top: 8,
+            left: 12,
+            right: 12,
+            bottom: 12,
+          }}
+        >
           
           {/* Desktop Spread Layout (Side-by-side) */}
           <div className="hidden md:flex w-full h-full">

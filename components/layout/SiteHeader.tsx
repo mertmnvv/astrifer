@@ -3,7 +3,6 @@
 import Link from "next/link";
 import { motion, useScroll, useTransform } from "framer-motion";
 import { Logo } from "@/components/Logo";
-import { LogoMark } from "@/components/LogoMark";
 import { CartLink } from "@/components/layout/CartLink";
 
 const NAV_LINKS = [
@@ -27,7 +26,7 @@ export function SiteHeader() {
       <div className="mx-auto max-w-6xl px-4 sm:px-8">
         <div className="flex items-center justify-between py-3 sm:py-4">
           <Link href="/" className="flex items-center" aria-label="Astrifer anasayfa">
-            <LogoMark size={22} className="sm:hidden" />
+            <Logo size={22} className="sm:hidden" />
             <Logo size={26} className="hidden sm:inline-block" />
           </Link>
           <nav className="flex items-center gap-4 sm:gap-7">
