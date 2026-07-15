@@ -20,6 +20,7 @@ export const PRODUCT_LABELS: Record<ProductType, string> = {
 export const PAYMENT_METHOD_LABELS: Record<PaymentMethod, string> = {
   manual: "Manuel (Havale/EFT)",
   iyzico: "iyzico",
+  paytr: "PayTR",
 };
 
 export type ProductFilter = "digital" | "journal" | "bundle";

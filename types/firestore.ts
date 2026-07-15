@@ -7,7 +7,14 @@ import type { Timestamp } from "firebase-admin/firestore";
 export type TemplateCategory = "dogum" | "yildonumu" | "teklif" | "mezuniyet" | "anma";
 export type OrderStatus = "pending" | "paid" | "failed" | "refunded" | "fulfilled" | "shipped";
 export type ProductType = "digital" | "journal" | "bundle";
-export type PaymentMethod = "manual" | "iyzico";
+export type PaymentMethod = "manual" | "iyzico" | "paytr";
+
+export interface ShippingAddress {
+  name: string;
+  address: string;
+  city: string;
+  district: string;
+}
 
 /** Collection `templates`, doc id = slug. */
 export interface TemplateDoc {
@@ -93,7 +100,7 @@ export interface OrderDoc {
   paymentMethod: PaymentMethod;
   iyzicoPaymentId: string | null;
   iyzicoConversationId: string | null;
-  shippingAddress: Record<string, unknown> | null;
+  shippingAddress: ShippingAddress | null;
   trackingNumber: string | null;
   /** Journal-only: user-authored letter for the sealed back-cover insert. */
   journalLetterText: string | null;

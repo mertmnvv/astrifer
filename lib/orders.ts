@@ -1,6 +1,6 @@
 import "server-only";
 
-import type { OrderItemDoc, PaymentMethod } from "@/types/firestore";
+import type { OrderItemDoc, PaymentMethod, ShippingAddress } from "@/types/firestore";
 
 // ---------------------------------------------------------------------------
 // Order number generation
@@ -41,6 +41,7 @@ export interface CreateOrderInput {
   items: OrderItemDoc[];
   /** Defaults to `"manual"` when omitted. */
   paymentMethod?: PaymentMethod;
+  shippingAddress?: ShippingAddress | null;
 }
 
 export interface CreateOrderResult {
@@ -90,11 +91,11 @@ export async function createOrder(input: CreateOrderInput): Promise<CreateOrderR
     totalAmount,
     currency: "TRY",
     items: input.items,
-    status: "paid",
+    status: "pending",
     paymentMethod: input.paymentMethod ?? "manual",
     iyzicoPaymentId: null,
     iyzicoConversationId: null,
-    shippingAddress: null,
+    shippingAddress: input.shippingAddress ?? null,
     trackingNumber: null,
     journalLetterText,
     journalLetterOpeningDate,
