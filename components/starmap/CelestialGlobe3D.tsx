@@ -70,6 +70,13 @@ export function CelestialGlobe3D({ sky, palette, className = "" }: CelestialGlob
     type: "star" | "body";
     kind?: string;
   } | null>(null);
+
+  // Hybrid Cinematic Refs
+  const interactionTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const isAutoRotating = useRef(true);
+  const targetStarVectorRef = useRef<THREE.Vector3 | null>(null);
+  const dustPointsRef = useRef<THREE.Points | null>(null);
+
   const rendererRef = useRef<THREE.WebGLRenderer | null>(null);
   const sceneRef = useRef<THREE.Scene | null>(null);
   const cameraRef = useRef<THREE.PerspectiveCamera | null>(null);
@@ -94,6 +101,17 @@ export function CelestialGlobe3D({ sky, palette, className = "" }: CelestialGlob
     horizon: isGravur ? 0x241f19 : 0xe6a35c,
     text: isGravur ? "#241F19" : "#e6a35c",
   };
+
+  // Listen to selectedStar to manage target vectors and interaction timeouts
+  useEffect(() => {
+    if (selectedStar === null) {
+      targetStarVectorRef.current = null;
+      if (interactionTimeoutRef.current) clearTimeout(interactionTimeoutRef.current);
+      interactionTimeoutRef.current = setTimeout(() => {
+        isAutoRotating.current = true;
+      }, 3000);
+    }
+  }, [selectedStar]);
 
   useEffect(() => {
     const container = containerRef.current;
@@ -295,6 +313,27 @@ export function CelestialGlobe3D({ sky, palette, className = "" }: CelestialGlob
     (gridHelper.material as THREE.Material).opacity = 0.08;
     scene.add(gridHelper);
 
+    // 9. Space Dust (Stardust) Particle System
+    const dustGeometry = new THREE.BufferGeometry();
+    const dustCount = 800;
+    const dustPositions = new Float32Array(dustCount * 3);
+    for (let i = 0; i < dustCount * 3; i++) {
+      dustPositions[i] = (Math.random() - 0.5) * 15; // Spread across a 15 unit cube
+    }
+    dustGeometry.setAttribute("position", new THREE.BufferAttribute(dustPositions, 3));
+    
+    const dustMaterial = new THREE.PointsMaterial({
+      color: 0xffffff,
+      size: 0.04,
+      transparent: true,
+      opacity: 0.4,
+      blending: THREE.AdditiveBlending,
+      depthWrite: false,
+    });
+    const dustPoints = new THREE.Points(dustGeometry, dustMaterial);
+    scene.add(dustPoints);
+    dustPointsRef.current = dustPoints;
+
     const handleResize = () => {
       if (!container || !renderer || !camera) return;
       const w = container.clientWidth;
@@ -307,7 +346,20 @@ export function CelestialGlobe3D({ sky, palette, className = "" }: CelestialGlob
     window.addEventListener("resize", handleResize);
 
     // 10. Drag & Click Interaction
+    const startInteraction = () => {
+      isAutoRotating.current = false;
+      if (interactionTimeoutRef.current) clearTimeout(interactionTimeoutRef.current);
+    };
+
+    const endInteraction = () => {
+      if (interactionTimeoutRef.current) clearTimeout(interactionTimeoutRef.current);
+      interactionTimeoutRef.current = setTimeout(() => {
+        isAutoRotating.current = true;
+      }, 3000);
+    };
+
     const handleMouseDown = (e: MouseEvent) => {
+      startInteraction();
       isDragging.current = true;
       previousMousePosition.current = { x: e.clientX, y: e.clientY };
       dragStartX = e.clientX;
@@ -322,7 +374,6 @@ export function CelestialGlobe3D({ sky, palette, className = "" }: CelestialGlob
         y: e.clientY - previousMousePosition.current.y,
       };
 
-      // Set velocity based on client drags
       rotationVelocity.current = {
         x: deltaMove.x * 0.005,
         y: deltaMove.y * 0.005,
@@ -336,8 +387,8 @@ export function CelestialGlobe3D({ sky, palette, className = "" }: CelestialGlob
 
     const handleMouseUp = (e: MouseEvent) => {
       isDragging.current = false;
+      endInteraction();
 
-      // Click detection: pointer barely moved
       const diffX = Math.abs(e.clientX - dragStartX);
       const diffY = Math.abs(e.clientY - dragStartY);
       if (diffX < 5 && diffY < 5) {
@@ -353,6 +404,12 @@ export function CelestialGlobe3D({ sky, palette, className = "" }: CelestialGlob
         if (intersects.length > 0) {
           const index = intersects[0].index;
           if (index !== undefined && sky) {
+            const px = starPositions[index * 3];
+            const py = starPositions[index * 3 + 1];
+            const pz = starPositions[index * 3 + 2];
+            targetStarVectorRef.current = new THREE.Vector3(px, py, pz);
+            isAutoRotating.current = false;
+
             if (index < sky.stars.length) {
               const star = sky.stars[index];
               setSelectedStar({
@@ -380,6 +437,7 @@ export function CelestialGlobe3D({ sky, palette, className = "" }: CelestialGlob
 
     // Touch event helpers
     const handleTouchStart = (e: TouchEvent) => {
+      startInteraction();
       const touch = e.touches[0];
       if (!touch) return;
       isDragging.current = true;
@@ -410,6 +468,7 @@ export function CelestialGlobe3D({ sky, palette, className = "" }: CelestialGlob
 
     const handleTouchEnd = (e: TouchEvent) => {
       isDragging.current = false;
+      endInteraction();
       const touch = e.changedTouches[0];
       if (!touch) return;
 
@@ -428,6 +487,12 @@ export function CelestialGlobe3D({ sky, palette, className = "" }: CelestialGlob
         if (intersects.length > 0) {
           const index = intersects[0].index;
           if (index !== undefined && sky) {
+            const px = starPositions[index * 3];
+            const py = starPositions[index * 3 + 1];
+            const pz = starPositions[index * 3 + 2];
+            targetStarVectorRef.current = new THREE.Vector3(px, py, pz);
+            isAutoRotating.current = false;
+
             if (index < sky.stars.length) {
               const star = sky.stars[index];
               setSelectedStar({
@@ -484,18 +549,46 @@ export function CelestialGlobe3D({ sky, palette, className = "" }: CelestialGlob
           (isGravur ? 0.35 : 0.22) + pulse * 0.25;
       }
 
-      // Slow drift friction rotation when user is not dragging
-      if (!isDragging.current && globeGroup) {
-        globeGroup.rotateOnWorldAxis(new THREE.Vector3(0, 1, 0), rotationVelocity.current.x);
-        globeGroup.rotateOnWorldAxis(new THREE.Vector3(1, 0, 0), rotationVelocity.current.y);
+      // Space Dust rotation
+      if (dustPointsRef.current) {
+        dustPointsRef.current.rotation.y += 0.0003;
+        dustPointsRef.current.rotation.x += 0.0001;
+        (dustPointsRef.current.material as THREE.PointsMaterial).opacity = 0.2 + pulse * 0.4;
+      }
 
-        // Apply friction to slow down to a crawl (diurnal drift pace)
+      // Hybrid Interaction: Lerp Camera Zoom and Globe Rotation
+      if (targetStarVectorRef.current && globeGroup && camera) {
+        // Zoom in smoothly
+        camera.fov = THREE.MathUtils.lerp(camera.fov, 25, 0.03);
+        camera.updateProjectionMatrix();
+
+        // Rotate globe so target points to camera
+        const currentWorldPos = targetStarVectorRef.current.clone().applyMatrix4(globeGroup.matrixWorld).normalize();
+        const targetWorldPos = new THREE.Vector3(0, 4, 8).normalize(); // Camera direction
+        const quaternion = new THREE.Quaternion().setFromUnitVectors(currentWorldPos, targetWorldPos);
+        globeGroup.quaternion.slerp(globeGroup.quaternion.clone().premultiply(quaternion), 0.04);
+      } else if (camera) {
+        // Zoom out smoothly
+        camera.fov = THREE.MathUtils.lerp(camera.fov, 60, 0.04);
+        camera.updateProjectionMatrix();
+      }
+
+      // Auto rotation and friction
+      if (!isDragging.current && globeGroup) {
+        if (!targetStarVectorRef.current) {
+          globeGroup.rotateOnWorldAxis(new THREE.Vector3(0, 1, 0), rotationVelocity.current.x);
+          globeGroup.rotateOnWorldAxis(new THREE.Vector3(1, 0, 0), rotationVelocity.current.y);
+        }
+
+        // Apply friction
         rotationVelocity.current.x *= 0.95;
         rotationVelocity.current.y *= 0.95;
 
-        // Keep a minimum passive drift rotation going around the Y zenith axis
-        if (Math.abs(rotationVelocity.current.x) < 0.0006) {
-          rotationVelocity.current.x = 0.0006;
+        // Auto Cinematic Spin
+        if (isAutoRotating.current && !targetStarVectorRef.current) {
+          rotationVelocity.current.x = THREE.MathUtils.lerp(rotationVelocity.current.x, 0.0015, 0.02);
+          // Optional subtle tilt
+          rotationVelocity.current.y = THREE.MathUtils.lerp(rotationVelocity.current.y, Math.sin(Date.now() * 0.0005) * 0.0002, 0.01);
         }
       }
 
