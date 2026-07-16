@@ -71,23 +71,25 @@ export function SkyFocusSection({
             </div>
 
             {/* Starmap Box (3D Celestial Globe Only) */}
-            <div
-              className="w-full aspect-[4/3] overflow-hidden border border-[#241F19] my-4 shadow-sm bg-[#E4DFCD] relative group"
-            >
-              <div className="w-full h-full relative">
-                <CelestialGlobe3D sky={sky} palette={palette} className="w-full h-full" />
-                {/* Zoom badge at top right */}
-                <button
-                  type="button"
-                  onClick={() => setIsZoomed(true)}
-                  className="absolute top-2 right-2 z-30 bg-[#E4DFCD] border border-[#241F19]/15 p-1 rounded-md opacity-60 hover:opacity-100 transition-opacity"
-                  title="Tam Ekran Görüntüle"
-                >
-                  <svg className="w-3.5 h-3.5 text-[#8A5A3B]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5">
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v6m3-3H7" />
-                  </svg>
-                </button>
+            <div className="relative w-full my-4 group">
+              <div
+                className="w-full aspect-[4/3] overflow-hidden border border-[#241F19] shadow-sm bg-[#E4DFCD] relative"
+              >
+                <div className="w-full h-full relative">
+                  <CelestialGlobe3D sky={sky} palette={palette} className="w-full h-full" />
+                </div>
               </div>
+              {/* Prominent Fullscreen Expand Button */}
+              <button
+                type="button"
+                onClick={() => setIsZoomed(true)}
+                className="absolute -bottom-3 right-4 z-40 bg-[#E4DFCD] border border-[#241F19] px-4 py-1.5 rounded-sm text-[#241F19] hover:bg-[#241F19]/5 transition-all shadow-md flex items-center gap-1.5"
+              >
+                <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4" />
+                </svg>
+                <span className="font-mono text-[9px] tracking-widest uppercase font-bold">Genişlet</span>
+              </button>
             </div>
 
             {/* Plate Name & Date */}
@@ -143,21 +145,19 @@ export function SkyFocusSection({
 
         {/* Fullscreen Zoom Lightbox Modal */}
         {isZoomed && (
-          <div className="fixed inset-0 z-50 flex flex-col items-center justify-center bg-[#0b0810]/95 p-4 md:p-8 backdrop-blur-md">
-            <div className="relative w-full max-w-3xl aspect-square md:aspect-[4/3] border-[1.5px] border-[#241F19] bg-[#E4DFCD] p-4 flex flex-col rounded-xl shadow-2xl">
-              <button
-                type="button"
-                onClick={() => setIsZoomed(false)}
-                className="absolute top-4 right-4 z-20 rounded-full p-2 text-[#241F19] hover:bg-[#241F19]/10 transition-colors"
-                aria-label="Kapat"
-              >
-                <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5">
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
-                </svg>
-              </button>
-              <div className="flex-1 w-full overflow-hidden relative">
-                <CelestialGlobe3D sky={sky} palette={palette} className="w-full h-full" />
-              </div>
+          <div className="fixed inset-0 z-[100] flex flex-col items-center justify-center bg-[#E4DFCD] backdrop-blur-md">
+            <button
+              type="button"
+              onClick={() => setIsZoomed(false)}
+              className="absolute top-[max(1.5rem,env(safe-area-inset-top))] right-4 md:right-6 z-[110] bg-[#241F19]/10 rounded-full p-3 text-[#241F19] hover:bg-[#241F19]/25 transition-colors"
+              aria-label="Kapat"
+            >
+              <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+            <div className="w-full h-full relative">
+              <CelestialGlobe3D sky={sky} palette={palette} className="w-full h-full" />
             </div>
           </div>
         )}
@@ -180,18 +180,19 @@ export function SkyFocusSection({
             className="aspect-square overflow-hidden rounded-full border border-amber/40 shadow-[0_25px_70px_-24px_rgba(0,0,0,0.65)] relative"
           >
             <CelestialGlobe3D sky={sky} palette={palette} className="w-full h-full" />
-            {/* Fullscreen zoom floating button */}
-            <button
-              type="button"
-              onClick={() => setIsZoomed(true)}
-              className="absolute top-4 right-4 z-30 bg-void/85 border border-amber/30 p-2 rounded-full text-amber opacity-60 hover:opacity-100 transition-opacity shadow-lg"
-              title="Tam Ekran Görüntüle"
-            >
-              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5">
-                <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v6m3-3H7" />
-              </svg>
-            </button>
           </div>
+          
+          {/* Prominent Fullscreen Expand Button (Placed outside the overflow-hidden mask) */}
+          <button
+            type="button"
+            onClick={() => setIsZoomed(true)}
+            className="absolute -bottom-4 left-1/2 -translate-x-1/2 z-40 bg-[#07050a] border border-amber/40 px-6 py-2.5 rounded-full text-amber hover:text-bright hover:bg-amber/10 transition-all shadow-[0_0_20px_rgba(230,184,119,0.2)] flex items-center gap-2 backdrop-blur-md"
+          >
+            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4" />
+            </svg>
+            <span className="font-mono text-[10px] tracking-widest uppercase font-medium">Genişlet</span>
+          </button>
         </div>
       </div>
 
@@ -217,21 +218,19 @@ export function SkyFocusSection({
 
       {/* Fullscreen Zoom Lightbox Modal */}
       {isZoomed && (
-        <div className="fixed inset-0 z-50 flex flex-col items-center justify-center bg-[#0b0810]/95 p-4 md:p-8 backdrop-blur-md">
-          <div className="relative w-full max-w-3xl aspect-square md:aspect-[4/3] border-[1.5px] border-amber/35 bg-[#15101a] p-4 flex flex-col rounded-xl shadow-2xl">
-            <button
-              type="button"
-              onClick={() => setIsZoomed(false)}
-              className="absolute top-4 right-4 z-20 rounded-full p-2 text-bright hover:bg-amber/15 transition-colors"
-              aria-label="Kapat"
-            >
-              <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5">
-                <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
-              </svg>
-            </button>
-            <div className="flex-1 w-full overflow-hidden relative">
-              <CelestialGlobe3D sky={sky} palette={palette} className="w-full h-full" />
-            </div>
+        <div className="fixed inset-0 z-[100] flex flex-col items-center justify-center bg-[#07050a] backdrop-blur-md">
+          <button
+            type="button"
+            onClick={() => setIsZoomed(false)}
+            className="absolute top-[max(1.5rem,env(safe-area-inset-top))] right-4 md:right-6 z-[110] bg-white/10 rounded-full p-3 text-white hover:bg-white/25 transition-colors"
+            aria-label="Kapat"
+          >
+            <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
+          <div className="w-full h-full relative">
+            <CelestialGlobe3D sky={sky} palette={palette} className="w-full h-full" />
           </div>
         </div>
       )}

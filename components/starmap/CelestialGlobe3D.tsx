@@ -123,7 +123,7 @@ export function CelestialGlobe3D({ sky, palette, className = "" }: CelestialGlob
     let dragStartTouchY = 0;
 
     const width = container.clientWidth;
-    const height = container.clientHeight || 450;
+    const height = container.clientHeight || window.innerHeight;
 
     // 1. Scene setup
     const scene = new THREE.Scene();
@@ -131,7 +131,7 @@ export function CelestialGlobe3D({ sky, palette, className = "" }: CelestialGlob
     sceneRef.current = scene;
 
     // 2. Camera setup
-    const camera = new THREE.PerspectiveCamera(60, width / height, 0.1, 100);
+    const camera = new THREE.PerspectiveCamera(60, width / height, 0.001, 100);
     camera.position.set(0, 4, 8);
     camera.lookAt(0, 0, 0);
     cameraRef.current = camera;
@@ -640,26 +640,26 @@ export function CelestialGlobe3D({ sky, palette, className = "" }: CelestialGlob
   }, [sky, colors.bg, colors.star, colors.constellation, colors.horizon, isGravur]);
 
   return (
-    <div className={`relative w-full ${className}`}>
+    <div className={`relative w-full h-full min-h-[400px] ${className}`}>
       {/* 3D Canvas Container */}
-      <div ref={containerRef} className="w-full h-[450px] relative overflow-hidden cursor-grab active:cursor-grabbing" />
+      <div ref={containerRef} className="w-full h-full absolute inset-0 overflow-hidden cursor-grab active:cursor-grabbing touch-none" />
       
       {/* Compass Directions Overlays (N, E, S, W) on the borders */}
-      <div className="absolute top-2 left-1/2 -translate-x-1/2 font-mono text-[9px] uppercase tracking-widest text-dim select-none pointer-events-none opacity-60">
+      <div className={`absolute top-2 left-1/2 -translate-x-1/2 font-mono text-[9px] uppercase tracking-widest select-none pointer-events-none opacity-60 ${isGravur ? "text-[#241F19]" : "text-dim"}`}>
         Kuzey (N)
       </div>
-      <div className="absolute bottom-2 left-1/2 -translate-x-1/2 font-mono text-[9px] uppercase tracking-widest text-dim select-none pointer-events-none opacity-60">
+      <div className={`absolute bottom-2 left-1/2 -translate-x-1/2 font-mono text-[9px] uppercase tracking-widest select-none pointer-events-none opacity-60 ${isGravur ? "text-[#241F19]" : "text-dim"}`}>
         Güney (S)
       </div>
-      <div className="absolute right-4 top-1/2 -translate-y-1/2 font-mono text-[9px] uppercase tracking-widest text-dim select-none pointer-events-none opacity-60">
+      <div className={`absolute right-4 top-1/2 -translate-y-1/2 font-mono text-[9px] uppercase tracking-widest select-none pointer-events-none opacity-60 ${isGravur ? "text-[#241F19]" : "text-dim"}`}>
         Doğu (E)
       </div>
-      <div className="absolute left-4 top-1/2 -translate-y-1/2 font-mono text-[9px] uppercase tracking-widest text-dim select-none pointer-events-none opacity-60">
+      <div className={`absolute left-4 top-1/2 -translate-y-1/2 font-mono text-[9px] uppercase tracking-widest select-none pointer-events-none opacity-60 ${isGravur ? "text-[#241F19]" : "text-dim"}`}>
         Batı (W)
       </div>
 
-      <div className="absolute bottom-4 right-4 bg-void/50 border border-text/10 rounded-full px-3 py-1 font-mono text-[8.5px] uppercase tracking-widest text-dim select-none pointer-events-none flex items-center gap-1.5">
-        <svg className="h-3.5 w-3.5 text-amber" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.2}>
+      <div className={`absolute top-8 md:top-6 left-1/2 -translate-x-1/2 ${isGravur ? "bg-[#E4DFCD]/90 border-[#241F19]/20 text-[#241F19]" : "bg-void/30 border-text/10 text-dim"} rounded-full px-3 py-1 font-mono text-[8.5px] uppercase tracking-widest select-none pointer-events-none flex items-center gap-1.5 opacity-80 backdrop-blur-sm`}>
+        <svg className={`h-3.5 w-3.5 ${isGravur ? "text-[#8A5A3B]" : "text-amber"}`} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.2}>
           <path strokeLinecap="round" strokeLinejoin="round" d="M7 11.5V14m0-2.5v-6a1.5 1.5 0 113 0m-3 6a1.5 1.5 0 00-3 0v2a7.5 7.5 0 0015 0v-5a1.5 1.5 0 00-3 0m-6-3V11m0-5.5v-1a1.5 1.5 0 013 0v1" />
         </svg>
         <span>Döndürmek için sürükleyin</span>
@@ -667,34 +667,34 @@ export function CelestialGlobe3D({ sky, palette, className = "" }: CelestialGlob
 
       {/* Selected Star Details Card */}
       {selectedStar && (
-        <div className="absolute bottom-16 left-4 right-4 md:left-1/2 md:right-auto md:-translate-x-1/2 md:w-80 rounded-xl border border-amber/20 bg-void/90 p-4 shadow-xl backdrop-blur-sm z-30 flex flex-col gap-1.5 text-left">
+        <div className={`absolute bottom-[max(2rem,env(safe-area-inset-bottom))] left-4 right-4 md:left-1/2 md:right-auto md:-translate-x-1/2 md:w-80 rounded-xl border p-4 shadow-xl backdrop-blur-sm z-30 flex flex-col gap-1.5 text-left animate-fadeIn ${isGravur ? "bg-[#E4DFCD]/95 border-[#241F19]/30 shadow-2xl" : "border-amber/20 bg-void/90"}`}>
           <button
             type="button"
             onClick={() => setSelectedStar(null)}
-            className="absolute top-2.5 right-2.5 text-dim hover:text-bright"
+            className={`absolute top-2.5 right-2.5 ${isGravur ? "text-[#241F19]/60 hover:text-[#241F19]" : "text-dim hover:text-bright"}`}
             aria-label="Kapat"
           >
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.5} className="h-4 w-4">
               <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
             </svg>
           </button>
-          <p className="font-mono text-[8.5px] uppercase tracking-[0.2em] text-amber">
+          <p className={`font-mono text-[8.5px] uppercase tracking-[0.2em] ${isGravur ? "text-[#8A5A3B]" : "text-amber"}`}>
             {selectedStar.type === "body" ? "🪐 Gök Cismi" : "⭐ Yıldız Raporu"}
           </p>
-          <h4 className="font-display text-base italic text-bright font-medium">
+          <h4 className={`font-display text-base italic font-medium ${isGravur ? "text-[#241F19] font-gravur-serif" : "text-bright"}`}>
             {selectedStar.name || "Katalog Yıldızı"}
           </h4>
-          <div className="grid grid-cols-2 gap-2 border-t border-text/10 pt-2 text-[10px] font-mono text-dim">
+          <div className={`grid grid-cols-2 gap-2 border-t pt-2 text-[10px] font-mono ${isGravur ? "border-[#241F19]/15 text-[#5C5646]" : "border-text/10 text-dim"}`}>
             <div>
-              <span className="text-[8px] uppercase tracking-wider block text-subtle">Kadir</span>
-              <span className="text-bright">{selectedStar.mag.toFixed(2)}</span>
+              <span className={`text-[8px] uppercase tracking-wider block ${isGravur ? "text-[#241F19]/60" : "text-subtle"}`}>Kadir</span>
+              <span className={isGravur ? "text-[#241F19]" : "text-bright"}>{selectedStar.mag.toFixed(2)}</span>
             </div>
             <div>
-              <span className="text-[8px] uppercase tracking-wider block text-subtle">Yükseklik</span>
-              <span className="text-bright">{selectedStar.altitude.toFixed(1)}°</span>
+              <span className={`text-[8px] uppercase tracking-wider block ${isGravur ? "text-[#241F19]/60" : "text-subtle"}`}>Yükseklik</span>
+              <span className={isGravur ? "text-[#241F19]" : "text-bright"}>{selectedStar.altitude.toFixed(1)}°</span>
             </div>
           </div>
-          <p className="text-[11px] leading-relaxed text-subtle italic mt-1.5">
+          <p className={`text-[11px] leading-relaxed italic mt-1.5 ${isGravur ? "text-[#5C5646] font-gravur-serif" : "text-subtle"}`}>
             {getStarDescription(selectedStar.name, selectedStar.mag, selectedStar.type, selectedStar.kind)}
           </p>
         </div>
