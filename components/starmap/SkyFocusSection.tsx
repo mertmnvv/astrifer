@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import { StarChart } from "@/components/astrolab/StarChart";
 import { CelestialGlobe3D } from "./CelestialGlobe3D";
 import type { SkyPalette } from "@/components/astrolab/palettes";
 import { LedgerRule } from "@/components/atlas/LedgerRule";
@@ -27,20 +26,14 @@ export interface SkyFocusSectionProps {
  */
 export function SkyFocusSection({
   sky,
-  previewLabel,
   palette,
   coordsLabel,
   message,
   skyLog,
-  interactive = false,
-  isPreviewMode = false,
   title = "",
   dateLabel = "",
 }: SkyFocusSectionProps) {
-  const [isSpinning, setIsSpinning] = useState(false);
-  const [resetTrigger, setResetTrigger] = useState(0);
   const [isZoomed, setIsZoomed] = useState(false);
-  const [viewMode, setViewMode] = useState<"2d" | "3d">("2d");
 
   const isGravur = palette.id === "gravur-atlas";
 
@@ -77,55 +70,22 @@ export function SkyFocusSection({
               </div>
             </div>
 
-            {/* Starmap Box */}
+            {/* Starmap Box (3D Celestial Globe Only) */}
             <div
               className="w-full aspect-[4/3] overflow-hidden border border-[#241F19] my-4 shadow-sm bg-[#E4DFCD] relative group"
             >
-              {viewMode === "2d" ? (
-                <div className="w-full h-full cursor-zoom-in" onClick={() => setIsZoomed(true)}>
-                  <StarChart
-                    sky={sky}
-                    label={previewLabel}
-                    className="h-full w-full"
-                    palette={palette}
-                    interactive={interactive}
-                    isPreviewMode={isPreviewMode}
-                    isSpinningExternal={isSpinning}
-                    onSpinChange={setIsSpinning}
-                    resetTrigger={resetTrigger}
-                    showControls={false}
-                  />
-                  <div className="absolute inset-0 bg-[#241F19]/[0.01] group-hover:bg-[#241F19]/[0.04] transition-colors pointer-events-none" />
-                  {/* Zoom badge at top right */}
-                  <div className="absolute top-2 right-2 bg-[#E4DFCD] border border-[#241F19]/15 p-1 rounded-md opacity-60 group-hover:opacity-100 transition-opacity">
-                    <svg className="w-3.5 h-3.5 text-[#8A5A3B]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5">
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v6m3-3H7" />
-                    </svg>
-                  </div>
-                </div>
-              ) : (
+              <div className="w-full h-full relative">
                 <CelestialGlobe3D sky={sky} palette={palette} className="w-full h-full" />
-              )}
-
-              {/* 2D/3D Toggle Pill Selector */}
-              <div className="absolute bottom-2 left-2 z-30 flex rounded-full border border-[#241F19]/15 bg-[#E4DFCD] p-0.5 shadow-sm">
+                {/* Zoom badge at top right */}
                 <button
                   type="button"
-                  onClick={(e) => { e.stopPropagation(); setViewMode("2d"); }}
-                  className={`rounded-full px-2 py-0.5 font-mono text-[8px] uppercase tracking-wider transition-colors ${
-                    viewMode === "2d" ? "bg-[#8A5A3B] text-[#E4DFCD] font-bold" : "text-[#5C5646] hover:text-[#241F19]"
-                  }`}
+                  onClick={() => setIsZoomed(true)}
+                  className="absolute top-2 right-2 z-30 bg-[#E4DFCD] border border-[#241F19]/15 p-1 rounded-md opacity-60 hover:opacity-100 transition-opacity"
+                  title="Tam Ekran Görüntüle"
                 >
-                  2D
-                </button>
-                <button
-                  type="button"
-                  onClick={(e) => { e.stopPropagation(); setViewMode("3d"); }}
-                  className={`rounded-full px-2 py-0.5 font-mono text-[8px] uppercase tracking-wider transition-colors ${
-                    viewMode === "3d" ? "bg-[#8A5A3B] text-[#E4DFCD] font-bold" : "text-[#5C5646] hover:text-[#241F19]"
-                  }`}
-                >
-                  3D Küre
+                  <svg className="w-3.5 h-3.5 text-[#8A5A3B]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v6m3-3H7" />
+                  </svg>
                 </button>
               </div>
             </div>
@@ -169,41 +129,7 @@ export function SkyFocusSection({
           </div>
         </div>
 
-        {interactive && (
-          <div className="mt-6 flex items-center gap-3 z-20">
-            <button
-              type="button"
-              onClick={() => setIsSpinning(!isSpinning)}
-              className="flex items-center gap-2 rounded-full border border-[#8A5A3B]/40 bg-[#E4DFCD] px-4 py-2 font-mono text-[9px] uppercase tracking-widest text-[#8A5A3B] transition-all hover:bg-[#8A5A3B]/10 active:scale-95"
-            >
-              {isSpinning ? (
-                <>
-                  <svg className="h-3.5 w-3.5 animate-spin" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                    <path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67" />
-                  </svg>
-                  Durdur
-                </>
-              ) : (
-                <>
-                  <svg className="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                    <polygon points="5 3 19 12 5 21 5 3" />
-                  </svg>
-                  Gökyüzünü Döndür
-                </>
-              )}
-            </button>
-            <button
-              type="button"
-              onClick={() => {
-                setResetTrigger((prev) => prev + 1);
-                setIsSpinning(false);
-              }}
-              className="rounded-full bg-[#8A5A3B]/10 px-4 py-2 font-mono text-[9px] uppercase tracking-widest text-[#241F19] transition-all hover:bg-[#8A5A3B]/20 active:scale-95"
-            >
-              Sıfırla
-            </button>
-          </div>
-        )}
+
 
         {skyLog && (
           <div className="mt-10 flex max-w-md flex-col items-center gap-6">
@@ -230,18 +156,7 @@ export function SkyFocusSection({
                 </svg>
               </button>
               <div className="flex-1 w-full overflow-hidden relative">
-                <StarChart
-                  sky={sky}
-                  label={previewLabel}
-                  className="h-full w-full bg-[#E4DFCD]"
-                  palette={palette}
-                  interactive={true}
-                  isPreviewMode={isPreviewMode}
-                  isSpinningExternal={isSpinning}
-                  onSpinChange={setIsSpinning}
-                  resetTrigger={resetTrigger}
-                  showControls={true}
-                />
+                <CelestialGlobe3D sky={sky} palette={palette} className="w-full h-full" />
               </div>
             </div>
           </div>
@@ -260,97 +175,27 @@ export function SkyFocusSection({
           className="pointer-events-none absolute -inset-10 -z-10 rounded-full"
           style={{ background: "radial-gradient(60% 60% at 50% 50%, rgba(230,184,119,0.18), transparent 70%)" }}
         />
-        <div className="rounded-full border border-amber/[0.2] p-[7px] group relative">
+        <div className="rounded-full border border-amber/[0.2] p-[7px] relative group">
           <div
             className="aspect-square overflow-hidden rounded-full border border-amber/40 shadow-[0_25px_70px_-24px_rgba(0,0,0,0.65)] relative"
           >
-            {viewMode === "2d" ? (
-              <div className="w-full h-full cursor-zoom-in" onClick={() => setIsZoomed(true)}>
-                <StarChart
-                  sky={sky}
-                  label={previewLabel}
-                  className="h-full w-full"
-                  palette={palette}
-                  interactive={interactive}
-                  isPreviewMode={isPreviewMode}
-                  isSpinningExternal={isSpinning}
-                  onSpinChange={setIsSpinning}
-                  resetTrigger={resetTrigger}
-                  showControls={false}
-                />
-                {/* Hover magnifying glass badge */}
-                <div className="absolute inset-0 bg-void/30 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center pointer-events-none">
-                  <div className="bg-void/85 border border-amber/30 p-3 rounded-full text-amber shadow-lg">
-                    <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5">
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v6m3-3H7" />
-                    </svg>
-                  </div>
-                </div>
-              </div>
-            ) : (
-              <CelestialGlobe3D sky={sky} palette={palette} className="w-full h-full" />
-            )}
-
-            {/* 2D/3D Toggle Pill Selector */}
-            <div className="absolute bottom-4 left-1/2 -translate-x-1/2 z-30 flex rounded-full border border-amber/30 bg-void/85 p-0.5 shadow-lg backdrop-blur-sm">
-              <button
-                type="button"
-                onClick={(e) => { e.stopPropagation(); setViewMode("2d"); }}
-                className={`rounded-full px-2.5 py-0.5 font-mono text-[8.5px] uppercase tracking-wider transition-colors ${
-                  viewMode === "2d" ? "bg-amber text-ink font-bold" : "text-muted hover:text-bright"
-                }`}
-              >
-                2D Harita
-              </button>
-              <button
-                type="button"
-                onClick={(e) => { e.stopPropagation(); setViewMode("3d"); }}
-                className={`rounded-full px-2.5 py-0.5 font-mono text-[8.5px] uppercase tracking-wider transition-colors ${
-                  viewMode === "3d" ? "bg-amber text-ink font-bold" : "text-muted hover:text-bright"
-                }`}
-              >
-                3D Küre
-              </button>
-            </div>
+            <CelestialGlobe3D sky={sky} palette={palette} className="w-full h-full" />
+            {/* Fullscreen zoom floating button */}
+            <button
+              type="button"
+              onClick={() => setIsZoomed(true)}
+              className="absolute top-4 right-4 z-30 bg-void/85 border border-amber/30 p-2 rounded-full text-amber opacity-60 hover:opacity-100 transition-opacity shadow-lg"
+              title="Tam Ekran Görüntüle"
+            >
+              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v6m3-3H7" />
+              </svg>
+            </button>
           </div>
         </div>
       </div>
 
-      {interactive && (
-        <div className="mt-6 flex items-center gap-3 z-20">
-          <button
-            type="button"
-            onClick={() => setIsSpinning(!isSpinning)}
-            className="flex items-center gap-2 rounded-full border border-amber/30 bg-void/60 px-4 py-2 font-mono text-[9px] uppercase tracking-widest text-amber transition-all hover:border-amber hover:bg-amber/10 active:scale-95"
-          >
-            {isSpinning ? (
-              <>
-                <svg className="h-3.5 w-3.5 animate-spin" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                  <path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67" />
-                </svg>
-                Durdur
-              </>
-            ) : (
-              <>
-                <svg className="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                  <polygon points="5 3 19 12 5 21 5 3" />
-                </svg>
-                Gökyüzünü Döndür
-              </>
-            )}
-          </button>
-          <button
-            type="button"
-            onClick={() => {
-              setResetTrigger((prev) => prev + 1);
-              setIsSpinning(false);
-            }}
-            className="rounded-full bg-amber/[0.06] px-4 py-2 font-mono text-[9px] uppercase tracking-widest text-muted transition-all hover:bg-amber/15 hover:text-bright active:scale-95"
-          >
-            Sıfırla
-          </button>
-        </div>
-      )}
+
 
       <div
         className="mt-10 flex max-w-md flex-col items-center gap-6"
@@ -385,18 +230,7 @@ export function SkyFocusSection({
               </svg>
             </button>
             <div className="flex-1 w-full overflow-hidden relative">
-              <StarChart
-                sky={sky}
-                label={previewLabel}
-                className="h-full w-full bg-[#15101a]"
-                palette={palette}
-                interactive={true}
-                isPreviewMode={isPreviewMode}
-                isSpinningExternal={isSpinning}
-                onSpinChange={setIsSpinning}
-                resetTrigger={resetTrigger}
-                showControls={true}
-              />
+              <CelestialGlobe3D sky={sky} palette={palette} className="w-full h-full" />
             </div>
           </div>
         </div>

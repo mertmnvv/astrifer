@@ -48,6 +48,11 @@ Bugünkü çalışma oturumunda, hem yönetici paneli kullanıcı deneyimini iyi
 * **20 Saniyelik Video Yükleme ve Kayıt:** Dosya seçerek ya da tarayıcı kamerasından sesli video kaydedilmesini sağlayan `VideoPicker` bileşeni oluşturuldu. 20 saniye sınırı ve sayaç eklendi. Cloudinary ve cam tasarımlı HTML5 video oynatıcısı kullanıcı arayüzüne ve yönetici paneline eklendi.
 * **Defter Alana Dijital Sayfa Bedava:** Sepette aynı slug ile Deri Defter ve Dijital Sayfa bulunduğunda, dijital sayfa fiyatı 0 TL'ye (Bedava) indirilip asıl fiyatının üzeri çizilerek sepet, ödeme ve Firestore sipariş toplamı güncellendi.
 * **Düğün Şablonu & Zengin Notlar:** Yeni Düğün şablonu eklendi ve tüm kategorilerin hazır not listeleri 6'şar adet romantik/duygusal mesajla zenginleştirildi.
+### 9. 3D Gök Küresi Odaklı Arayüz, Groq AI Entegrasyonu, SVG İkon Geçişi ve Yıldız Tozu Efekti
+* **Sadece 3D Gök Küresi Madalyonu:** 2D Harita madalyonu, 2D/3D geçiş butonları ve 2D döndürme butonları kaldırıldı. Madalyon ve Gravür kutularında varsayılan olarak interaktif, döndürülebilir 3D Gök Küresi (`CelestialGlobe3D`) yerleştirildi. Büyüteç butonuna basıldığında açılan tam ekran modalda da 3D Küre render edilmektedir.
+* **Groq Llama 3.1 AI Mektup Entegrasyonu:** AI mektup üretici API endpoint'i güncellenerek Groq altyapısına bağlandı. Son derece hızlı ve akıcı Türkçe yanıtlar üreten `llama-3.1-8b-instant` modeli entegre edildi.
+* **SVG İkon Modernizasyonu:** Tüm sayfalarda yer alan emojiler (sürükleme, kozmik başlıklar, AI butonları ve video kaydedici butonları) temizlenerek platformun minimalist tasarım çizgisine uygun lüks SVG vektör ikonlarla değiştirildi.
+* **Yıldız Tozu İmleç Efekti (`CosmicCursorTrail`):** Kullanıcı fareyi hareket ettirdikçe veya ekrana dokundukça süzülen, yavaşça sönen yıldız tozu parçacıkları efekti yazıldı ve yalnızca modern kozmik temalı sayfalarda aktif olacak şekilde entegre edildi.
 
 ---
 
@@ -57,11 +62,5 @@ Bugünkü çalışma oturumunda, hem yönetici paneli kullanıcı deneyimini iyi
 - **[ ] Ödeme (iyzico/PayTR) Entegrasyonu:** `/checkout` sayfası ödeme akışına yönlendirmeye hazır ancak iyzico/PayTR entegrasyon API'leri üretim ortamında aktif edilmeli.
 - **[ ] Domain Satın Alımı & Ayarları:** `astrifer.net` domain yönlendirmeleri tamamlanıp production deploy ortamındaki `NEXT_PUBLIC_SITE_URL` ayarları yapılmalı.
 
-### Yeni Dijital Sayfa Özellikleri (Roadmap)
-- **[ ] 3D Celestial Globe (Three.js Gök Küresi - Özellik 2):** İki boyutlu yıldız haritası madalyonu yerine parmakla döndürülebilen, takımyıldızların parıldadığı 3D dönebilir gök küresi.
-- **[ ] Ambient Audio Visualizer (Müzik Görselleştirici - Özellik 3):** Çalan arka plan müziğinin ritim ve bas tonlarına göre gökyüzündeki nebula ve yıldızların hafifçe titreşip parıldaması.
-- **[ ] AI Memory Narrative (AI Hikaye Asistanı - Özellik 4):** Yüklenen ses/video veya anahtar kelimelerden yararlanarak o anın duygusuna uygun edebi bir günlük/anı yazısı hazırlayan hafif yapay zeka servisi.
-- **[ ] Dynamic Day/Night Cycle (Gece/Gündüz Canlı Gökyüzü - Özellik 6):** Sayfanın açıldığı yerel saate göre gökyüzü atmosferinin gün doğumu, gündüz ve kozmik gece renklerine otomatik olarak bürünmesi.
-- **[ ] Cosmic Anniversary Sync (Astronomik Olay Vurgusu - Özellik 7):** Seçilen tarihte gökyüzünde gerçekleşen meteor yağmurları, dolunay gibi doğa olaylarının harita üzerinde özel bir ikon ve kutuyla vurgulanması.
 
 

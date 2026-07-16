@@ -12,6 +12,7 @@ import { PageGate } from "@/components/journal/PageGate";
 import { VoiceNote } from "@/components/journal/VoiceNote";
 import { MusicToggle } from "@/components/ui/MusicToggle";
 import { RevealOnScroll } from "@/components/ui/RevealOnScroll";
+import { CosmicCursorTrail } from "@/components/ui/CosmicCursorTrail";
 import { computeSky } from "@/lib/astronomy/computeSky";
 import { buildSkyNarrative } from "@/lib/astronomy/skyNarrative";
 import { getCosmicEvents } from "@/lib/astronomy/cosmicEvents";
@@ -98,6 +99,7 @@ export function StarMapView({
 
   return (
     <PageGate title={starMap.title} subtitle={`${dateLabel} · ${starMap.locationName}`} musicUrl={starMap.musicUrl} isGravur={isGravur}>
+      {!isGravur && <CosmicCursorTrail />}
       {isGravur ? (
         <>
           <div aria-hidden className="fixed inset-0 -z-20 bg-gravur-paper" />
@@ -212,8 +214,12 @@ export function StarMapView({
             <RevealOnScroll durationMs={1000} className="mt-16 w-full max-w-xl">
               <AtlasPanel padding="lg" className={`flex flex-col gap-4 text-center ${isGravur ? "border-gravur-ink/10 bg-gravur-ink/[0.015]" : "border-amber/15 bg-amber/[0.02]"}`}>
                 <div className="flex flex-col items-center gap-1">
-                  <p className={`font-mono text-[9px] uppercase tracking-[0.25em] ${isGravur ? "text-gravur-copper" : "text-amber"}`}>
-                    🌌 Kozmik Gökyüzü Olayları
+                  <p className={`font-mono text-[9.5px] uppercase tracking-[0.25em] ${isGravur ? "text-gravur-copper" : "text-amber"} flex items-center gap-1.5`}>
+                    <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.2}>
+                      <circle cx="12" cy="12" r="2.5" />
+                      <path strokeLinecap="round" d="M12 2v2M12 20v2M2 12h2M20 12h2M5.636 5.636l1.414 1.414M16.95 16.95l1.414 1.414M5.636 18.364l1.414-1.414M16.95 7.05l1.414-1.414" />
+                    </svg>
+                    <span>Kozmik Gökyüzü Olayları</span>
                   </p>
                   <div className={`w-[80px] h-[1px] ${isGravur ? "bg-gravur-copper/35" : "bg-amber/35"} mt-1.5`} />
                 </div>

@@ -953,7 +953,10 @@ export function CreateForm({ templates, pricing }: CreateFormProps) {
                 onClick={() => setShowAiModal(true)}
                 className="font-mono text-[9px] uppercase tracking-wider text-amber hover:underline flex items-center gap-1 focus:outline-none"
               >
-                <span>✨ Yapay Zeka ile Yaz</span>
+                <svg className="h-3 w-3 text-amber" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.2}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M9.813 15.904L9 21l8.904-4.467L21 21l-4.467-8.904t-8.904 4.467z" />
+                </svg>
+                <span>Yapay Zeka ile Yaz</span>
               </button>
             </div>
             <textarea
@@ -1320,8 +1323,11 @@ export function CreateForm({ templates, pricing }: CreateFormProps) {
                 </svg>
               </button>
 
-              <p className="font-mono text-[9px] uppercase tracking-[0.25em] text-amber mb-1">
-                ✨ Yapay Zeka Hikaye Asistanı
+              <p className="font-mono text-[9px] uppercase tracking-[0.25em] text-amber mb-1 flex items-center gap-1.5">
+                <svg className="h-3 w-3 text-amber" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.2}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M9.813 15.904L9 21l8.904-4.467L21 21l-4.467-8.904t-8.904 4.467z" />
+                </svg>
+                <span>Yapay Zeka Hikaye Asistanı</span>
               </p>
               <h3 className="font-display text-xl italic text-bright mb-4">
                 Anılarınızı Şiirsel Bir Mektuba Dönüştürün

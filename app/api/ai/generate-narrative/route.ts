@@ -25,12 +25,28 @@ export async function POST(req: NextRequest) {
       ${inputs.join("\n")}
     `.trim();
 
+    const groqKey = process.env.GROQ_API_KEY;
     const geminiKey = process.env.GEMINI_API_KEY;
     const openaiKey = process.env.OPENAI_API_KEY;
 
     let text = "";
 
-    if (geminiKey) {
+    if (groqKey) {
+      const res = await fetch("https://api.groq.com/openai/v1/chat/completions", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${groqKey}`
+        },
+        body: JSON.stringify({
+          model: "llama-3.1-8b-instant",
+          messages: [{ role: "user", content: prompt }],
+          max_tokens: 200
+        })
+      });
+      const data = await res.json();
+      text = data?.choices?.[0]?.message?.content || "";
+    } else if (geminiKey) {
       const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${geminiKey}`;
       const res = await fetch(url, {
         method: "POST",

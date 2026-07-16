@@ -222,9 +222,12 @@ export function VideoPicker({ value, onChange }: VideoPickerProps) {
           <button
             type="button"
             onClick={stopRecording}
-            className="w-full rounded-md border border-red-500/60 bg-red-950/20 py-2.5 font-mono text-[11px] uppercase tracking-widest text-red-300 hover:bg-red-950/40 transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-red-400"
+            className="w-full rounded-md border border-red-500/60 bg-red-950/20 py-2.5 font-mono text-[11px] uppercase tracking-widest text-red-300 hover:bg-red-950/40 transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-red-400 flex items-center justify-center gap-1.5"
           >
-            ● Kaydı Durdur
+            <svg className="h-3 w-3 fill-current" viewBox="0 0 24 24">
+              <rect x="5" y="5" width="14" height="14" rx="2" />
+            </svg>
+            <span>Kaydı Durdur</span>
           </button>
         </div>
       ) : (
