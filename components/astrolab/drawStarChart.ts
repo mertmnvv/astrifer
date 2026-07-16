@@ -169,7 +169,8 @@ export function project(
 }
 
 export function starRadius(mag: number, scale: number): number {
-  return Math.max(0.9, 4.2 - mag * 0.65) * scale;
+  // Yıldızları daha belirgin yapmak için taban boyutu artırıldı
+  return Math.max(1.3, 5.0 - mag * 0.72) * scale;
 }
 
 /** Soft radial gradient, never flat/pure black — easy on the eyes at any hour. */
@@ -333,9 +334,9 @@ function drawStar(
     const phase = (seed % 1000) / 1000;
     const speed = 1.4 + ((seed >> 3) % 500) / 500;
     const glowAlpha = reducedMotion
-      ? 0.4
-      : 0.28 + 0.32 * (0.5 + 0.5 * Math.sin(time * speed + phase * Math.PI * 2));
-    const glowR = r * 4.2;
+      ? 0.55
+      : 0.35 + 0.45 * (0.5 + 0.5 * Math.sin(time * speed + phase * Math.PI * 2));
+    const glowR = r * 5.2; // Glow yarıçapı artırıldı
     const glow = ctx.createRadialGradient(point.x, point.y, 0, point.x, point.y, glowR);
     glow.addColorStop(0, `rgba(${palette.starGlowRgb}, ${glowAlpha})`);
     glow.addColorStop(1, `rgba(${palette.starGlowRgb}, 0)`);
@@ -626,23 +627,29 @@ export function drawStarChart(
     ctx.save();
     ctx.fillStyle = palette.sun;
     ctx.strokeStyle = palette.sun;
-    ctx.lineWidth = 1.6 * scale;
-    ctx.globalAlpha = 0.42;
+    ctx.lineWidth = Math.max(1.5, 2.0 * scale);
+    ctx.globalAlpha = palette.id === "gravur-atlas" ? 0.55 : 0.65; // Görünürlüğü artırmak için opaklık yükseltildi
+
+    // Kilit simgesinin boyutları küçülmeyi önlemek için ölçeklendi
+    const lw = Math.max(16, 24 * scale);
+    const lh = Math.max(12, 18 * scale);
+    const lr = Math.max(6, 9 * scale);
 
     // Draw Lock Icon
     ctx.beginPath();
-    ctx.rect(cx - 7 * scale, cy - 3 * scale, 14 * scale, 10 * scale);
+    ctx.rect(cx - lw / 2, cy - lh / 2, lw, lh);
     ctx.stroke();
 
     ctx.beginPath();
-    ctx.arc(cx, cy - 3 * scale, 5 * scale, Math.PI, 0);
+    ctx.arc(cx, cy - lh / 2, lr, Math.PI, 0);
     ctx.stroke();
 
-    // Draw "GEÇİCİ ÖNİZLEME" text
-    ctx.font = `600 ${Math.max(9, 9 * scale)}px var(--font-mono, monospace)`;
+    // Draw "GEÇİCİ ÖNİZLEME" text (Font boyutu okunabilirlik için büyütüldü)
+    const fontPx = Math.max(11, 15 * scale);
+    ctx.font = `600 ${fontPx}px var(--font-mono, monospace)`;
     ctx.textAlign = "center";
     ctx.textBaseline = "middle";
-    ctx.fillText("GEÇİCİ ÖNİZLEME", cx, cy + 22 * scale);
+    ctx.fillText("GEÇİCİ ÖNİZLEME", cx, cy + lh + 12 * scale);
     ctx.restore();
   }
 }
