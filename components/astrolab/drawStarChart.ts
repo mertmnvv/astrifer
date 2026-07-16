@@ -169,7 +169,7 @@ export function project(
 }
 
 export function starRadius(mag: number, scale: number): number {
-  return Math.max(0.5, 3.4 - mag * 0.55) * scale;
+  return Math.max(0.9, 4.2 - mag * 0.65) * scale;
 }
 
 /** Soft radial gradient, never flat/pure black — easy on the eyes at any hour. */

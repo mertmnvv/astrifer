@@ -40,7 +40,7 @@ function formatCoordinates(latitude: number, longitude: number): string {
  * produces, so its restore-from-URL effect can continue editing the
  * existing draft instead of handing back a blank form.
  */
-function buildEditParams(starMap: StarMapRecord): URLSearchParams {
+function buildEditParams(starMap: StarMapRecord, step?: number, furthestStep?: number): URLSearchParams {
   const params = new URLSearchParams({
     title: starMap.title,
     message: starMap.message ?? "",
@@ -55,6 +55,8 @@ function buildEditParams(starMap: StarMapRecord): URLSearchParams {
   const photoUrls = (initialEntry?.photos ?? []).map((photo) => photo.url).filter((url): url is string => Boolean(url));
   if (photoUrls.length > 0) params.set("photos", photoUrls.join(","));
   if (starMap.voiceNoteUrl) params.set("voice", starMap.voiceNoteUrl);
+  if (step) params.set("step", step.toString());
+  if (furthestStep) params.set("furthestStep", furthestStep.toString());
   return params;
 }
 
@@ -64,9 +66,11 @@ export interface StarMapViewProps {
   isPreview?: boolean;
   /** True only when a valid owner cookie was verified server-side — see app/s/[slug]/page.tsx. */
   isOwner?: boolean;
+  step?: number;
+  furthestStep?: number;
 }
 
-export function StarMapView({ starMap, isPreview = false, isOwner = false }: StarMapViewProps) {
+export function StarMapView({ starMap, isPreview = false, isOwner = false, step, furthestStep }: StarMapViewProps) {
   const sky = computeSky({
     date: starMap.eventDateUtc,
     latitude: starMap.latitude,
@@ -79,7 +83,7 @@ export function StarMapView({ starMap, isPreview = false, isOwner = false }: Sta
   const palette = getSkyPalette(starMap.palette);
   const isGravur = palette.id === "gravur-atlas";
   const hasStarKey = buildSkyLabels(sky).length > 0;
-  const editHref = `/create?${buildEditParams(starMap).toString()}`;
+  const editHref = `/create?${buildEditParams(starMap, step, furthestStep).toString()}`;
   const initialEntry = starMap.entries.find((entry) => entry.isInitial) ?? starMap.entries[0];
   const periodicEntries = starMap.entries.filter((entry) => entry !== initialEntry);
 
@@ -228,9 +232,9 @@ export function StarMapView({ starMap, isPreview = false, isOwner = false }: Sta
         )}
 
         {/* İlk An — kurucu andaki fotoğraflar, aşağıdaki büyüyen çizelgeden ayrı bir sahne */}
-        {initialEntry && initialEntry.photos.length > 0 && (
+        {initialEntry && (initialEntry.photos.length > 0 || isPreview) && (
           <RevealOnScroll durationMs={1000} className="mt-24 w-full max-w-xl">
-            <FirstMomentSection photos={initialEntry.photos} isPreviewMode={isPreview} />
+            <FirstMomentSection photos={initialEntry.photos ?? []} isPreviewMode={isPreview} editHref={editHref} />
           </RevealOnScroll>
         )}
 
@@ -248,9 +252,42 @@ export function StarMapView({ starMap, isPreview = false, isOwner = false }: Sta
         )}
 
         {/* Sesli Mesaj */}
-        {starMap.voiceNoteUrl && (
+        {(starMap.voiceNoteUrl || isPreview) && (
           <RevealOnScroll durationMs={1000} className="mt-24 w-full max-w-sm">
-            <VoiceNote url={starMap.voiceNoteUrl} />
+            {starMap.voiceNoteUrl ? (
+              <VoiceNote url={starMap.voiceNoteUrl} />
+            ) : (
+              <Link
+                href={editHref}
+                className={`flex items-center gap-4 rounded-2xl border border-dashed px-5 py-4 transition-colors group text-left ${
+                  isGravur
+                    ? "border-gravur-copper/40 bg-gravur-copper/[0.02] hover:bg-gravur-copper/[0.04]"
+                    : "border-amber/30 bg-amber/[0.02] hover:bg-amber/[0.04]"
+                }`}
+              >
+                <div className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-full border transition-all duration-300 ${
+                  isGravur
+                    ? "border-gravur-copper/40 bg-gravur-copper/5 text-gravur-copper group-hover:bg-gravur-copper group-hover:text-gravur-paper"
+                    : "border-amber/30 bg-amber/5 text-amber group-hover:bg-amber group-hover:text-ink"
+                }`}>
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="h-5 w-5">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M12 18.75a6 6 0 0 0 6-6v-1.5m-6 7.5a6 6 0 0 1-6-6v-1.5m6 7.5v3.75m-3.75 0h7.5M12 15.75a3 3 0 0 1-3-3V4.5a3 3 0 1 1 6 0v8.25a3 3 0 0 1-3 3Z" />
+                  </svg>
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className={`font-mono text-[9px] uppercase tracking-wider font-bold ${
+                    isGravur ? "text-gravur-copper" : "text-amber"
+                  }`}>
+                    Sesli Mesaj Eklenmedi
+                  </p>
+                  <p className={`text-[11px] leading-normal mt-0.5 ${
+                    isGravur ? "text-gravur-ink-soft" : "text-subtle"
+                  }`}>
+                    Sesli bir mesaj kaydetmek veya yüklemek ister misiniz?
+                  </p>
+                </div>
+              </Link>
+            )}
           </RevealOnScroll>
         )}
 

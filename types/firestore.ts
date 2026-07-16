@@ -5,7 +5,7 @@
 import type { Timestamp } from "firebase-admin/firestore";
 
 export type TemplateCategory = "dogum" | "yildonumu" | "teklif" | "mezuniyet" | "anma";
-export type OrderStatus = "pending" | "paid" | "failed" | "refunded" | "fulfilled" | "shipped";
+export type OrderStatus = "pending" | "paid" | "failed" | "refunded" | "fulfilled" | "shipped" | "cancelled";
 export type ProductType = "digital" | "journal" | "bundle";
 export type PaymentMethod = "manual" | "iyzico" | "paytr";
 
@@ -135,7 +135,9 @@ export interface OrderDoc {
  */
 export interface PricingConfigDoc {
   journalPrice: number;
+  journalOriginalPrice?: number | null;
   digitalPrice: number;
+  digitalOriginalPrice?: number | null;
   updatedAt: Timestamp;
 }
 

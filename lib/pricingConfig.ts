@@ -1,17 +1,21 @@
 import "server-only";
 import { isFirebaseConfigured } from "@/lib/firebase/isConfigured";
-import { DIGITAL_PRICE, JOURNAL_PRICE } from "@/lib/pricing";
+import { DIGITAL_PRICE, DIGITAL_ORIGINAL_PRICE, JOURNAL_PRICE, JOURNAL_ORIGINAL_PRICE } from "@/lib/pricing";
 import type { PricingConfigDoc } from "@/types/firestore";
 
 export interface PricingConfig {
   journalPrice: number;
+  journalOriginalPrice: number;
   digitalPrice: number;
+  digitalOriginalPrice: number;
 }
 
 function defaultPricingConfig(): PricingConfig {
   return {
     journalPrice: JOURNAL_PRICE,
+    journalOriginalPrice: JOURNAL_ORIGINAL_PRICE,
     digitalPrice: DIGITAL_PRICE,
+    digitalOriginalPrice: DIGITAL_ORIGINAL_PRICE,
   };
 }
 
@@ -33,7 +37,9 @@ export async function getPricingConfig(): Promise<PricingConfig> {
     const doc = snapshot.data() as PricingConfigDoc;
     return {
       journalPrice: doc.journalPrice,
+      journalOriginalPrice: doc.journalOriginalPrice ?? doc.journalPrice,
       digitalPrice: doc.digitalPrice,
+      digitalOriginalPrice: doc.digitalOriginalPrice ?? doc.digitalPrice,
     };
   } catch {
     return defaultPricingConfig();

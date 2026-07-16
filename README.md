@@ -1,150 +1,135 @@
-# Astrifer
+# 🌌 Astrifer — Gökyüzü Zaman Kapsülü
 
-Kişiye özel yıldız haritası: kullanıcı bir tarih/saat/konum girer, o anın
-astronomik olarak doğru gökyüzü render edilir. Dijital paylaşılabilir sayfa +
-(opsiyonel) fiziksel Deri Defter olarak satılır.
+> **Astrifer**, hayatınızın en anlamlı anlarını donduran, kişiye özel astronomik gökyüzü haritası ve yaşayan bir zaman kapsülü projesidir. Kullanıcının girdiği konum, tarih ve saat verilerine göre o anın gerçek gökyüzünü hesaplar; bunu kalıcı bir **dijital paylaşım sayfası** ve el yapımı, şık bir fiziksel **Deri Defter** ürünü olarak sunar.
 
-## Yığın
+---
 
-- Next.js 14 (App Router), TypeScript, Tailwind CSS
-- Astronomik hesaplama: [`astronomy-engine`](https://github.com/cosinekitty/astronomy) — gerçek efemeris
-- Firebase (Firestore), Admin SDK üzerinden sunucu tarafı erişim
-- Cloudinary — fotoğraf/sesli mesaj yüklemeleri (Firebase Storage'ın Blaze planı
-  gerektirmesi nedeniyle ücretsiz alternatif olarak seçildi)
-- Ödeme: iyzico (planlanan)
-- 300 DPI baskı render: Puppeteer + `@sparticuz/chromium`, mevcut Next.js
-  server action'ları içinde (ayrı bir worker servisi değil — bkz. aşağıda)
+## 🛠 Teknoloji Yığını (Tech Stack)
 
-## Klasör yapısı
+Astrifer modern, performansı yüksek ve güvenli web teknolojileri üzerine inşa edilmiştir:
+
+* **Çatı:** Next.js 14 (App Router), TypeScript, Tailwind CSS
+* **Astronomi Motoru:** [`astronomy-engine`](https://github.com/cosinekitty/astronomy) — Gerçek efemeris verileriyle hatasız gökyüzü, takımyıldız ve gezegen hesaplamaları
+* **Veritabanı & Storage:** Firebase Firestore & Storage (Yalnızca güvenli Admin SDK üzerinden erişim)
+* **Medya Yönetimi:** Cloudinary (İmzalı, istemci tarafı doğrudan fotoğraf ve ses yüklemeleri)
+* **Müzik Altyapısı:** YouTube Iframe Player API (Arka planda YouTube videolarından müzik çalma)
+* **Baskı Motoru (300 DPI):** Puppeteer + `@sparticuz/chromium` (Sunucu tarafında tarayıcı tabanlı yüksek çözünürlüklü baskı üretimi)
+
+---
+
+## 📐 Sistem Mimarisi ve İş Akışı
+
+Aşağıdaki şema, kullanıcının sipariş oluşturma sürecinden adminin baskı PDF'ini elde etmesine kadar olan uçtan uca akışı özetlemektedir:
+
+```mermaid
+graph TD
+    User([Kullanıcı]) -->|1. Tarih/Saat/Konum Girer| Configurator[Create Sihirbazı /create]
+    Configurator -->|Hesaplama| Astronomy[astronomy-engine]
+    Astronomy -->|Gökyüzü Verisi| Preview[Canlı Gökyüzü Önizlemesi]
+    Configurator -->|2. Fotoğraf/Ses/YouTube Linki Ekle| Cloudinary[Cloudinary Yükleme]
+    Configurator -->|3. Sipariş Oluştur| Firestore[(Firebase Firestore)]
+    
+    Admin([Yönetici]) -->|4. Siparişleri Yönetir /admin| AdminPanel[Yönetici Paneli]
+    AdminPanel -->|5. PDF Baskı Tetikler| Puppeteer[Puppeteer & Chromium]
+    Puppeteer -->|6. Tokenlı Sayfayı Fotoğraflar| PrintRoute[/print/journal/[slug]/[page]]
+    PrintRoute -->|7. Canvas Çizimi| Astronomy
+    Puppeteer -->|8. PDF Yükler| Storage[(Firebase Storage - Özel)]
+    AdminPanel -->|9. Güvenli Signed URL ile PDF İndir| Admin
+```
+
+---
+
+## 🌟 Öne Çıkan Özellikler
+
+### 1. Dijital Zaman Kapsülü (`/s/[slug]`)
+* **Sinematik Kaydırma Deneyimi:** Tam ekran sahnelerden oluşan, scroll hareketiyle bulanıklıktan netliğe kavuşan gökyüzü madalyonu.
+* **Yıldız Anahtarı:** Gökyüzündeki yıldızları ve gezegenleri parlaklık sırasına göre numaralandıran ve gerçek isimleriyle eşleştiren özgün astronomik gösterge tablosu.
+* **Yaşayan Zaman Tüneli:** Sayfa sahibinin her 6 ayda bir yeni anılar, fotoğraflar ve mesajlar ekleyerek büyütebildiği dijital zaman çizgisi.
+* **Arka Plan Müziği:** YouTube videolarından veya doğrudan ses dosyalarından beslenen, ziyaretçiyi o anın duygusuna ortak eden ses oynatıcısı.
+
+### 2. Fiziksel Deri Defter (`/urun/defter`)
+* **Özel Tasarım Temaları:** "Modern Gece + Altın", "Sıcak Gece + Bakır" ve "Mürdüm Gece + Gül Altını" olmak üzere seçilen gökyüzü rengiyle otomatik eşleşen 3 lüks tema.
+* **26 Sayfa Yüksek Kaliteli İçerik:** Kapak, mücevher kesim yıldız haritası sayfaları, QR kodları, kişisel anı sayfaları ve boş yazım sayfaları.
+* **Mühürlü Gelecek Mektubu:** Defterin arkasında yer alan, belirlenen açılış tarihine kadar saklanması gereken fiziksel mühürlü mektup eki.
+
+### 3. Yönetici Paneli (`/admin`)
+* **İnteraktif Sipariş Yönetimi:** Müşteri adı, sipariş numarası veya e-postaya göre anlık arama. Sipariş durumlarına ve ürün tiplerine göre sekmeli filtreleme.
+* **Canlı Sayfa Önizleme:** Sipariş sayfasında yer alan mobil iframe önizlemesi sayesinde sipariş içeriğini anında görebilme.
+* **Dinamik Fiyatlandırma:** Tüm ürünlerin liste ve indirimli fiyatlarını doğrudan panel üzerinden yönetebilme yeteneği.
+
+---
+
+## 📂 Klasör Yapısı
 
 ```
-app/                    route'lar (App Router)
-  create/               ürün konfigüratörü (/create)
-  s/[slug]/             paylaşılan yıldız haritası sayfası
-  urun/defter/          Deri Defter satış sayfası
-  admin/                sipariş/şablon yönetim paneli (/admin) — bkz. aşağıda
-  api/geocode/          yer arama proxy'si (Nominatim + tz-lookup)
-  api/upload/sign/      Cloudinary imzalı upload için kısa ömürlü imza üretir
-  print/journal/[slug]/[page]/   baskı render'ının Puppeteer ile fotoğrafladığı,
-                         token'la korunan çıplak canvas sayfası — insan için değil
+app/
+  admin/                 Sipariş, şablon ve fiyat yönetimi içeren şifreli panel
+  api/
+    geocode/             Harita arama ve saat dilimi proxy'si
+    upload/sign/         İmzalı Cloudinary yüklemeleri için geçici imza servisi
+  create/                5 Adımlı gökyüzü sihirbazı ve canlı önizleme arayüzü
+  s/[slug]/              Paylaşılabilir dijital zaman kapsülü sayfası
+  urun/                  Ürün tanıtım ve vitrin sayfaları (defter & dijital)
+  print/journal/...      Puppeteer'ın baskı amacıyla ziyaret ettiği token korumalı canvas
 components/
-  astrolab/             framework-agnostic canvas çizim katmanı (drawStarChart)
-                         + React sarmalayıcıları (StarChart canlı önizleme)
-  ui/                   paylaşılan form bileşenleri
+  astrolab/              Kanvas çizim katmanı ve gökyüzü render bileşenleri
+  starmap/               Dijital sayfanın sinematik sahneleri (TitleReveal, Timeline vb.)
+  journal/               Deri defter kapak ve iç sayfa görselleştirme araçları
 lib/
-  astronomy/            computeSky.ts — saf astronomi hesaplaması, render'dan bağımsız
-  geocode/               yerleşik şehir listesi, saat dilimi dönüşümü
-  firebase/              Admin SDK istemcisi (lib/firebase/admin.ts) + isFirebaseConfigured()
-  cloudinary/            imzalı upload config + client helper (uploadFile.ts)
-  journalPrintRender.ts   Puppeteer ile /print/journal/[slug]/[page]'ı fotoğraflayıp
-                         starmaps-print/'e yükleyen sunucu-taraflı render pipeline'ı
-  printRenderToken.ts     baskı render sayfalarına erişimi kısıtlayan kısa ömürlü imzalı token
-  templates.ts           Firestore erişilemediğinde kullanılan yedek şablon listesi
-scripts/
-  seed-firestore.mjs     varsayılan şablonları Firestore'a yazan tek seferlik script
-types/
-  firestore.ts            elle yazılmış doküman tipleri (templates/starMaps/orders)
-firestore.rules          Firestore güvenlik kuralları
-storage.rules            Storage güvenlik kuralları
-firebase.json             Firebase CLI config (rules dosyalarına işaret eder)
+  astronomy/             computeSky.ts — astronomy-engine tabanlı matematik motoru
+  firebase/              Firebase admin istemcisi ve yapılandırma denetimleri
+  journalPrintRender.ts  Puppeteer tabanlı 300 DPI baskı alma motoru
 ```
 
-## Geliştirme
+---
+
+## 🚀 Yerel Geliştirme (Local Development)
+
+### 1. Kurulum ve Çalıştırma
 
 ```bash
+# Bağımlılıkları yükleyin
 npm install
-cp .env.example .env.local   # Firebase/iyzico anahtarlarını doldurun
+
+# Çevre değişkenleri dosyasını oluşturun
+cp .env.example .env.local
+
+# Projeyi lokalde başlatın
 npm run dev
 ```
 
-Firebase env değişkenleri boşsa `/create` sayfası `lib/templates.ts` içindeki
-yedek şablon listesiyle çalışır — yerel geliştirme için Firebase projesi şart
-değildir.
+> [!NOTE]
+> `.env.local` dosyasındaki Firebase kimlik bilgileri boşsa, uygulama veritabanı olmadan yerel şablonlarla (`lib/templates.ts`) fallback modunda çalışacaktır.
 
-Gerçek bir Firebase projesine bağlanmak için:
+### 2. Firebase Kurulumu
+
+Firestore kurallarını ve varsayılan verileri yüklemek için:
 
 ```bash
+# Firebase CLI üzerinden giriş yapın
 firebase login
-firebase use --add                          # proje ID'ni seç, .firebaserc oluşur (commit edilmez)
+
+# Projenizi seçip yapılandırın
+firebase use --add
+
+# Güvenlik kurallarını yükleyin
 firebase deploy --only firestore:rules,storage:rules
-npm run seed:firebase                        # varsayılan 5 şablonu Firestore'a yazar
+
+# Varsayılan şablonları Firestore'a aktarın
+npm run seed:firebase
 ```
 
-`FIREBASE_PROJECT_ID` / `FIREBASE_CLIENT_EMAIL` / `FIREBASE_PRIVATE_KEY`,
-Firebase Console → Project Settings → Service Accounts → "Generate new
-private key" ile indirilen JSON'dan gelir. Vercel'de `FIREBASE_PRIVATE_KEY`'i
-tek satırda `\n` kaçışlarıyla girin — `lib/firebase/admin.ts` bunları kendisi
-gerçek satır sonlarına çevirir.
+### 3. Kullanılan Komutlar
 
-## Fotoğraf/sesli mesaj yüklemeleri (Cloudinary)
+* `npm run dev`: Geliştirme sunucusunu başlatır (`localhost:3000`).
+* `npm run build`: Production için Next.js çıktısı üretir.
+* `npx tsc --noEmit`: Projedeki TypeScript tip kontrolünü çalıştırır.
+* `npm run lint`: ESLint kontrollerini yapar.
 
-`/create` konfigüratöründeki fotoğraf ve sesli mesaj alanları, dosyayı
-doğrudan tarayıcıdan Cloudinary'ye yükler — sunucu sadece kısa ömürlü bir
-imza üretir (`app/api/upload/sign`), dosyanın kendisi hiçbir zaman bizim
-sunucumuzdan geçmez. `CLOUDINARY_CLOUD_NAME` / `CLOUDINARY_API_KEY` /
-`CLOUDINARY_API_SECRET` boşsa bu route 503 döner ve PhotoPicker/VoiceRecorder
-yükleme başarısız olarak işaretlenir — konfigüratörün geri kalanı yine de
-çalışır durumda kalır.
+---
 
-Kurulum: [cloudinary.com](https://cloudinary.com) üzerinde ücretsiz bir hesap
-aç, Console ana sayfasındaki "Product Environment Credentials" bölümünden
-Cloud Name / API Key / API Secret'ı `.env.local`'a kopyala. Ekstra bir
-upload preset veya bucket oluşturmak gerekmiyor — izin verilen klasörler
-`app/api/upload/sign/route.ts`'teki `ALLOWED_FOLDERS` listesinde sabit
-kodlanmış.
+## 🔒 Güvenlik Politikası
 
-## Admin paneli (/admin)
-
-Siparişleri (`orders`) ve şablonları (`templates`) yönetmek için tek şifreli
-bir panel. Kullanıcı hesabı sistemi yok — `ADMIN_PASSWORD` ile giriş yapılır,
-imzalı bir session cookie'si (`lib/adminAuth.ts`, `middleware.ts`) 7 gün
-geçerli kalır.
-
-```bash
-# .env.local
-ADMIN_PASSWORD=güçlü-bir-şifre
-ADMIN_SESSION_SECRET=rastgele-uzun-bir-değer   # openssl rand -hex 32
-```
-
-- `/admin` — özet: toplam sipariş, ciro, duruma göre dağılım
-- `/admin/orders` — sipariş listesi; durum güncelleme (pending → paid → fulfilled → shipped) ve kargo takip numarası girme
-- `/admin/templates` — şablonları aktif/pasif yapma, yeni şablon ekleme
-
-Panel her sayfada Admin SDK üzerinden okuma/yazma yapar (client-side Firestore
-erişimi yok), bu yüzden `firestore.rules`'taki `allow write: if false`
-kuralları etkilenmez.
-
-## Güvenlik notu: 300dpi baskı varlığı
-
-`starmaps-print/` Storage path'i tamamen kapalıdır (`storage.rules`'ta
-`allow read, write: if false`). Baskıya hazır görsele yalnızca Admin SDK ile
-çalışan sunucu taraflı kod kısa ömürlü bir signed URL üreterek erişebilir; bu
-URL asla client'a kalıcı olarak saklanmamalıdır.
-
-Render pipeline'ı (`lib/journalPrintRender.ts`) şöyle çalışır:
-
-1. `/admin/orders/[id]`'de "26 Sayfayı Oluştur" butonu
-   `renderJournalPrintFilesAction`'ı tetikler (server action, `/admin/:path*`
-   middleware'i tarafından oturum kontrolüyle korunur); mühürlü Gelecek
-   Mektubu eki ayrı ve daha kısıtlı bir `renderLetterInsertAction`'a bağlıdır.
-2. Sunucu, headless Chromium'u (üründe `@sparticuz/chromium`, yerelde
-   `PUPPETEER_EXECUTABLE_PATH`) başlatıp `/print/journal/[slug]/[page]`
-   sayfasını hedef baskı boyutunda (300 DPI, aşırı büyük render'lara karşı
-   `lib/printSizing.ts`'teki bir üst sınıra kadar ölçeklenir) tam piksel
-   viewport'unda açar.
-3. `/print/journal/[slug]/[page]` kendisi, `lib/printRenderToken.ts` ile
-   üretilmiş ~60 saniyelik imzalı bir token olmadan hiçbir şey döndürmez
-   (`notFound()`) — bu sayede o çıplak, tam çözünürlüklü canvas'ı hiçbir
-   tarayıcı doğrudan ziyaret ederek göremez.
-4. Alınan ekran görüntüleri doğrudan `starmaps-print/{slug}/...png`'ye
-   yüklenir; dosyaların Storage path'leri sipariş dokümanına yazılır,
-   dosyaların kendisi hiçbir zaman bir HTTP response body'si olarak admin'in
-   tarayıcısına gönderilmez.
-5. "İndirme Linki Al" butonu (`getLetterInsertDownloadUrlAction`) her
-   tıklamada 5 dakikalık taze bir signed URL üretip admin'in tarayıcısını
-   oraya yönlendirir — link hiçbir yerde kalıcı olarak saklanmaz.
-
-Canlı önizleme (`components/astrolab/StarChart.tsx`) tamamen ayrı bir
-bileşendir: ekran boyutu × `devicePixelRatio` çözünürlüğünde çalışır ve asla
-300 DPI hedefine çıkmaz — bu yüzden konfigüratördeki önizlemeden asla
-baskı kalitesinde bir görsel kopyalanamaz.
+> [!IMPORTANT]
+> 300 DPI baskı kalitesindeki PDF dosyaları **kesinlikle genel erişime açık bir Storage URL'i üzerinden paylaşılmaz**.
+> Bu dosyalara erişim, yalnızca yetkilendirilmiş admin oturumuna sahip kullanıcılar tarafından, sunucu tarafında üretilen 5 dakikalık geçici imzalı URL'ler (`signed URL`) aracılığıyla sağlanır. Güvenlik kuralları `storage.rules` dosyasından yönetilmektedir.

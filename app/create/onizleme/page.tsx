@@ -54,5 +54,15 @@ export default async function CreatePreviewPage({
     ],
   };
 
-  return <StarMapView starMap={starMap} isPreview />;
+  const step = get("step");
+  const furthestStep = get("furthestStep");
+
+  return (
+    <StarMapView
+      starMap={starMap}
+      isPreview
+      step={step ? Number(step) : undefined}
+      furthestStep={furthestStep ? Number(furthestStep) : undefined}
+    />
+  );
 }

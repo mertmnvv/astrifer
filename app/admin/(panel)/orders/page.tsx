@@ -1,9 +1,6 @@
-import Link from "next/link";
 import { isFirebaseConfigured } from "@/lib/firebase/isConfigured";
-import { formatTRY } from "@/lib/pricing";
 import type { OrderDoc } from "@/types/firestore";
-import { updateOrderAction } from "./actions";
-import { PAYMENT_METHOD_LABELS, PRODUCT_FILTERS, PRODUCT_LABELS, STATUS_LABELS, STATUS_OPTIONS, type ProductFilter } from "./shared";
+import { OrdersManager, type SerializableOrder } from "./OrdersManager";
 
 export const dynamic = "force-dynamic";
 
@@ -17,15 +14,7 @@ async function getOrders(): Promise<OrderRow[]> {
   return snapshot.docs.map((doc) => ({ id: doc.id, ...(doc.data() as OrderDoc) }));
 }
 
-function formatDate(timestamp: OrderDoc["createdAt"]): string {
-  return new Intl.DateTimeFormat("tr-TR", { dateStyle: "medium", timeStyle: "short" }).format(timestamp.toDate());
-}
-
-export default async function AdminOrdersPage({
-  searchParams,
-}: {
-  searchParams: { product?: string };
-}) {
+export default async function AdminOrdersPage() {
   if (!isFirebaseConfigured()) {
     return (
       <p className="text-sm text-subtle">
@@ -35,140 +24,28 @@ export default async function AdminOrdersPage({
     );
   }
 
-  const activeFilter = PRODUCT_FILTERS.find((filter) => filter.value === searchParams.product)?.value as
-    | ProductFilter
-    | undefined;
   const allOrders = await getOrders();
-  const orders = activeFilter
-    ? allOrders.filter((order) =>
-        PRODUCT_FILTERS.find((filter) => filter.value === activeFilter)!.matches.includes(order.productType),
-      )
-    : allOrders;
+  const serializableOrders: SerializableOrder[] = allOrders.map((order) => ({
+    id: order.id,
+    orderNumber: order.orderNumber ?? "",
+    starMapSlug: order.starMapSlug,
+    customerEmail: order.customerEmail,
+    customerName: order.customerName,
+    customerPhone: order.customerPhone,
+    productType: order.productType,
+    totalAmount: order.totalAmount ?? order.priceAmount,
+    priceAmount: order.priceAmount,
+    status: order.status,
+    paymentMethod: order.paymentMethod,
+    trackingNumber: order.trackingNumber,
+    printPdfPath: order.printPdfPath ?? null,
+    createdAtIso: order.createdAt.toDate().toISOString(),
+  }));
 
   return (
     <div className="space-y-6">
       <h1 className="font-display text-2xl italic text-bright">Siparişler</h1>
-
-      <div className="flex flex-wrap items-center gap-2">
-        <Link
-          href="/admin/orders"
-          className={`rounded-full border px-3 py-1 font-mono text-[10px] uppercase tracking-widest transition-colors ${
-            !activeFilter ? "border-amber/60 bg-amber/15 text-amber" : "border-text/20 text-subtle hover:border-amber/50 hover:text-amber"
-          }`}
-        >
-          Tümü
-        </Link>
-        {PRODUCT_FILTERS.map((filter) => (
-          <Link
-            key={filter.value}
-            href={`/admin/orders?product=${filter.value}`}
-            className={`rounded-full border px-3 py-1 font-mono text-[10px] uppercase tracking-widest transition-colors ${
-              activeFilter === filter.value
-                ? "border-amber/60 bg-amber/15 text-amber"
-                : "border-text/20 text-subtle hover:border-amber/50 hover:text-amber"
-            }`}
-          >
-            {filter.label}
-          </Link>
-        ))}
-      </div>
-
-      {orders.length === 0 ? (
-        <p className="text-sm text-subtle">Henüz sipariş yok.</p>
-      ) : (
-        <div className="overflow-x-auto rounded-2xl border border-text/10">
-          <table className="w-full min-w-[1280px] text-left text-sm">
-            <thead className="bg-panel font-mono text-[10px] uppercase tracking-widest text-dim">
-              <tr>
-                <th className="px-4 py-3">Sipariş No</th>
-                <th className="px-4 py-3">Tarih</th>
-                <th className="px-4 py-3">Müşteri</th>
-                <th className="px-4 py-3">Ürün</th>
-                <th className="px-4 py-3">Tutar</th>
-                <th className="px-4 py-3">Ödeme</th>
-                <th className="px-4 py-3">Baskı</th>
-                <th className="px-4 py-3">Durum / Takip No</th>
-              </tr>
-            </thead>
-            <tbody>
-              {orders.map((order) => (
-                <tr key={order.id} className="border-t border-text/10">
-                  <td className="px-4 py-3 align-top">
-                    <Link href={`/admin/orders/${order.id}`} className="font-mono text-xs text-amber hover:underline">
-                      {order.orderNumber ?? "—"}
-                    </Link>
-                  </td>
-                  <td className="px-4 py-3 align-top text-subtle">{formatDate(order.createdAt)}</td>
-                  <td className="px-4 py-3 align-top">
-                    <Link href={`/admin/orders/${order.id}`} className="text-text hover:text-amber hover:underline">
-                      {order.customerName ?? "—"}
-                    </Link>
-                    <div className="text-xs text-subtle">{order.customerEmail}</div>
-                    {order.customerPhone && (
-                      <div className="text-xs text-subtle">{order.customerPhone}</div>
-                    )}
-                  </td>
-                  <td className="px-4 py-3 align-top text-text">
-                    <Link href={`/admin/orders/${order.id}`} className="hover:text-amber hover:underline">
-                      {PRODUCT_LABELS[order.productType] ?? order.productType}
-                    </Link>
-                  </td>
-                  <td className="px-4 py-3 align-top text-text">
-                    {formatTRY(order.totalAmount ?? order.priceAmount)}
-                  </td>
-                  <td className="px-4 py-3 align-top text-xs text-subtle">
-                    {order.paymentMethod
-                      ? (PAYMENT_METHOD_LABELS[order.paymentMethod] ?? order.paymentMethod)
-                      : "—"}
-                  </td>
-                  <td className="px-4 py-3 align-top">
-                    {order.productType === "journal" || order.productType === "bundle" ? (
-                      <span
-                        className={`rounded-full px-2 py-0.5 font-mono text-[10px] uppercase tracking-widest ${
-                          order.printPdfPath ? "bg-amber/20 text-amber" : "bg-text/10 text-subtle"
-                        }`}
-                      >
-                        {order.printPdfPath ? "PDF Hazır" : "Bekliyor"}
-                      </span>
-                    ) : (
-                      <span className="text-xs text-dim">—</span>
-                    )}
-                  </td>
-                  <td className="px-4 py-3 align-top">
-                    <form action={updateOrderAction} className="flex flex-wrap items-center gap-2">
-                      <input type="hidden" name="orderId" value={order.id} />
-                      <select
-                        name="status"
-                        defaultValue={order.status}
-                        className="rounded-md border border-text/[0.14] bg-text/[0.04] px-2 py-1 text-xs text-text"
-                      >
-                        {STATUS_OPTIONS.map((status) => (
-                          <option key={status} value={status} className="bg-panel text-text">
-                            {STATUS_LABELS[status]}
-                          </option>
-                        ))}
-                      </select>
-                      <input
-                        type="text"
-                        name="trackingNumber"
-                        defaultValue={order.trackingNumber ?? ""}
-                        placeholder="Takip no"
-                        className="w-28 rounded-md border border-text/[0.14] bg-text/[0.04] px-2 py-1 text-xs text-text placeholder:text-subtle"
-                      />
-                      <button
-                        type="submit"
-                        className="rounded-full border border-amber/40 px-3 py-1 font-mono text-[10px] uppercase tracking-widest text-amber transition-colors hover:bg-amber hover:text-ink"
-                      >
-                        Kaydet
-                      </button>
-                    </form>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      )}
+      <OrdersManager orders={serializableOrders} />
     </div>
   );
 }

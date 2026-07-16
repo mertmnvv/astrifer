@@ -7,6 +7,7 @@ export const STATUS_LABELS: Record<OrderStatus, string> = {
   refunded: "İade edildi",
   fulfilled: "Hazırlandı",
   shipped: "Kargoya verildi",
+  cancelled: "İptal edildi",
 };
 
 export const STATUS_OPTIONS = Object.keys(STATUS_LABELS) as OrderStatus[];

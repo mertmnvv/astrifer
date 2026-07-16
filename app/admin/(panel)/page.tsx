@@ -64,35 +64,39 @@ export default async function AdminDashboardPage() {
 
   return (
     <div className="space-y-8">
-      <h1 className="font-display text-2xl italic text-bright">Özet</h1>
+      <h1 className="font-display text-2xl italic text-bright border-b border-text/10 pb-4">Özet</h1>
 
       <div className="grid gap-4 sm:grid-cols-3">
-        <div className="rounded-2xl border border-text/10 bg-text/[0.035] p-6">
+        <div className="rounded-2xl border border-text/10 bg-panel p-6 shadow-lg">
           <p className="font-mono text-[10px] uppercase tracking-widest text-dim">Toplam sipariş</p>
-          <p className="mt-2 font-display text-3xl italic text-text">{stats.totalOrders}</p>
+          <p className="mt-2 font-display text-3xl italic text-bright">{stats.totalOrders}</p>
         </div>
-        <div className="rounded-2xl border border-text/10 bg-text/[0.035] p-6">
+        <div className="rounded-2xl border border-text/10 bg-panel p-6 shadow-lg relative overflow-hidden">
+          <div className="absolute top-0 right-0 -translate-y-1/2 translate-x-1/2 w-24 h-24 rounded-full bg-amber/5 blur-xl pointer-events-none" />
           <p className="font-mono text-[10px] uppercase tracking-widest text-dim">Ciro (ödenen)</p>
           <p className="mt-2 font-display text-3xl italic text-amber">{formatTRY(stats.revenue)}</p>
         </div>
         <Link
           href="/admin/orders"
-          className="rounded-2xl border border-text/10 bg-text/[0.035] p-6 transition-colors hover:border-amber/40"
+          className="rounded-2xl border border-text/10 bg-panel p-6 shadow-lg transition-all hover:border-amber/40 group relative overflow-hidden"
         >
-          <p className="font-mono text-[10px] uppercase tracking-widest text-dim">Baskı bekleyen (Deri Defter)</p>
-          <p className={`mt-2 font-display text-3xl italic ${stats.pendingPrintCount > 0 ? "text-amber" : "text-text"}`}>
+          {stats.pendingPrintCount > 0 && (
+            <div className="absolute top-0 right-0 -translate-y-1/2 translate-x-1/2 w-24 h-24 rounded-full bg-amber/5 blur-xl pointer-events-none" />
+          )}
+          <p className="font-mono text-[10px] uppercase tracking-widest text-dim group-hover:text-amber transition-colors">Baskı bekleyen (Deri Defter)</p>
+          <p className={`mt-2 font-display text-3xl italic transition-colors ${stats.pendingPrintCount > 0 ? "text-amber" : "text-bright"}`}>
             {stats.pendingPrintCount}
           </p>
         </Link>
       </div>
 
-      <div className="rounded-2xl border border-text/10 bg-text/[0.035] p-6">
-        <p className="mb-4 font-mono text-[10px] uppercase tracking-widest text-dim">Duruma göre dağılım</p>
+      <div className="rounded-2xl border border-text/10 bg-panel p-6 shadow-lg">
+        <p className="mb-4 font-mono text-[10px] uppercase tracking-widest text-dim border-b border-text/5 pb-2">Duruma Göre Dağılım</p>
         <dl className="grid grid-cols-2 gap-4 sm:grid-cols-3">
           {(Object.keys(STATUS_LABELS) as OrderStatus[]).map((status) => (
-            <div key={status}>
+            <div key={status} className="p-4 rounded-xl bg-void/30 border border-text/5">
               <dt className="text-xs text-subtle">{STATUS_LABELS[status]}</dt>
-              <dd className="font-display text-xl italic text-text">{stats.countsByStatus[status]}</dd>
+              <dd className="font-display text-2xl italic text-bright mt-1">{stats.countsByStatus[status]}</dd>
             </div>
           ))}
         </dl>

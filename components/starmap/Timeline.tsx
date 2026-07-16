@@ -75,9 +75,9 @@ export function Timeline({ slug, createdAt, entries, isOwner, isPreviewMode = fa
     <div ref={ref}>
       <p className="text-center font-mono text-[10px] uppercase tracking-[0.3em] text-dim">Zaman Çizelgesi</p>
 
-      {isOwner && (
+      {isOwner && windowOpen && (
         <div className="mt-5 flex flex-col items-center gap-3">
-          {windowOpen && !showForm && (
+          {!showForm && (
             <div className="flex items-center gap-2.5 rounded-full border border-amber/40 bg-amber/10 px-4 py-2">
               <span
                 aria-hidden
@@ -115,7 +115,7 @@ export function Timeline({ slug, createdAt, entries, isOwner, isPreviewMode = fa
         </div>
       )}
 
-      {isTimelineEmpty && isOwner && (
+      {isTimelineEmpty && isOwner && windowOpen && (
         <div className="mt-8">
           <p className="text-center text-xs text-subtle mb-6 max-w-md mx-auto leading-relaxed">
             Zaman çizelgeniz henüz boş. Sevdiğiniz anıları ekleyerek sayfanızı zenginleştirebilirsiniz. İlham almak için aşağıdaki şablonlardan birine tıklayın:

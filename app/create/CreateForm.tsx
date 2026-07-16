@@ -20,6 +20,7 @@ import { StarKeyPage } from "@/components/journal/night/StarKeyPage";
 import { MemoryPage } from "@/components/journal/night/MemoryPage";
 import { EssayPage } from "@/components/journal/night/EssayPage";
 import { BlankPage } from "@/components/journal/night/BlankPage";
+import { getYoutubeId } from "@/components/journal/MusicContext";
 import { BackCoverPage } from "@/components/journal/night/BackCoverPage";
 import { QrPage } from "@/components/journal/night/QrPage";
 import { BookFlip } from "@/components/journal/BookFlip";
@@ -173,11 +174,10 @@ export function CreateForm({ templates, pricing }: CreateFormProps) {
 
   const [musicUrl, setMusicUrl] = useState<string | null>(null);
   const [youtubeInput, setYoutubeInput] = useState("");
-  const [isConvertingMusic, setIsConvertingMusic] = useState(false);
   const [musicError, setMusicError] = useState<string | null>(null);
   const [showBookModal, setShowBookModal] = useState(false);
 
-  const handleYoutubeChange = async (val: string) => {
+  const handleYoutubeChange = (val: string) => {
     setYoutubeInput(val);
     setMusicError(null);
 
@@ -186,33 +186,14 @@ export function CreateForm({ templates, pricing }: CreateFormProps) {
       return;
     }
 
-    const isYt = /^(?:https?:\/\/)?(?:www\.)?(?:youtube\.com|youtu\.be)\//.test(val.trim());
-    if (!isYt) {
+    const videoId = getYoutubeId(val.trim());
+    if (!videoId) {
       setMusicError("Lütfen geçerli bir YouTube video linki girin.");
+      setMusicUrl(null);
       return;
     }
 
-    setIsConvertingMusic(true);
-    try {
-      const res = await fetch("/api/youtube-mp3", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ url: val.trim() }),
-      });
-      if (!res.ok) {
-        const data = await res.json().catch(() => null);
-        throw new Error(data?.error || "Dönüştürme başarısız.");
-      }
-      const data = await res.json();
-      setMusicUrl(data.url);
-    } catch (err: unknown) {
-      console.error(err);
-      const errMsg = err instanceof Error ? err.message : "Bir hata oluştu.";
-      setMusicError(errMsg);
-      setMusicUrl(null);
-    } finally {
-      setIsConvertingMusic(false);
-    }
+    setMusicUrl(val.trim());
   };
 
   // Guards the template auto-fill effect below against clobbering a message
@@ -286,6 +267,12 @@ export function CreateForm({ templates, pricing }: CreateFormProps) {
         setMusicUrl(draft.musicUrl);
         setYoutubeInput(draft.musicUrl);
       }
+      if (draft.currentStep) {
+        setCurrentStep(draft.currentStep);
+      }
+      if (draft.furthestStep) {
+        setFurthestStep(draft.furthestStep);
+      }
 
       // Always mark the skip (even when the template itself isn't changing)
       // so the auto-fill effect's dev-mode double-invoke can't clobber the
@@ -348,6 +335,26 @@ export function CreateForm({ templates, pricing }: CreateFormProps) {
       setMusicUrl(musicParam);
       setYoutubeInput(musicParam);
     }
+
+    const stepParam = params.get("step");
+    if (stepParam) {
+      const parsedStep = Number(stepParam);
+      if (!isNaN(parsedStep) && parsedStep >= 1 && parsedStep <= 5) {
+        setCurrentStep(parsedStep);
+      }
+    }
+    const furthestStepParam = params.get("furthestStep");
+    if (furthestStepParam) {
+      const parsedFurthest = Number(furthestStepParam);
+      if (!isNaN(parsedFurthest) && parsedFurthest >= 1 && parsedFurthest <= 5) {
+        setFurthestStep(parsedFurthest);
+      }
+    } else if (stepParam) {
+      const parsedStep = Number(stepParam);
+      if (!isNaN(parsedStep) && parsedStep >= 1 && parsedStep <= 5) {
+        setFurthestStep((f) => Math.max(f, parsedStep));
+      }
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -402,9 +409,11 @@ export function CreateForm({ templates, pricing }: CreateFormProps) {
     const params = buildShareParams(place, eventDateUtc);
     params.set("timezone", place.timezone);
     params.set("slug", previewSlug);
+    params.set("step", currentStep.toString());
+    params.set("furthestStep", furthestStep.toString());
     return `/create/onizleme?${params.toString()}`;
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [place, eventDateUtc, title, message, photos, voiceNote, musicUrl, paletteId, previewSlug]);
+  }, [place, eventDateUtc, title, message, photos, voiceNote, musicUrl, paletteId, previewSlug, currentStep, furthestStep]);
 
   const bookPages = useMemo(() => {
     // Pick stars based on previewSky
@@ -446,11 +455,11 @@ export function CreateForm({ templates, pricing }: CreateFormProps) {
         </ScaledPreview>
       </div>,
       // 9: Blank Page
-      <BlankPage key="blank-pre-qr" />,
-      // 10: QR Code Page
+      <BlankPage key="blank-9" />,
+      // 10: Blank Page
+      <BlankPage key="blank-10" />,
+      // 11: QR Code Page
       <QrPage key="qr-page" qrUrl={previewHref || "https://astrifer.com/s/preview"} />,
-      // 11: Blank Page
-      <BlankPage key="blank-post-qr" />,
       // 12: Back Cover
       <BackCoverPage key="back-cover" />,
     ];
@@ -481,7 +490,7 @@ export function CreateForm({ templates, pricing }: CreateFormProps) {
   const totalPrice = pricing.digitalPrice + (journalEnabled ? pricing.journalPrice : 0);
 
   const requiredFieldsValid = Boolean(place && date && time && title.trim() && templateSlug);
-  const uploadsPending = photos.some((photo) => photo.status === "uploading") || voiceNote?.status === "uploading" || isConvertingMusic;
+  const uploadsPending = photos.some((photo) => photo.status === "uploading") || voiceNote?.status === "uploading";
   const uploadsFailed = photos.some((photo) => photo.status === "error") || voiceNote?.status === "error";
   const isValid = requiredFieldsValid && !uploadsPending && !uploadsFailed;
 
@@ -543,6 +552,8 @@ export function CreateForm({ templates, pricing }: CreateFormProps) {
       journalLetterText,
       journalOpeningDate,
       musicUrl: musicUrl,
+      currentStep,
+      furthestStep,
     });
   }, [
     date,
@@ -560,6 +571,8 @@ export function CreateForm({ templates, pricing }: CreateFormProps) {
     journalLetterText,
     journalOpeningDate,
     musicUrl,
+    currentStep,
+    furthestStep,
   ]);
 
   const handleSubmit = async (event: React.FormEvent) => {
@@ -725,22 +738,15 @@ export function CreateForm({ templates, pricing }: CreateFormProps) {
                 onChange={(e) => handleYoutubeChange(e.target.value)}
                 placeholder="ör. https://www.youtube.com/watch?v=..."
                 className={FIELD_CLASS}
-                disabled={isConvertingMusic}
               />
-              {isConvertingMusic && (
-                <div className="mt-2 flex items-center gap-2 text-xs text-amber font-mono">
-                  <span className="h-3.5 w-3.5 animate-spin rounded-full border-2 border-amber border-t-transparent" />
-                  YouTube videosundan müzik dönüştürülüyor, lütfen bekleyin...
-                </div>
-              )}
               {musicError && (
                 <p className="mt-1 text-xs text-red-500 font-mono">{musicError}</p>
               )}
-              {musicUrl && !isConvertingMusic && (
+              {musicUrl && (
                 <div className="mt-3 flex flex-col gap-2 rounded-xl border border-amber/20 bg-amber/[0.04] p-3">
                   <div className="flex items-center justify-between gap-3">
                     <span className="font-mono text-[9px] uppercase tracking-wider text-amber font-bold">
-                      Arka Plan Müziği Aktif
+                      YouTube Müziği Aktif
                     </span>
                     <button
                       type="button"
@@ -754,7 +760,14 @@ export function CreateForm({ templates, pricing }: CreateFormProps) {
                       Kaldır
                     </button>
                   </div>
-                  <audio controls src={musicUrl} className="h-8 w-full mt-1 bg-transparent" />
+                  <iframe
+                    width="100%"
+                    height="60"
+                    src={`https://www.youtube.com/embed/${getYoutubeId(musicUrl)}?controls=1`}
+                    title="YouTube music preview"
+                    className="rounded-lg mt-1 border border-text/10"
+                    allow="autoplay; encrypted-media"
+                  />
                 </div>
               )}
             </div>
@@ -842,7 +855,19 @@ export function CreateForm({ templates, pricing }: CreateFormProps) {
             </div>
             <div className="flex items-center justify-between gap-2">
               <span className="text-[11px] text-dim">Suni deri · 26 sayfa</span>
-              <span className="font-mono text-xs text-amber">{formatTRY(pricing.journalPrice)}</span>
+              <span className="font-mono text-xs text-amber flex items-center gap-1.5">
+                {pricing.journalOriginalPrice > pricing.journalPrice ? (
+                  <>
+                    <span className="line-through text-dim">{formatTRY(pricing.journalOriginalPrice)}</span>
+                    <span className="font-semibold">{formatTRY(pricing.journalPrice)}</span>
+                    <span className="rounded bg-green-500/10 px-1 py-0.5 text-[8px] font-bold text-green-400">
+                      %{Math.round(((pricing.journalOriginalPrice - pricing.journalPrice) / pricing.journalOriginalPrice) * 100)} İNDİRİM
+                    </span>
+                  </>
+                ) : (
+                  <span>{formatTRY(pricing.journalPrice)}</span>
+                )}
+              </span>
             </div>
           </label>
 
@@ -1108,12 +1133,22 @@ export function CreateForm({ templates, pricing }: CreateFormProps) {
         <div className="flex flex-col gap-2 border-t border-text/10 pt-4">
           <div className="flex items-baseline justify-between">
             <span className="font-mono text-[10px] uppercase tracking-widest text-dim">Dijital Sayfa</span>
-            <span className="font-mono text-sm text-text">{formatTRY(pricing.digitalPrice)}</span>
+            <span className="font-mono text-sm text-text flex items-center gap-1.5">
+              {pricing.digitalOriginalPrice > pricing.digitalPrice && (
+                <span className="line-through text-dim text-xs">{formatTRY(pricing.digitalOriginalPrice)}</span>
+              )}
+              <span>{formatTRY(pricing.digitalPrice)}</span>
+            </span>
           </div>
           {journalEnabled && (
             <div className="flex items-baseline justify-between">
               <span className="font-mono text-[10px] uppercase tracking-widest text-dim">Deri Defter</span>
-              <span className="font-mono text-sm text-text">{formatTRY(pricing.journalPrice)}</span>
+              <span className="font-mono text-sm text-text flex items-center gap-1.5">
+                {pricing.journalOriginalPrice > pricing.journalPrice && (
+                  <span className="line-through text-dim text-xs">{formatTRY(pricing.journalOriginalPrice)}</span>
+                )}
+                <span>{formatTRY(pricing.journalPrice)}</span>
+              </span>
             </div>
           )}
           <div className="flex items-baseline justify-between border-t border-text/10 pt-2">

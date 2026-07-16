@@ -76,11 +76,11 @@ export function JournalBookPreview({ starMap }: { starMap: StarMapRecord }) {
         <PageCard label="Sayfa 9 — Günün Anlamı" wide>
           <EssayPage essay={essay} />
         </PageCard>
-        <PageCard label="Sayfa 10 — QR">
-          <QrPage qrUrl={qrUrl} />
-        </PageCard>
-        <PageCard label="Sayfa 11–25 — Boş" badge="× 15">
+        <PageCard label="Sayfa 10–24 — Boş" badge="× 15">
           <BlankPage />
+        </PageCard>
+        <PageCard label="Sayfa 25 — QR">
+          <QrPage qrUrl={qrUrl} />
         </PageCard>
         <PageCard label="Sayfa 26 — Arka Kapak">
           <BackCoverPage />

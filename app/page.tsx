@@ -9,13 +9,18 @@ import { ProductsTeaser } from "@/components/home/ProductsTeaser";
 import { Testimonials } from "@/components/home/Testimonials";
 import { Faq } from "@/components/home/Faq";
 import { FinalCta } from "@/components/home/FinalCta";
+import { getPricingConfig } from "@/lib/pricingConfig";
 
-export default function HomePage() {
+export const dynamic = "force-dynamic";
+
+export default async function HomePage() {
   const sky = computeSky({
     date: DEMO_STAR_MAP.eventDateUtc,
     latitude: DEMO_STAR_MAP.latitude,
     longitude: DEMO_STAR_MAP.longitude,
   });
+
+  const pricing = await getPricingConfig();
 
   return (
     <>
@@ -24,7 +29,7 @@ export default function HomePage() {
         <Hero sky={sky} />
         <ConceptSection />
         <HowItWorks />
-        <ProductsTeaser />
+        <ProductsTeaser pricing={pricing} />
         <Testimonials />
         <Faq />
         <FinalCta />

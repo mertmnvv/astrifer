@@ -31,6 +31,16 @@ export async function updateOrderAction(formData: FormData) {
   revalidatePath("/admin");
 }
 
+export async function deleteOrderAction(formData: FormData) {
+  const orderId = String(formData.get("orderId") ?? "");
+  if (!orderId) throw new Error("Geçersiz sipariş.");
+
+  await getDb().collection("orders").doc(orderId).delete();
+
+  revalidatePath("/admin/orders");
+  redirect("/admin/orders");
+}
+
 /**
  * Renders all 26 journal pages (13 distinct files — the 15 blank pages
  * reuse one render) and stores the manifest on the order doc.
@@ -61,8 +71,7 @@ export async function renderJournalPrintFilesAction(formData: FormData) {
 }
 
 /** Mints a fresh short-lived signed URL for the single, print-ready 26-page book PDF — the file handed to the print shop. Same security posture as getLetterInsertDownloadUrlAction. */
-export async function getJournalPrintPdfDownloadUrlAction(formData: FormData) {
-  const orderId = String(formData.get("orderId") ?? "");
+export async function getJournalPrintPdfDownloadUrlAction(orderId: string): Promise<string> {
   if (!orderId) throw new Error("Geçersiz sipariş.");
 
   const snapshot = await getDb().collection("orders").doc(orderId).get();
@@ -75,7 +84,7 @@ export async function getJournalPrintPdfDownloadUrlAction(formData: FormData) {
     .file(order.printPdfPath)
     .getSignedUrl({ action: "read", expires: Date.now() + SIGNED_URL_TTL_MS });
 
-  redirect(url);
+  return url;
 }
 
 /**
@@ -92,12 +101,21 @@ export async function renderLetterInsertAction(formData: FormData) {
   if (!snapshot.exists) throw new Error("Sipariş bulunamadı.");
 
   const order = snapshot.data() as OrderDoc;
-  if ((order.productType !== "journal" && order.productType !== "bundle") || !order.journalLetterText) {
+  const journalItem = order.items?.find((entry) => entry.productType === "journal");
+  const letterText = journalItem?.journalLetterText ?? order.journalLetterText;
+  const letterOpeningDateStr = journalItem?.journalLetterOpeningDate ?? null;
+
+  if ((order.productType !== "journal" && order.productType !== "bundle") || !letterText) {
     throw new Error("Bu sipariş için mektup metni bulunamadı.");
   }
 
-  const openingDateIso = order.journalLetterOpeningDate ? order.journalLetterOpeningDate.toDate().toISOString() : "";
-  const result = await renderLetterInsert(resolveItemSlug(order, "journal"), order.journalLetterText, openingDateIso);
+  const openingDateIso = letterOpeningDateStr
+    ? letterOpeningDateStr
+    : order.journalLetterOpeningDate
+      ? order.journalLetterOpeningDate.toDate().toISOString()
+      : "";
+
+  const result = await renderLetterInsert(resolveItemSlug(order, "journal"), letterText, openingDateIso);
 
   await orderRef.update({
     letterInsertPrintPath: result.storagePath,
@@ -108,8 +126,7 @@ export async function renderLetterInsertAction(formData: FormData) {
 }
 
 /** Mints a fresh short-lived signed URL for the sealed letter insert — same security posture as getPrintDownloadUrlAction, kept as its own action since this file is more sensitive than the rest of the book. */
-export async function getLetterInsertDownloadUrlAction(formData: FormData) {
-  const orderId = String(formData.get("orderId") ?? "");
+export async function getLetterInsertDownloadUrlAction(orderId: string): Promise<string> {
   if (!orderId) throw new Error("Geçersiz sipariş.");
 
   const snapshot = await getDb().collection("orders").doc(orderId).get();
@@ -122,5 +139,5 @@ export async function getLetterInsertDownloadUrlAction(formData: FormData) {
     .file(order.letterInsertPrintPath)
     .getSignedUrl({ action: "read", expires: Date.now() + SIGNED_URL_TTL_MS });
 
-  redirect(url);
+  return url;
 }

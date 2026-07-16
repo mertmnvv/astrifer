@@ -109,7 +109,7 @@ export default async function JournalProductPage() {
   const initialEntry = source.entries.find((entry) => entry.isInitial) ?? source.entries[0];
   const memoryPhotos = initialEntry?.photos ?? [];
   const qrUrl = `${getSiteUrl()}/s/${source.slug}`;
-  const { journalPrice } = await getPricingConfig();
+  const { journalPrice, journalOriginalPrice } = await getPricingConfig();
   const openingDateLabel = new Intl.DateTimeFormat("tr-TR", { dateStyle: "long" }).format(SAMPLE_OPENING_DATE);
 
 
@@ -127,10 +127,23 @@ export default async function JournalProductPage() {
                 <h1 className="mt-3.5 font-display text-3xl italic text-bright sm:text-5xl">
                   Kapağında adın, içinde o an.
                 </h1>
-                <p className="mx-auto mt-3 max-w-xl text-sm text-subtle sm:text-base lg:mx-0">
-                  Premium suni deri ciltli, 26 sayfalık kişiye özel bir defter — kapakta gerçek
-                  yıldız haritan, içinde anılarınız ve mühürlü bir gelecek mektubu. {formatTRY(journalPrice)}.
-                </p>
+                <div className="mx-auto mt-3 max-w-xl text-sm text-subtle sm:text-base lg:mx-0">
+                  <span>
+                    Premium suni deri ciltli, 26 sayfalık kişiye özel bir defter — kapakta gerçek
+                    yıldız haritan, içinde anılarınız ve mühürlü bir gelecek mektubu.{" "}
+                  </span>
+                  {journalOriginalPrice > journalPrice ? (
+                    <span className="flex items-center gap-1.5 inline-flex flex-wrap">
+                      <span className="line-through text-dim">{formatTRY(journalOriginalPrice)}</span>
+                      <span className="text-amber font-semibold">{formatTRY(journalPrice)}</span>
+                      <span className="rounded bg-green-500/10 px-2 py-0.5 text-[10px] font-bold text-green-400">
+                        %{Math.round(((journalOriginalPrice - journalPrice) / journalOriginalPrice) * 100)} İNDİRİM
+                      </span>
+                    </span>
+                  ) : (
+                    <span>{formatTRY(journalPrice)}</span>
+                  )}
+                </div>
                 <div className="mt-7 flex flex-col items-center gap-3 lg:items-start">
                   <Link href="/create" className={CTA_CLASS}>
                     Yaşayan Sayfanızı Oluşturun →
@@ -165,6 +178,7 @@ export default async function JournalProductPage() {
                 title={source.title}
                 memoryPhotos={memoryPhotos}
                 journalPrice={journalPrice}
+                journalOriginalPrice={journalOriginalPrice}
               />
             </RevealOnScroll>
           </div>

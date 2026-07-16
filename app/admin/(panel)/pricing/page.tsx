@@ -17,22 +17,37 @@ export default async function AdminPricingPage() {
     );
   }
 
-  const { journalPrice, digitalPrice } = await getPricingConfig();
+  const { journalPrice, journalOriginalPrice, digitalPrice, digitalOriginalPrice } = await getPricingConfig();
 
   return (
     <div className="space-y-6">
       <h1 className="font-display text-2xl italic text-bright">Fiyatlar</h1>
       <p className="text-sm text-subtle">
-        Buradaki değerler kaydedildiği anda /urun/defter ve /checkout sayfalarına yansır.
+        Buradaki değerler kaydedildiği anda tüm site genelinde dinamik olarak yansır.
       </p>
 
       <form action={savePricingAction} className="space-y-8">
         <div className="space-y-4">
-          <h2 className="font-mono text-xs uppercase tracking-widest text-amber">Diğer ürünler</h2>
+          <h2 className="font-mono text-xs uppercase tracking-widest text-amber">Deri Defter Fiyatlandırması</h2>
           <div className="grid gap-4 sm:grid-cols-2">
             <div className="space-y-1.5">
+              <label htmlFor="journalOriginalPrice" className={FIELD_LABEL_CLASS}>
+                Gerçek Fiyat (₺) - Üstü Çizilecek Olan
+              </label>
+              <input
+                id="journalOriginalPrice"
+                name="journalOriginalPrice"
+                type="number"
+                min={0}
+                step={1}
+                required
+                defaultValue={journalOriginalPrice}
+                className={FIELD_CLASS}
+              />
+            </div>
+            <div className="space-y-1.5">
               <label htmlFor="journalPrice" className={FIELD_LABEL_CLASS}>
-                Deri Defter (₺)
+                İndirimli Fiyat (₺) - Satış Fiyatı
               </label>
               <input
                 id="journalPrice"
@@ -45,9 +60,30 @@ export default async function AdminPricingPage() {
                 className={FIELD_CLASS}
               />
             </div>
+          </div>
+        </div>
+
+        <div className="space-y-4">
+          <h2 className="font-mono text-xs uppercase tracking-widest text-amber">Dijital Sayfa Fiyatlandırması</h2>
+          <div className="grid gap-4 sm:grid-cols-2">
+            <div className="space-y-1.5">
+              <label htmlFor="digitalOriginalPrice" className={FIELD_LABEL_CLASS}>
+                Gerçek Fiyat (₺) - Üstü Çizilecek Olan
+              </label>
+              <input
+                id="digitalOriginalPrice"
+                name="digitalOriginalPrice"
+                type="number"
+                min={0}
+                step={1}
+                required
+                defaultValue={digitalOriginalPrice}
+                className={FIELD_CLASS}
+              />
+            </div>
             <div className="space-y-1.5">
               <label htmlFor="digitalPrice" className={FIELD_LABEL_CLASS}>
-                Dijital Sayfa (₺)
+                İndirimli Fiyat (₺) - Satış Fiyatı
               </label>
               <input
                 id="digitalPrice"

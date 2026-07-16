@@ -24,6 +24,7 @@ export interface JournalShowcaseProps {
   title: string;
   memoryPhotos: StarMapPhoto[];
   journalPrice: number;
+  journalOriginalPrice?: number;
 }
 
 interface PageDescription {
@@ -84,14 +85,14 @@ const PAGE_DESCRIPTIONS: Record<number, PageDescription> = {
     body: "Defterin geri kalanı, hediye gönderilen altın renkli kalemle kendi el yazınızla anılarınızı veya ortak hayallerinizi yazabileceğiniz yüksek kaliteli dokulu sayfalardan oluşur."
   },
   10: {
-    title: "Zaman Kapsülü & QR Kod",
-    subtitle: "Dijital Sayfa ve Ses Kaydı Bağlantısı",
-    body: "Telefon kamerasıyla tarandığında, oluşturduğunuz dijital anı sayfasına ve ses kaydına/müziğe ulaştıran özel olarak entegre edilmiş QR kod sayfası."
-  },
-  11: {
     title: "Yazı Sayfaları",
     subtitle: "Ortak Hayalleriniz İçin",
     body: "Defterin son kısımlarında yer alan, duygularınızı ve planlarınızı kalıcı kılmak için kullanabileceğiniz çizgili sayfalar."
+  },
+  11: {
+    title: "Zaman Kapsülü & QR Kod",
+    subtitle: "Dijital Sayfa ve Ses Kaydı Bağlantısı",
+    body: "Telefon kamerasıyla tarandığında, oluşturduğunuz dijital anı sayfasına ve ses kaydına/müziğe ulaştıran özel olarak entegre edilmiş QR kod sayfası."
   },
   12: {
     title: "Gelecek Mektubu Cebi",
@@ -100,7 +101,7 @@ const PAGE_DESCRIPTIONS: Record<number, PageDescription> = {
   }
 };
 
-export function JournalShowcase({ sky, title, memoryPhotos, journalPrice }: JournalShowcaseProps) {
+export function JournalShowcase({ sky, title, memoryPhotos, journalPrice, journalOriginalPrice }: JournalShowcaseProps) {
   const [activePageIndex, setActivePageIndex] = useState(0);
   const paletteId = "gece-laciverti"; // Default presentation color theme
 
@@ -142,10 +143,10 @@ export function JournalShowcase({ sky, title, memoryPhotos, journalPrice }: Jour
       </div>,
       // 9: Blank Page (Left)
       <BlankPage key="blank-pre-qr" />,
-      // 10: QR Code Page (Right)
-      <QrPage key="qr-page" qrUrl="https://astrifer.com/s/preview" />,
-      // 11: Blank Page (Left)
+      // 10: Blank Page (Right)
       <BlankPage key="blank-post-qr" />,
+      // 11: QR Code Page (Left)
+      <QrPage key="qr-page" qrUrl="https://astrifer.com/s/preview" />,
       // 12: Back Cover (Right)
       <BackCoverPage key="back-cover" />,
     ];
@@ -178,9 +179,22 @@ export function JournalShowcase({ sky, title, memoryPhotos, journalPrice }: Jour
           </p>
         </div>
 
-        <div className="mt-8 pt-4 border-t border-text/5 flex items-center justify-between">
+        <div className="mt-8 pt-4 border-t border-text/5 flex items-center justify-between flex-wrap gap-2">
           <span className="text-[10px] font-mono text-dim">Yüksek kaliteli dokulu kâğıt</span>
-          <span className="text-xs font-bold text-amber font-mono">Astrifer Defter · {formatTRY(journalPrice)}</span>
+          <span className="text-xs font-bold text-amber font-mono flex items-center gap-1.5 flex-wrap">
+            Astrifer Defter ·{" "}
+            {journalOriginalPrice && journalOriginalPrice > journalPrice ? (
+              <>
+                <span className="line-through text-dim">{formatTRY(journalOriginalPrice)}</span>
+                <span>{formatTRY(journalPrice)}</span>
+                <span className="rounded bg-green-500/10 px-1.5 py-0.5 text-[8px] font-bold text-green-400">
+                  %{Math.round(((journalOriginalPrice - journalPrice) / journalOriginalPrice) * 100)} İNDİRİM
+                </span>
+              </>
+            ) : (
+              <span>{formatTRY(journalPrice)}</span>
+            )}
+          </span>
         </div>
       </div>
 

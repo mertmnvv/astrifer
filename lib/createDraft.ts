@@ -34,6 +34,8 @@ export interface CreateDraft {
   journalLetterText: string;
   journalOpeningDate: string;
   musicUrl: string | null;
+  currentStep?: number;
+  furthestStep?: number;
   savedAt: string;
 }
 

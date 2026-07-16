@@ -13,11 +13,15 @@ function parseNonNegativeNumber(formData: FormData, key: string): number {
 
 export async function savePricingAction(formData: FormData) {
   const journalPrice = parseNonNegativeNumber(formData, "journalPrice");
+  const journalOriginalPrice = parseNonNegativeNumber(formData, "journalOriginalPrice");
   const digitalPrice = parseNonNegativeNumber(formData, "digitalPrice");
+  const digitalOriginalPrice = parseNonNegativeNumber(formData, "digitalOriginalPrice");
 
   await getDb().collection("config").doc("pricing").set({
     journalPrice,
+    journalOriginalPrice,
     digitalPrice,
+    digitalOriginalPrice,
     updatedAt: new Date(),
   });
 

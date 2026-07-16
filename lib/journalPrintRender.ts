@@ -36,8 +36,8 @@ export const JOURNAL_PAGE_ORDER: JournalPageKind[] = [
   "memory-3",
   "memory-4",
   "essay",
-  "qr",
   ...(Array(15).fill("blank") as JournalPageKind[]),
+  "qr",
   "back-cover",
 ];
 
