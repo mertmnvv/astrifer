@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import * as THREE from "three";
 import type { ComputeSkyResult } from "@/lib/astronomy/computeSky";
 import type { SkyPalette } from "@/components/astrolab/palettes";
@@ -63,6 +63,13 @@ export function CelestialGlobe3D({ sky, palette, className = "" }: CelestialGlob
   }, [music.getFrequencies]);
 
   const containerRef = useRef<HTMLDivElement | null>(null);
+  const [selectedStar, setSelectedStar] = useState<{
+    name: string;
+    mag: number;
+    altitude: number;
+    type: "star" | "body";
+    kind?: string;
+  } | null>(null);
   const rendererRef = useRef<THREE.WebGLRenderer | null>(null);
   const sceneRef = useRef<THREE.Scene | null>(null);
   const cameraRef = useRef<THREE.PerspectiveCamera | null>(null);
@@ -91,6 +98,11 @@ export function CelestialGlobe3D({ sky, palette, className = "" }: CelestialGlob
   useEffect(() => {
     const container = containerRef.current;
     if (!sky || !container) return;
+
+    let dragStartX = 0;
+    let dragStartY = 0;
+    let dragStartTouchX = 0;
+    let dragStartTouchY = 0;
 
     const width = container.clientWidth;
     const height = container.clientHeight || 450;
@@ -294,10 +306,12 @@ export function CelestialGlobe3D({ sky, palette, className = "" }: CelestialGlob
     };
     window.addEventListener("resize", handleResize);
 
-    // 10. Drag Interaction
+    // 10. Drag & Click Interaction
     const handleMouseDown = (e: MouseEvent) => {
       isDragging.current = true;
       previousMousePosition.current = { x: e.clientX, y: e.clientY };
+      dragStartX = e.clientX;
+      dragStartY = e.clientY;
     };
 
     const handleMouseMove = (e: MouseEvent) => {
@@ -320,8 +334,48 @@ export function CelestialGlobe3D({ sky, palette, className = "" }: CelestialGlob
       previousMousePosition.current = { x: e.clientX, y: e.clientY };
     };
 
-    const handleMouseUp = () => {
+    const handleMouseUp = (e: MouseEvent) => {
       isDragging.current = false;
+
+      // Click detection: pointer barely moved
+      const diffX = Math.abs(e.clientX - dragStartX);
+      const diffY = Math.abs(e.clientY - dragStartY);
+      if (diffX < 5 && diffY < 5) {
+        const rect = dom.getBoundingClientRect();
+        const x = ((e.clientX - rect.left) / rect.width) * 2 - 1;
+        const y = -((e.clientY - rect.top) / rect.height) * 2 + 1;
+        
+        const raycaster = new THREE.Raycaster();
+        raycaster.params.Points.threshold = 0.16;
+        raycaster.setFromCamera(new THREE.Vector2(x, y), camera);
+        const intersects = raycaster.intersectObject(starPoints);
+
+        if (intersects.length > 0) {
+          const index = intersects[0].index;
+          if (index !== undefined && sky) {
+            if (index < sky.stars.length) {
+              const star = sky.stars[index];
+              setSelectedStar({
+                name: star.name,
+                mag: star.mag,
+                altitude: star.altitude,
+                type: "star",
+              });
+            } else {
+              const body = sky.bodies[index - sky.stars.length];
+              setSelectedStar({
+                name: body.name,
+                mag: body.mag,
+                altitude: body.altitude,
+                type: "body",
+                kind: body.kind,
+              });
+            }
+          }
+        } else {
+          setSelectedStar(null);
+        }
+      }
     };
 
     // Touch event helpers
@@ -330,6 +384,8 @@ export function CelestialGlobe3D({ sky, palette, className = "" }: CelestialGlob
       if (!touch) return;
       isDragging.current = true;
       previousMousePosition.current = { x: touch.clientX, y: touch.clientY };
+      dragStartTouchX = touch.clientX;
+      dragStartTouchY = touch.clientY;
     };
 
     const handleTouchMove = (e: TouchEvent) => {
@@ -352,6 +408,51 @@ export function CelestialGlobe3D({ sky, palette, className = "" }: CelestialGlob
       previousMousePosition.current = { x: touch.clientX, y: touch.clientY };
     };
 
+    const handleTouchEnd = (e: TouchEvent) => {
+      isDragging.current = false;
+      const touch = e.changedTouches[0];
+      if (!touch) return;
+
+      const diffX = Math.abs(touch.clientX - dragStartTouchX);
+      const diffY = Math.abs(touch.clientY - dragStartTouchY);
+      if (diffX < 5 && diffY < 5) {
+        const rect = dom.getBoundingClientRect();
+        const x = ((touch.clientX - rect.left) / rect.width) * 2 - 1;
+        const y = -((touch.clientY - rect.top) / rect.height) * 2 + 1;
+        
+        const raycaster = new THREE.Raycaster();
+        raycaster.params.Points.threshold = 0.22;
+        raycaster.setFromCamera(new THREE.Vector2(x, y), camera);
+        const intersects = raycaster.intersectObject(starPoints);
+
+        if (intersects.length > 0) {
+          const index = intersects[0].index;
+          if (index !== undefined && sky) {
+            if (index < sky.stars.length) {
+              const star = sky.stars[index];
+              setSelectedStar({
+                name: star.name,
+                mag: star.mag,
+                altitude: star.altitude,
+                type: "star",
+              });
+            } else {
+              const body = sky.bodies[index - sky.stars.length];
+              setSelectedStar({
+                name: body.name,
+                mag: body.mag,
+                altitude: body.altitude,
+                type: "body",
+                kind: body.kind,
+              });
+            }
+          }
+        } else {
+          setSelectedStar(null);
+        }
+      }
+    };
+
     const dom = renderer.domElement;
     dom.addEventListener("mousedown", handleMouseDown);
     window.addEventListener("mousemove", handleMouseMove);
@@ -359,7 +460,7 @@ export function CelestialGlobe3D({ sky, palette, className = "" }: CelestialGlob
     
     dom.addEventListener("touchstart", handleTouchStart, { passive: true });
     dom.addEventListener("touchmove", handleTouchMove, { passive: true });
-    dom.addEventListener("touchend", handleMouseUp);
+    dom.addEventListener("touchend", handleTouchEnd, { passive: true });
 
     // 11. Render / Animation Loop
     const animate = () => {
@@ -413,7 +514,7 @@ export function CelestialGlobe3D({ sky, palette, className = "" }: CelestialGlob
 
       dom.removeEventListener("touchstart", handleTouchStart);
       dom.removeEventListener("touchmove", handleTouchMove);
-      dom.removeEventListener("touchend", handleMouseUp);
+      dom.removeEventListener("touchend", handleTouchEnd);
 
       if (animationFrameRef.current !== null) {
         cancelAnimationFrame(animationFrameRef.current);
@@ -470,6 +571,111 @@ export function CelestialGlobe3D({ sky, palette, className = "" }: CelestialGlob
         </svg>
         <span>Döndürmek için sürükleyin</span>
       </div>
+
+      {/* Selected Star Details Card */}
+      {selectedStar && (
+        <div className="absolute bottom-16 left-4 right-4 md:left-1/2 md:right-auto md:-translate-x-1/2 md:w-80 rounded-xl border border-amber/20 bg-void/90 p-4 shadow-xl backdrop-blur-sm z-30 flex flex-col gap-1.5 text-left">
+          <button
+            type="button"
+            onClick={() => setSelectedStar(null)}
+            className="absolute top-2.5 right-2.5 text-dim hover:text-bright"
+            aria-label="Kapat"
+          >
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.5} className="h-4 w-4">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
+          <p className="font-mono text-[8.5px] uppercase tracking-[0.2em] text-amber">
+            {selectedStar.type === "body" ? "🪐 Gök Cismi" : "⭐ Yıldız Raporu"}
+          </p>
+          <h4 className="font-display text-base italic text-bright font-medium">
+            {selectedStar.name || "Katalog Yıldızı"}
+          </h4>
+          <div className="grid grid-cols-2 gap-2 border-t border-text/10 pt-2 text-[10px] font-mono text-dim">
+            <div>
+              <span className="text-[8px] uppercase tracking-wider block text-subtle">Kadir</span>
+              <span className="text-bright">{selectedStar.mag.toFixed(2)}</span>
+            </div>
+            <div>
+              <span className="text-[8px] uppercase tracking-wider block text-subtle">Yükseklik</span>
+              <span className="text-bright">{selectedStar.altitude.toFixed(1)}°</span>
+            </div>
+          </div>
+          <p className="text-[11px] leading-relaxed text-subtle italic mt-1.5">
+            {getStarDescription(selectedStar.name, selectedStar.mag, selectedStar.type, selectedStar.kind)}
+          </p>
+        </div>
+      )}
     </div>
   );
+}
+
+// Poetic Turkish descriptions for stars and planets
+function getStarDescription(name: string, mag: number, type?: string, kind?: string): string {
+  if (type === "body") {
+    const k = kind || "";
+    if (k === "sun") {
+      return "Güneş. Hayat veren ışığın, bilincin ve o özel anın merkezindeki sıcak enerjinin kaynağı.";
+    }
+    if (k === "moon") {
+      return "Ay. Duyguların, sezgilerin ve o unutulmaz anı çevreleyen gümüş ışığın koruyucusu.";
+    }
+    // Turkish translation for planet names
+    const planetName = name === "Mercury" ? "Merkür" 
+                     : name === "Venus" ? "Venüs" 
+                     : name === "Mars" ? "Mars" 
+                     : name === "Jupiter" ? "Jüpiter" 
+                     : name === "Saturn" ? "Satürn" 
+                     : name === "Uranus" ? "Uranüs" 
+                     : name === "Neptune" ? "Neptün" : name;
+    return `${planetName} Gezegeni. Kozmik yörüngedeki dansıyla, hayatınızın o benzersiz anına eşlik eden büyük gezegen gücü.`;
+  }
+
+  const normalizedName = (name || "").toLowerCase();
+  
+  if (normalizedName.includes("sirius")) {
+    return "Gökyüzünün en parlak yıldızı. Antik çağlardan beri sadakat, rehberlik ve büyük dönüşümlerin simgesi olarak kabul edilir.";
+  }
+  if (normalizedName.includes("vega")) {
+    return "Mavi-beyaz ışığıyla göğün liri. Gece gökyüzündeki en saf ışıklardan biri, sanatsal ilhamın ve yaratıcılığın sembolü.";
+  }
+  if (normalizedName.includes("polaris") || normalizedName.includes("kutup")) {
+    return "Kutup Yıldızı. Yüzyıllardır denizcilere ve kaybolan ruhlara yön gösteren, sadakatin ve değişmez sığınağın temsilcisi.";
+  }
+  if (normalizedName.includes("capella")) {
+    return "Gökyüzünün altın sarısı kraliçesi. Bolluk, bereket ve koruyucu enerjiyi simgeler.";
+  }
+  if (normalizedName.includes("rigel")) {
+    return "Orion takımyıldızının görkemli mavi devi. Cesaretin, bilgeliğin ve yüksek hedeflerin ışığı.";
+  }
+  if (normalizedName.includes("betelgeuse")) {
+    return "Ömrünün son demlerindeki dev kızıl yıldız. Yaşam döngülerinin güzelliğini ve tutkuyu sembolize eder.";
+  }
+  if (normalizedName.includes("altair")) {
+    return "Kartal takımyıldızının kalbi. Hızlı kararların, özgürlüğün ve cesur uçuşların habercisidir.";
+  }
+  if (normalizedName.includes("aldebaran")) {
+    return "Boğanın öfkeli kırmızı gözü. Güçlü bir duruşu, sarsılmaz inancı ve kararlılığı temsil eder.";
+  }
+  if (normalizedName.includes("procyon")) {
+    return "Küçük Köpek takımyıldızının incisi. Erken uyanışların ve yeni fırsatların müjdecisidir.";
+  }
+  if (normalizedName.includes("spica")) {
+    return "Başak takımyıldızının buğday başağı. Saf sevginin, zarafetin ve emek verilen değerlerin parıltısı.";
+  }
+  if (normalizedName.includes("antares")) {
+    return "Akrebin kalbindeki dev kızıl fener. Derin duyguları, gizemi ve dönüşümün gücünü simgeler.";
+  }
+  if (normalizedName.includes("fomalhaut")) {
+    return "Güney Balığı'nın ağzındaki yalnız yıldız. Bağımsızlığı, mistik sezgileri ve yalnızlığın asaletini yansıtır.";
+  }
+
+  // Fallback for nameless/catalog stars based on magnitude
+  if (mag < 2.0) {
+    return "Gökyüzünü parlaklığıyla taçlandıran bu yıldız, o özel anda hayatınızı aydınlatan önemli bir enerjiyi simgeliyor.";
+  }
+  if (mag < 4.0) {
+    return "Göğün bu zarif yıldızı, o büyülü gecede arka planda sessizce parıldayan, detaylarda gizli mutlulukları anlatıyor.";
+  }
+  return "Kozmik örtünün derinliklerindeki bu küçük yıldız, hayatınızın büyük tablosunu tamamlayan görünmez bağların temsilcisidir.";
 }
