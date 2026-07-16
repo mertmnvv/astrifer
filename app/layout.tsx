@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Instrument_Serif, JetBrains_Mono, Hanken_Grotesk, Spectral } from "next/font/google";
+import { Instrument_Serif, JetBrains_Mono, Hanken_Grotesk, Spectral, EB_Garamond, Cormorant_SC } from "next/font/google";
 import "./globals.css";
 
 const displayFont = Instrument_Serif({
@@ -32,6 +32,21 @@ const logoFont = Spectral({
   display: "swap",
 });
 
+const ebGaramond = EB_Garamond({
+  subsets: ["latin", "latin-ext"],
+  weight: ["400", "500", "600"],
+  style: ["normal", "italic"],
+  variable: "--font-eb-garamond",
+  display: "swap",
+});
+
+const cormorantSC = Cormorant_SC({
+  subsets: ["latin", "latin-ext"],
+  weight: ["500", "600"],
+  variable: "--font-cormorant-sc",
+  display: "swap",
+});
+
 export const metadata: Metadata = {
   metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL ?? "https://astrifer.com"),
   title: "Astrifer — Kişiye Özel Yıldız Haritası",
@@ -47,7 +62,7 @@ export default function RootLayout({
   return (
     <html
       lang="tr"
-      className={`${displayFont.variable} ${monoFont.variable} ${bodyFont.variable} ${logoFont.variable}`}
+      className={`${displayFont.variable} ${monoFont.variable} ${bodyFont.variable} ${logoFont.variable} ${ebGaramond.variable} ${cormorantSC.variable}`}
       suppressHydrationWarning
     >
       <body className="bg-void text-text font-body antialiased">

@@ -66,8 +66,8 @@ export function OrderReadyView({ order, starMap }: OrderReadyViewProps) {
   const journalItem = order.items.find((item) => item.productType === "journal");
 
   const journalTheme = useMemo(() => {
-    return getJournalTheme(starMap.palette);
-  }, [starMap.palette]);
+    return getJournalTheme(starMap.journalThemeId || starMap.palette);
+  }, [starMap.journalThemeId, starMap.palette]);
 
   const coordsLabel = useMemo(() => {
     const lat = `${Math.abs(starMap.latitude).toFixed(2)}°${starMap.latitude >= 0 ? "K" : "G"}`;

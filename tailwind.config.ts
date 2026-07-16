@@ -27,12 +27,21 @@ const config: Config = {
         leather: "#2b1e15",
         "leather-dk": "#150d07",
         "leather-lt": "#5a3c22",
+        // Gravur theme
+        "gravur-paper": "#E4DFCD",
+        "gravur-paper-dim": "#DAD3BC",
+        "gravur-ink": "#241F19",
+        "gravur-ink-soft": "#5C5646",
+        "gravur-copper": "#8A5A3B",
+        "gravur-verdigris": "#5C7A6B",
       },
       fontFamily: {
         display: ["var(--font-display)", "serif"],
         mono: ["var(--font-mono)", "monospace"],
         body: ["var(--font-body)", "sans-serif"],
         logo: ["var(--font-logo)", "serif"],
+        "gravur-serif": ["var(--font-eb-garamond)", "serif"],
+        "gravur-sc": ["var(--font-cormorant-sc)", "serif"],
       },
       keyframes: {
         twinkle: {

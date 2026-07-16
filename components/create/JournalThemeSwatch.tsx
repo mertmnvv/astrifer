@@ -2,16 +2,18 @@ import { getJournalTheme } from "@/components/journal/night/journalTheme";
 
 export interface JournalThemeSwatchProps {
   paletteId: string;
+  journalThemeId?: string;
+  isManuallySelected?: boolean;
 }
 
 /**
  * Small live indicator next to the sky-palette picker showing which of the
- * 3 fixed Deri Defter color themes the current selection maps to — reads
+ * Deri Defter color themes the current selection maps to — reads
  * getJournalTheme() directly, no JournalThemeProvider needed (same
  * lightweight pure-CSS approach as SkyPaletteSwatchPicker's own swatches).
  */
-export function JournalThemeSwatch({ paletteId }: JournalThemeSwatchProps) {
-  const theme = getJournalTheme(paletteId);
+export function JournalThemeSwatch({ paletteId, journalThemeId, isManuallySelected }: JournalThemeSwatchProps) {
+  const theme = getJournalTheme(journalThemeId || paletteId);
   const [c0, c1] = theme.leather.gradientStops;
 
   return (
@@ -30,7 +32,11 @@ export function JournalThemeSwatch({ paletteId }: JournalThemeSwatchProps) {
         <p className="font-mono text-[9.5px] uppercase tracking-[0.14em]" style={{ color: theme.accentMetal }}>
           {theme.label}
         </p>
-        <p className="text-[11px] text-dim">Deri Defter de bu renkte olacak.</p>
+        <p className="text-[11px] text-dim">
+          {isManuallySelected
+            ? "Deri Defter rengini 5. adımda manuel olarak değiştirdiniz."
+            : "Deri Defter de varsayılan olarak bu renkte olacak."}
+        </p>
       </div>
     </div>
   );

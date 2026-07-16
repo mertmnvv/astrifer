@@ -25,6 +25,8 @@ export interface StarChartProps {
   resetTrigger?: number;
   /** Show or hide internal controls. */
   showControls?: boolean;
+  /** Event triggered when the spinning state changes. */
+  onSpinChange?: (spinning: boolean) => void;
 }
 
 export function StarChart({
@@ -38,6 +40,7 @@ export function StarChart({
   isSpinningExternal,
   resetTrigger,
   showControls = true,
+  onSpinChange,
 }: StarChartProps) {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const containerRef = useRef<HTMLDivElement | null>(null);
@@ -47,6 +50,7 @@ export function StarChart({
   const isSpinning = isSpinningExternal !== undefined ? isSpinningExternal : isSpinningInternal;
   const setIsSpinning = (val: boolean) => {
     setIsSpinningInternal(val);
+    onSpinChange?.(val);
   };
   const isSpinningRef = useRef(false);
   isSpinningRef.current = isSpinning;
@@ -104,6 +108,7 @@ export function StarChart({
         palette,
         isPreviewMode,
         manualRotationDeg: manualRotation.current,
+        isSpinning: isSpinningRef.current,
       });
     };
 

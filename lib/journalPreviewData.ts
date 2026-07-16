@@ -36,7 +36,7 @@ export function buildJournalPreviewData(starMap: StarMapRecord): JournalPreviewD
   const initialEntry = starMap.entries.find((entry) => entry.isInitial) ?? starMap.entries[0];
 
   return {
-    theme: getJournalTheme(starMap.palette),
+    theme: getJournalTheme(starMap.journalThemeId || starMap.palette),
     sky,
     page1Stars,
     page2Stars,

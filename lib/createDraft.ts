@@ -26,6 +26,8 @@ export interface CreateDraft {
   message: string;
   templateSlug: string;
   paletteId: string;
+  journalThemeId?: string;
+  isJournalThemeManuallySelected?: boolean;
   photos: CreateDraftPhoto[];
   voiceNoteUrl: string | null;
   journalEnabled: boolean;

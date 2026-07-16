@@ -77,21 +77,33 @@ export function StarMapView({ starMap, isPreview = false, isOwner = false }: Sta
   const previewLabel = `${starMap.locationName} üzerinde ${dateLabel} anının gökyüzü`;
   const skyLog = buildSkyNarrative(sky);
   const palette = getSkyPalette(starMap.palette);
+  const isGravur = palette.id === "gravur-atlas";
   const hasStarKey = buildSkyLabels(sky).length > 0;
   const editHref = `/create?${buildEditParams(starMap).toString()}`;
   const initialEntry = starMap.entries.find((entry) => entry.isInitial) ?? starMap.entries[0];
   const periodicEntries = starMap.entries.filter((entry) => entry !== initialEntry);
 
   return (
-    <PageGate title={starMap.title} subtitle={`${dateLabel} · ${starMap.locationName}`} musicUrl={starMap.musicUrl}>
-      {/* Gökyüzü animasyonu — tüm sayfayı kaplayan sabit arka plan, atmosfer için soluk/bulanık; net "harita" aşağıdaki madalyonda */}
-      <div aria-hidden className="fixed inset-0 -z-10 opacity-75 blur-[1.5px]">
-        <StarChart sky={sky} label={previewLabel} className="h-full w-full" palette={palette} showLabels={false} />
-      </div>
-      <div
-        aria-hidden
-        className="pointer-events-none fixed inset-0 -z-10 bg-[radial-gradient(circle_at_50%_40%,rgba(11,8,16,0.25)_0%,rgba(11,8,16,0.6)_66%,#0b0810_100%)]"
-      />
+    <PageGate title={starMap.title} subtitle={`${dateLabel} · ${starMap.locationName}`} musicUrl={starMap.musicUrl} isGravur={isGravur}>
+      {isGravur ? (
+        <>
+          <div aria-hidden className="fixed inset-0 -z-20 bg-gravur-paper" />
+          <div aria-hidden className="fixed inset-0 -z-10 opacity-[0.35] pointer-events-none select-none">
+            <StarChart sky={sky} label={previewLabel} className="h-full w-full" palette={palette} showLabels={false} />
+          </div>
+        </>
+      ) : (
+        <>
+          {/* Gökyüzü animasyonu — tüm sayfayı kaplayan sabit arka plan, atmosfer için soluk/bulanık; net "harita" aşağıdaki madalyonda */}
+          <div aria-hidden className="fixed inset-0 -z-10 opacity-75 blur-[1.5px]">
+            <StarChart sky={sky} label={previewLabel} className="h-full w-full" palette={palette} showLabels={false} />
+          </div>
+          <div
+            aria-hidden
+            className="pointer-events-none fixed inset-0 -z-10 bg-[radial-gradient(circle_at_50%_40%,rgba(11,8,16,0.25)_0%,rgba(11,8,16,0.6)_66%,#0b0810_100%)]"
+          />
+        </>
+      )}
 
       <div className="fixed bottom-4 left-4 z-30 sm:bottom-6 sm:left-6">
         <MusicToggle />
@@ -100,22 +112,38 @@ export function StarMapView({ starMap, isPreview = false, isOwner = false }: Sta
       {isPreview && (
         <>
           <div className="watermark-overlay" />
-          <div className="fixed inset-x-0 top-0 z-50 border-b border-amber/20 bg-void/90 px-4 py-3 backdrop-blur-md">
+          <div className={`fixed inset-x-0 top-0 z-50 border-b px-4 py-3 backdrop-blur-md ${
+            isGravur 
+              ? "border-gravur-copper/20 bg-gravur-paper/95 text-gravur-ink" 
+              : "border-amber/20 bg-void/90 text-text"
+          }`}>
             <div className="mx-auto flex max-w-5xl flex-wrap items-center justify-between gap-3 text-center sm:text-left">
               <div className="flex items-center gap-2.5">
-                <span aria-hidden className="h-1.5 w-1.5 shrink-0 animate-pulse rounded-full bg-amber motion-reduce:animate-none" />
-                <p className="font-mono text-[10px] uppercase tracking-wider text-amber font-semibold">
+                <span aria-hidden className={`h-1.5 w-1.5 shrink-0 animate-pulse rounded-full motion-reduce:animate-none ${
+                  isGravur ? "bg-gravur-copper" : "bg-amber"
+                }`} />
+                <p className={`font-mono text-[10px] uppercase tracking-wider font-semibold ${
+                  isGravur ? "text-gravur-copper" : "text-amber"
+                }`}>
                   Tasarım Önizleme Modu
                 </p>
-                <span aria-hidden className="hidden h-3 w-px bg-amber/30 sm:inline" />
-                <p className="hidden text-xs text-subtle sm:inline">
+                <span aria-hidden className={`hidden h-3 w-px sm:inline ${
+                  isGravur ? "bg-gravur-copper/30" : "bg-amber/30"
+                }`} />
+                <p className={`hidden text-xs sm:inline ${
+                  isGravur ? "text-gravur-ink-soft" : "text-subtle"
+                }`}>
                   Sayfanızı kaydetmek için yan sekmedeki tasarım ekranına dönebilirsiniz.
                 </p>
               </div>
               <div className="flex items-center gap-3">
                 <Link
                   href={editHref}
-                  className="rounded-full border border-amber/40 px-3.5 py-1.5 font-mono text-[9.5px] uppercase tracking-widest text-amber transition-colors hover:bg-amber hover:text-ink"
+                  className={`rounded-full border px-3.5 py-1.5 font-mono text-[9.5px] uppercase tracking-widest transition-colors ${
+                    isGravur
+                      ? "border-gravur-copper/40 text-gravur-copper hover:bg-gravur-copper hover:text-gravur-paper"
+                      : "border-amber/40 text-amber hover:bg-amber hover:text-ink"
+                  }`}
                 >
                   Düzenle
                 </Link>
@@ -128,7 +156,11 @@ export function StarMapView({ starMap, isPreview = false, isOwner = false }: Sta
                       // Fallback: window.close might be blocked
                     }
                   }}
-                  className="rounded-full bg-amber/[0.08] px-3.5 py-1.5 font-mono text-[9.5px] uppercase tracking-widest text-muted transition-colors hover:bg-amber/15 hover:text-bright"
+                  className={`rounded-full px-3.5 py-1.5 font-mono text-[9.5px] uppercase tracking-widest transition-colors ${
+                    isGravur
+                      ? "bg-gravur-copper/10 text-gravur-ink-soft hover:bg-gravur-copper/20 hover:text-gravur-ink"
+                      : "bg-amber/[0.08] text-muted hover:bg-amber/15 hover:text-bright"
+                  }`}
                 >
                   Kapat
                 </button>
@@ -138,7 +170,11 @@ export function StarMapView({ starMap, isPreview = false, isOwner = false }: Sta
         </>
       )}
 
-      <main className={`relative flex flex-col items-center px-4 py-12 sm:px-8 sm:py-16 ${isPreview ? "pt-24 sm:pt-28" : ""}`}>
+      <main className={`relative flex flex-col items-center px-4 py-12 sm:px-8 sm:py-16 ${
+        isPreview ? "pt-24 sm:pt-28" : ""
+      } ${
+        isGravur ? "theme-gravur text-gravur-ink" : ""
+      }`}>
         {/* Sahne 1 — İsim ve an, gökyüzü henüz atmosferik arka planda */}
         <TitleReveal title={starMap.title} dateLabel={dateLabel} locationName={starMap.locationName} />
 
@@ -150,21 +186,27 @@ export function StarMapView({ starMap, isPreview = false, isOwner = false }: Sta
           coordsLabel={`${formatCoordinates(starMap.latitude, starMap.longitude)} · ${starMap.locationName.toUpperCase()}`}
           message={starMap.message}
           skyLog={skyLog}
-          interactive={isPreview}
+          interactive={true}
           isPreviewMode={isPreview}
+          title={starMap.title}
+          dateLabel={dateLabel}
         />
 
         {/* Yıldız Anahtarı — haritadaki numaralı yıldız/gezegen işaretlerini gerçek adlarına bağlar */}
         {hasStarKey && (
           <RevealOnScroll durationMs={1000} className="mt-24 w-full max-w-xl">
             <div className="relative">
-              <AtlasPanel padding="lg" className="text-center">
+              <AtlasPanel padding="lg" className={`text-center ${isGravur ? "border-gravur-ink/15 bg-gravur-ink/[0.025]" : ""}`}>
                 <StarKeyLegend sky={sky} palette={palette} className="mx-auto max-w-sm" />
               </AtlasPanel>
               {isPreview && (
-                <div className="absolute inset-0 z-20 flex flex-col items-center justify-center rounded-2xl border border-amber/20 bg-void/80 px-6 text-center backdrop-blur-[2px]">
+                <div className={`absolute inset-0 z-20 flex flex-col items-center justify-center rounded-2xl border px-6 text-center backdrop-blur-[2px] ${
+                  isGravur 
+                    ? "border-gravur-copper/20 bg-gravur-paper-dim/80 text-gravur-ink" 
+                    : "border-amber/20 bg-void/80 text-amber"
+                }`}>
                   <svg
-                    className="mb-3 h-7 w-7 text-amber/80"
+                    className={`mb-3 h-7 w-7 ${isGravur ? "text-gravur-copper/80" : "text-amber/80"}`}
                     viewBox="0 0 24 24"
                     fill="none"
                     stroke="currentColor"
@@ -173,10 +215,10 @@ export function StarMapView({ starMap, isPreview = false, isOwner = false }: Sta
                     <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
                     <path d="M7 11V7a5 5 0 0 1 10 0v4" />
                   </svg>
-                  <p className="font-mono text-[10px] font-bold uppercase tracking-[0.25em] text-amber">
+                  <p className={`font-mono text-[10px] font-bold uppercase tracking-[0.25em] ${isGravur ? "text-gravur-copper" : "text-amber"}`}>
                     Yıldız Anahtarı Önizlemesi
                   </p>
-                  <p className="mt-2 max-w-xs text-xs text-subtle leading-relaxed">
+                  <p className={`mt-2 max-w-xs text-xs leading-relaxed ${isGravur ? "text-gravur-ink-soft" : "text-subtle"}`}>
                     Haritadaki yıldızların tam listesi satın aldığınızda aktif olacaktır.
                   </p>
                 </div>

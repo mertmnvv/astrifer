@@ -10,9 +10,10 @@ import { RadioCardGroup } from "@/components/ui/RadioCardGroup";
 import { PhotoPicker, type PickedPhoto } from "@/components/ui/PhotoPicker";
 import { VoiceRecorder, type VoiceRecorderValue } from "@/components/ui/VoiceRecorder";
 import { SkyPaletteSwatchPicker } from "@/components/ui/SkyPaletteSwatchPicker";
+import { JournalThemeSwatchPicker } from "@/components/ui/JournalThemeSwatchPicker";
 import { SKY_PALETTES, DEFAULT_SKY_PALETTE, getSkyPalette } from "@/components/astrolab/palettes";
 import { NightCoverPage } from "@/components/journal/night/NightCoverPage";
-import { getJournalTheme } from "@/components/journal/night/journalTheme";
+import { getJournalTheme, type JournalThemeId, PALETTE_TO_JOURNAL_THEME } from "@/components/journal/night/journalTheme";
 import { JournalThemeProvider } from "@/components/journal/JournalThemeContext";
 import { StarMapSpreadPage } from "@/components/journal/night/StarMapSpreadPage";
 import { StarKeyPage } from "@/components/journal/night/StarKeyPage";
@@ -144,6 +145,8 @@ export function CreateForm({ templates, pricing }: CreateFormProps) {
   const [photos, setPhotos] = useState<PickedPhoto[]>([]);
   const [voiceNote, setVoiceNote] = useState<VoiceRecorderValue | null>(null);
   const [paletteId, setPaletteId] = useState(DEFAULT_SKY_PALETTE.id);
+  const [journalThemeId, setJournalThemeId] = useState<JournalThemeId>("navy-gold");
+  const [isJournalThemeManuallySelected, setIsJournalThemeManuallySelected] = useState(false);
   const [touchedSubmit, setTouchedSubmit] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
@@ -154,6 +157,15 @@ export function CreateForm({ templates, pricing }: CreateFormProps) {
   );
   const [journalOpeningDate, setJournalOpeningDate] = useState("");
   const minOpeningDate = useMemo(() => tomorrowIso(), []);
+
+  // Synchronize the notebook theme with the sky palette theme by default,
+  // until the user manually changes the notebook theme.
+  useEffect(() => {
+    if (!isJournalThemeManuallySelected) {
+      const defaultThemeId = PALETTE_TO_JOURNAL_THEME[paletteId] ?? "navy-gold";
+      setJournalThemeId(defaultThemeId);
+    }
+  }, [paletteId, isJournalThemeManuallySelected]);
 
   const [currentStep, setCurrentStep] = useState(1);
   const [furthestStep, setFurthestStep] = useState(1);
@@ -247,6 +259,12 @@ export function CreateForm({ templates, pricing }: CreateFormProps) {
       setTime(draft.time);
       if (isValidPlace(draft.place)) setPlace(draft.place);
       setPaletteId(draft.paletteId);
+      if (draft.journalThemeId) {
+        setJournalThemeId(draft.journalThemeId as JournalThemeId);
+      }
+      if (draft.isJournalThemeManuallySelected !== undefined) {
+        setIsJournalThemeManuallySelected(draft.isJournalThemeManuallySelected);
+      }
       if (draft.photos.length > 0) {
         setPhotos(
           draft.photos.map((photo) => ({
@@ -515,6 +533,8 @@ export function CreateForm({ templates, pricing }: CreateFormProps) {
       message,
       templateSlug,
       paletteId,
+      journalThemeId,
+      isJournalThemeManuallySelected,
       photos: photos
         .filter((photo) => photo.status === "done" && photo.url)
         .map((photo) => ({ id: photo.id, url: photo.url as string, caption: photo.caption })),
@@ -532,6 +552,8 @@ export function CreateForm({ templates, pricing }: CreateFormProps) {
     message,
     templateSlug,
     paletteId,
+    journalThemeId,
+    isJournalThemeManuallySelected,
     photos,
     voiceNote,
     journalEnabled,
@@ -563,6 +585,7 @@ export function CreateForm({ templates, pricing }: CreateFormProps) {
         eventDateIso: eventDateUtc.toISOString(),
         templateSlug,
         paletteId,
+        journalThemeId,
         photoUrls,
         voiceNoteUrl: voiceNote?.status === "done" ? (voiceNote.remoteUrl ?? null) : null,
         musicUrl: musicUrl,
@@ -680,7 +703,7 @@ export function CreateForm({ templates, pricing }: CreateFormProps) {
         <div className={currentStep === 3 ? "block" : "hidden"}>
           <SectionLabel n="03">Gökyüzü Rengi</SectionLabel>
           <SkyPaletteSwatchPicker name="palette" palettes={SKY_PALETTES} value={paletteId} onChange={setPaletteId} />
-          <JournalThemeSwatch paletteId={paletteId} />
+          <JournalThemeSwatch paletteId={paletteId} journalThemeId={journalThemeId} isManuallySelected={isJournalThemeManuallySelected} />
         </div>
 
         <div className={currentStep === 4 ? "block" : "hidden"}>
@@ -806,11 +829,13 @@ export function CreateForm({ templates, pricing }: CreateFormProps) {
               onChange={(event) => setJournalEnabled(event.target.checked)}
             />
             <div className="mx-auto w-full max-w-[7rem]">
-              <JournalThemeProvider theme={getJournalTheme(paletteId)}>
+              <JournalThemeProvider theme={getJournalTheme(journalThemeId)}>
                 <NightCoverPage names={title.trim() || "İsim & İsim"} />
               </JournalThemeProvider>
             </div>
-            <p className="text-center text-[10px] text-dim">Renk: {getJournalTheme(paletteId).label} (03. adımda seçildi)</p>
+            <p className="text-center text-[10px] text-dim">
+              Renk: {getJournalTheme(journalThemeId).label} {!isJournalThemeManuallySelected ? "(Varsayılan)" : "(Özelleştirildi)"}
+            </p>
             <div className="flex items-center justify-between gap-2">
               <span className="font-display text-base italic text-bright">Deri Defter</span>
               <AddOnCheckbox checked={journalEnabled} />
@@ -826,6 +851,21 @@ export function CreateForm({ templates, pricing }: CreateFormProps) {
           >
             <div className="overflow-hidden">
               <div className="flex flex-col gap-4 rounded-2xl border border-text/10 bg-text/[0.02] p-4">
+                <div>
+                  <label className={FIELD_LABEL_CLASS}>Defter Kapak Rengi</label>
+                  <JournalThemeSwatchPicker
+                    name="journalTheme"
+                    value={journalThemeId}
+                    onChange={(themeId) => {
+                      setJournalThemeId(themeId);
+                      setIsJournalThemeManuallySelected(true);
+                    }}
+                  />
+                  <p className="mt-1 text-[11px] text-dim">
+                    Varsayılan olarak dijital sayfada seçtiğiniz renk tonuna uygun bir kapak atanır, isterseniz yukarıdan değiştirebilirsiniz.
+                  </p>
+                </div>
+
                 <div>
                   <label htmlFor="letter-text" className={FIELD_LABEL_CLASS}>
                     Gelecek Mektubu
@@ -1149,7 +1189,7 @@ export function CreateForm({ templates, pricing }: CreateFormProps) {
 
               {/* Flippable Book */}
               <div className="w-full py-4">
-                <JournalThemeProvider theme={getJournalTheme(paletteId)}>
+                <JournalThemeProvider theme={getJournalTheme(journalThemeId)}>
                   <BookFlip pages={bookPages} />
                 </JournalThemeProvider>
               </div>

@@ -33,6 +33,8 @@ export interface StarMapRecord {
   voiceNoteUrl: string | null;
   /** Sky color scheme id — see components/astrolab/palettes.ts. */
   palette: string;
+  /** Custom leather notebook theme id — see components/journal/night/journalTheme.ts. */
+  journalThemeId?: string | null;
   /** When the page itself was created — anchors the 6-month timeline-entry schedule (see lib/starmapTimeline.ts). */
   createdAt: Date;
   /** Newest first. */
@@ -59,6 +61,7 @@ export const DEMO_STAR_MAP: StarMapRecord = {
   // recording exists — is exercised the same way it will be in production.
   voiceNoteUrl: null,
   palette: DEFAULT_SKY_PALETTE.id,
+  journalThemeId: null,
   createdAt: new Date("2024-06-21T18:45:00.000Z"),
   entries: [
     {
@@ -96,6 +99,7 @@ function docToRecord(slug: string, doc: StarMapDoc, entries: TimelineEntry[]): S
     musicUrl: doc.musicUrl,
     voiceNoteUrl: doc.voiceNoteUrl,
     palette: doc.palette ?? DEFAULT_SKY_PALETTE.id,
+    journalThemeId: doc.journalThemeId ?? null,
     createdAt: doc.createdAt.toDate(),
     entries,
   };
@@ -148,6 +152,7 @@ export interface CreateStarMapInput {
   eventDateIso: string;
   templateSlug: string | null;
   paletteId: string | null;
+  journalThemeId: string | null;
   photoUrls: string[];
   voiceNoteUrl: string | null;
   musicUrl: string | null;
@@ -200,6 +205,7 @@ export async function createStarMap(input: CreateStarMapInput): Promise<CreateSt
       musicUrl: input.musicUrl,
       voiceNoteUrl: input.voiceNoteUrl,
       palette: input.paletteId,
+      journalThemeId: input.journalThemeId || null,
       isPublic: true,
       viewCount: 0,
       createdAt: now,

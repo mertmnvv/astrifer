@@ -1,10 +1,15 @@
 /**
- * Deri Defter'in 3 sabit renk teması — /create'te seçilen Gökyüzü Rengi'ne
- * (components/astrolab/palettes.ts) göre otomatik eşlenir, ayrıca
- * saklanmaz. "navy-gold" bugüne kadarki tek sabit tasarımın ("Modern
- * Gece + Altın") ta kendisi — değerleri hiç değişmedi.
+ * Deri Defter'in renk temaları — /create'te seçilen Gökyüzü Rengi'ne
+ * (components/astrolab/palettes.ts) göre otomatik eşlenir, ayrıca kullanıcı
+ * tarafından serbestçe özelleştirilebilir.
  */
-export type JournalThemeId = "navy-gold" | "warm-copper" | "plum-rose-gold";
+export type JournalThemeId =
+  | "navy-gold"
+  | "warm-copper"
+  | "plum-rose-gold"
+  | "emerald-gold"
+  | "crimson-copper"
+  | "cosmic-purple-rose";
 
 export interface JournalTheme {
   id: JournalThemeId;
@@ -147,16 +152,120 @@ export const JOURNAL_THEMES: Record<JournalThemeId, JournalTheme> = {
       captionText: "#c9a8ac",
     },
   },
+  "emerald-gold": {
+    id: "emerald-gold",
+    label: "Zümrüt Gece + Yeşil Altın",
+    pageGround: "#030807",
+    edgeStripeGradient: "linear-gradient(90deg,#15803d,#bbf7d0,#22c55e,#bbf7d0,#15803d)",
+    leather: {
+      gradientStops: ["#0f3a2c", "#0a241b", "#05130d", "#020805"],
+      grainDark: "#000000",
+      grainLight: "#1c5c47",
+      creaseStroke: "rgba(0,0,0,.18)",
+      sheenRgb: "90,190,140",
+      borderDashRgba: "rgba(34,197,94,.28)",
+    },
+    starMap: {
+      bgGradientStops: ["#0f3026", "#0a2019", "#05100c"],
+      dimStarColor: "#d1fae5",
+      connectorLineRgba: "rgba(209,250,229,.18)",
+    },
+    accentMetal: "#22c55e",
+    accentMetalDim: "#15803d",
+    text: { body: "#ecfdf5", bodyMuted: "#a7f3d0", caption: "#d1fae5" },
+    qrBacking: "#e6fcf4",
+    ruledLine: "#0f3026",
+    backCover: {
+      borderDash: "#22c55e",
+      flapStroke: "#15803d",
+      sealFill: "#16a34a",
+      sealStroke: "#14532d",
+      sealCross: "#05130d",
+      captionText: "#a7f3d0",
+    },
+  },
+  "crimson-copper": {
+    id: "crimson-copper",
+    label: "Kızıl Gece + Antik Bakır",
+    pageGround: "#0a0303",
+    edgeStripeGradient: "linear-gradient(90deg,#991b1b,#fecaca,#ef4444,#fecaca,#991b1b)",
+    leather: {
+      gradientStops: ["#451a1a", "#2b0f0f", "#170808", "#080202"],
+      grainDark: "#000000",
+      grainLight: "#6b2d2d",
+      creaseStroke: "rgba(0,0,0,.18)",
+      sheenRgb: "220,110,110",
+      borderDashRgba: "rgba(239,68,68,.28)",
+    },
+    starMap: {
+      bgGradientStops: ["#3b1111", "#240b0b", "#120505"],
+      dimStarColor: "#fee2e2",
+      connectorLineRgba: "rgba(254,226,226,.18)",
+    },
+    accentMetal: "#ef4444",
+    accentMetalDim: "#991b1b",
+    text: { body: "#fef2f2", bodyMuted: "#fca5a5", caption: "#fee2e2" },
+    qrBacking: "#fdeeed",
+    ruledLine: "#3b1111",
+    backCover: {
+      borderDash: "#ef4444",
+      flapStroke: "#991b1b",
+      sealFill: "#dc2626",
+      sealStroke: "#7f1d1d",
+      sealCross: "#170808",
+      captionText: "#fca5a5",
+    },
+  },
+  "cosmic-purple-rose": {
+    id: "cosmic-purple-rose",
+    label: "Kozmik Mor + Gül Altını",
+    pageGround: "#07030a",
+    edgeStripeGradient: "linear-gradient(90deg,#701a75,#f5d0f9,#d946ef,#f5d0f9,#701a75)",
+    leather: {
+      gradientStops: ["#3b0764", "#220042", "#120024", "#07000e"],
+      grainDark: "#000000",
+      grainLight: "#5b21b6",
+      creaseStroke: "rgba(0,0,0,.18)",
+      sheenRgb: "180,100,220",
+      borderDashRgba: "rgba(217,70,239,.28)",
+    },
+    starMap: {
+      bgGradientStops: ["#32074f", "#1c042e", "#0e0217"],
+      dimStarColor: "#f5e3fc",
+      connectorLineRgba: "rgba(245,227,252,.18)",
+    },
+    accentMetal: "#d946ef",
+    accentMetalDim: "#701a75",
+    text: { body: "#faf5ff", bodyMuted: "#e9d5ff", caption: "#f5e3fc" },
+    qrBacking: "#f7effc",
+    ruledLine: "#32074f",
+    backCover: {
+      borderDash: "#d946ef",
+      flapStroke: "#701a75",
+      sealFill: "#c084fc",
+      sealStroke: "#581c87",
+      sealCross: "#120024",
+      captionText: "#e9d5ff",
+    },
+  },
 };
 
-const PALETTE_TO_JOURNAL_THEME: Record<string, JournalThemeId> = {
+export const PALETTE_TO_JOURNAL_THEME: Record<string, JournalThemeId> = {
   "gece-laciverti": "navy-gold",
   kehribar: "warm-copper",
   komur: "warm-copper",
   "gul-safagi": "plum-rose-gold",
+  "gravur-atlas": "warm-copper",
+  "kozmik-aurora": "emerald-gold",
+  "kizil-bulut": "crimson-copper",
+  "derin-mor": "cosmic-purple-rose",
 };
 
-export function getJournalTheme(paletteId: string | null | undefined): JournalTheme {
-  const themeId = PALETTE_TO_JOURNAL_THEME[paletteId ?? ""] ?? "navy-gold";
+export function getJournalTheme(themeOrPaletteId: string | null | undefined): JournalTheme {
+  if (!themeOrPaletteId) return JOURNAL_THEMES["navy-gold"];
+  if (themeOrPaletteId in JOURNAL_THEMES) {
+    return JOURNAL_THEMES[themeOrPaletteId as JournalThemeId];
+  }
+  const themeId = PALETTE_TO_JOURNAL_THEME[themeOrPaletteId] ?? "navy-gold";
   return JOURNAL_THEMES[themeId];
 }

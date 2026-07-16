@@ -12,6 +12,7 @@ export interface CreateStarMapActionInput {
   eventDateIso: string;
   templateSlug: string;
   paletteId: string;
+  journalThemeId?: string | null;
   photoUrls: string[];
   voiceNoteUrl: string | null;
   musicUrl: string | null;
@@ -44,6 +45,7 @@ export async function createStarMapAction(input: CreateStarMapActionInput): Prom
     eventDateIso: input.eventDateIso,
     templateSlug: input.templateSlug || null,
     paletteId: input.paletteId || null,
+    journalThemeId: input.journalThemeId || null,
     photoUrls: input.photoUrls,
     voiceNoteUrl: input.voiceNoteUrl,
     musicUrl: input.musicUrl,

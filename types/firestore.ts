@@ -44,6 +44,8 @@ export interface StarMapDoc {
   voiceNoteUrl: string | null;
   /** Sky color scheme id — see components/astrolab/palettes.ts. */
   palette: string | null;
+  /** Custom leather notebook theme id — see components/journal/night/journalTheme.ts. */
+  journalThemeId?: string | null;
   isPublic: boolean;
   viewCount: number;
   createdAt: Timestamp;

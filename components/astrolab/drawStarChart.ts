@@ -21,6 +21,8 @@ export interface DrawStarChartOptions {
   isPreviewMode?: boolean;
   /** Extra rotation degree adjusted interactively by dragging. */
   manualRotationDeg?: number;
+  /** Controls if the spin state is active to override reduced motion static checks. */
+  isSpinning?: boolean;
 }
 
 const CONSTELLATION_LINES = [
@@ -172,6 +174,11 @@ export function starRadius(mag: number, scale: number): number {
 
 /** Soft radial gradient, never flat/pure black — easy on the eyes at any hour. */
 function drawSkyBackground(ctx: CanvasRenderingContext2D, width: number, height: number, palette: SkyPalette) {
+  if (palette.id === "gravur-atlas") {
+    ctx.fillStyle = palette.skyCenter;
+    ctx.fillRect(0, 0, width, height);
+    return;
+  }
   const gradient = ctx.createRadialGradient(
     width * 0.5,
     height * 0.42,
@@ -198,6 +205,43 @@ function drawNebulaClouds(
   palette: SkyPalette,
   seed: number,
 ) {
+  if (palette.id === "gravur-atlas") {
+    let s = seed;
+    const nextRnd = () => {
+      s = (s * 9301 + 49297) % 233280;
+      return s / 233280;
+    };
+
+    const cx = width * 0.5;
+    const cy = height * 0.5;
+    const fieldRadius = Math.hypot(width, height) * 0.46;
+    const scale = Math.min(width, height) / 640;
+
+    ctx.save();
+    ctx.fillStyle = palette.star; // Mürekkep rengi
+
+    const ncx = cx - 0.05 * fieldRadius;
+    const ncy = cy - 0.05 * fieldRadius;
+    const rad = fieldRadius * 0.72;
+
+    const dotsCount = 420;
+    for (let i = 0; i < dotsCount; i++) {
+      const a = nextRnd() * Math.PI * 2;
+      const r = Math.pow(nextRnd(), 0.65) * rad;
+      const x = ncx + Math.cos(a) * r;
+      const y = ncy + Math.sin(a) * r * 0.82;
+      
+      const size = (0.35 + nextRnd() * 0.55) * scale;
+      const op = 0.12 + (1 - r / rad) * 0.38;
+
+      ctx.globalAlpha = Math.max(0, Math.min(1, op));
+      ctx.beginPath();
+      ctx.arc(x, y, size, 0, Math.PI * 2);
+      ctx.fill();
+    }
+    ctx.restore();
+    return;
+  }
   let color1 = "rgba(79, 70, 229, 0.11)"; // Default Indigo
   let color2 = "rgba(37, 99, 235, 0.08)"; // Default Blue
   let color3 = "rgba(168, 85, 247, 0.04)"; // Default Purple
@@ -218,6 +262,18 @@ function drawNebulaClouds(
     color1 = "rgba(71, 85, 105, 0.09)"; // Slate gray
     color2 = "rgba(217, 119, 6, 0.04)"; // Soft amber/bronze
     color3 = "rgba(241, 245, 249, 0.03)"; // Off-white dust
+  } else if (palette.id === "kozmik-aurora") {
+    color1 = "rgba(16, 185, 129, 0.12)"; // Emerald Green
+    color2 = "rgba(6, 182, 212, 0.09)"; // Cyan/Teal
+    color3 = "rgba(234, 179, 8, 0.04)"; // Gold glow
+  } else if (palette.id === "kizil-bulut") {
+    color1 = "rgba(239, 68, 68, 0.12)"; // Crimson Red
+    color2 = "rgba(185, 28, 28, 0.09)"; // Dark Red
+    color3 = "rgba(249, 115, 22, 0.04)"; // Orange glow
+  } else if (palette.id === "derin-mor") {
+    color1 = "rgba(168, 85, 247, 0.11)"; // Violet
+    color2 = "rgba(79, 70, 229, 0.08)"; // Indigo
+    color3 = "rgba(236, 72, 153, 0.04)"; // Pink glow
   }
 
   const cx = width * 0.5;
@@ -273,7 +329,7 @@ function drawStar(
   // Bright stars (mag < 2.5) get a soft pulsing glow halo — the "sparkle."
   // Positions and core dots never move or resize from this; only the glow's
   // opacity animates, and only when the viewer allows motion.
-  if (mag < 2.5) {
+  if (mag < 2.5 && palette.id !== "gravur-atlas") {
     const phase = (seed % 1000) / 1000;
     const speed = 1.4 + ((seed >> 3) % 500) / 500;
     const glowAlpha = reducedMotion
@@ -482,7 +538,8 @@ export function drawStarChart(
   const showLabels = options.showLabels ?? true;
   const palette = options.palette ?? DEFAULT_SKY_PALETTE;
   const manualRot = options.manualRotationDeg ?? 0;
-  const driftDeg = (reducedMotion ? 0 : (time * DRIFT_DEG_PER_SEC) % 360) + manualRot;
+  const isSpinning = options.isSpinning ?? false;
+  const driftDeg = ((reducedMotion && !isSpinning) ? 0 : (time * DRIFT_DEG_PER_SEC) % 360) + manualRot;
   const scale = Math.min(width, height) / 640;
   const cx = width / 2;
   const cy = height / 2;
@@ -512,7 +569,7 @@ export function drawStarChart(
   // Draw constellation lines
   ctx.save();
   ctx.strokeStyle = palette.star;
-  ctx.globalAlpha = 0.12;
+  ctx.globalAlpha = palette.id === "gravur-atlas" ? 0.22 : 0.12;
   ctx.lineWidth = 0.8 * scale;
   for (const [starA, starB] of CONSTELLATION_LINES) {
     const ptA = starPoints.get(starA);
@@ -537,6 +594,7 @@ export function drawStarChart(
         color: palette.sun,
         fontFamily: "var(--font-mono, monospace)",
         numberFontPx: Math.max(8, 8 * scale),
+        isLightTheme: palette.id === "gravur-atlas",
       });
     } else {
       drawStar(ctx, point, star.mag, scale, time, reducedMotion, hash(star.name), palette);

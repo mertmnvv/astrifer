@@ -5,6 +5,7 @@ export interface JewelStarOptions {
   fontFamily?: string;
   /** Overrides the badge's auto-scaled (size * 3.2) font size. */
   numberFontPx?: number;
+  isLightTheme?: boolean;
 }
 
 /**
@@ -21,16 +22,27 @@ export function drawJewelStar(
 ): void {
   const { x, y } = point;
   const color = options.color ?? "#e8c974";
+  const isLightTheme = options.isLightTheme ?? false;
 
   ctx.save();
   ctx.translate(x, y);
   ctx.rotate(Math.PI / 4);
   const grad = ctx.createRadialGradient(0, 0, 0, 0, 0, size);
-  grad.addColorStop(0, "#fff7de");
-  grad.addColorStop(0.55, color);
-  grad.addColorStop(1, "rgba(169,131,47,0)");
-  ctx.shadowColor = `${color}e6`;
-  ctx.shadowBlur = size * 1.4;
+  if (isLightTheme) {
+    grad.addColorStop(0, "#fffaf0");
+    grad.addColorStop(0.55, color);
+    grad.addColorStop(1, "rgba(138, 90, 59, 0)");
+  } else {
+    grad.addColorStop(0, "#fff7de");
+    grad.addColorStop(0.55, color);
+    grad.addColorStop(1, "rgba(169,131,47,0)");
+  }
+  
+  if (!isLightTheme) {
+    ctx.shadowColor = `${color}e6`;
+    ctx.shadowBlur = size * 1.4;
+  }
+  
   ctx.fillStyle = grad;
   ctx.beginPath();
   ctx.moveTo(0, -size);
@@ -43,7 +55,7 @@ export function drawJewelStar(
   ctx.shadowBlur = 0;
   ctx.restore();
 
-  ctx.strokeStyle = "rgba(255,247,222,.55)";
+  ctx.strokeStyle = isLightTheme ? "rgba(36, 31, 25, 0.25)" : "rgba(255,247,222,.55)";
   ctx.lineWidth = Math.max(0.4, size * 0.08);
   ctx.beginPath();
   ctx.moveTo(x - size * 1.7, y);
@@ -60,7 +72,7 @@ export function drawJewelStar(
     ctx.font = `600 ${fontPx}px ${fontFamily}`;
     ctx.textBaseline = "middle";
     const tw = ctx.measureText(options.numberLabel).width;
-    ctx.fillStyle = "rgba(8,11,32,.6)";
+    ctx.fillStyle = isLightTheme ? "rgba(228, 223, 205, 0.85)" : "rgba(8,11,32,.6)";
     ctx.fillRect(lx - 2, ly - 7, tw + 4, 14);
     ctx.fillStyle = color;
     ctx.fillText(options.numberLabel, lx, ly);

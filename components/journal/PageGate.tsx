@@ -6,7 +6,7 @@ import { LogoMark } from "@/components/LogoMark";
 import { MusicProvider, useMusic } from "./MusicContext";
 import { usePrefersReducedMotion } from "@/lib/hooks/usePrefersReducedMotion";
 
-function GateButton({ title, subtitle, onOpen }: { title: string; subtitle: string; onOpen: () => void }) {
+function GateButton({ title, subtitle, onOpen, isGravur }: { title: string; subtitle: string; onOpen: () => void; isGravur?: boolean }) {
   const music = useMusic();
 
   return (
@@ -18,12 +18,16 @@ function GateButton({ title, subtitle, onOpen }: { title: string; subtitle: stri
         onOpen();
       }}
       aria-label="Aç"
-      className="flex h-full w-full cursor-pointer flex-col items-center justify-center gap-3 bg-[radial-gradient(circle_at_50%_40%,#15101a_0%,#0b0810_70%)] px-6 text-center"
+      className={`flex h-full w-full cursor-pointer flex-col items-center justify-center gap-3 px-6 text-center ${
+        isGravur 
+          ? "bg-[#E4DFCD] text-[#241F19]" 
+          : "bg-[radial-gradient(circle_at_50%_40%,#15101a_0%,#0b0810_70%)]"
+      }`}
     >
-      <LogoMark size={46} variant="compass" />
-      <p className="mt-1 font-display text-2xl italic text-bright sm:text-3xl">{title}</p>
-      <p className="font-mono text-[10px] uppercase tracking-[0.25em] text-amber">{subtitle}</p>
-      <span className="mt-2 animate-bounce-y font-mono text-[10.5px] uppercase tracking-[0.14em] text-muted motion-reduce:animate-none">
+      <LogoMark size={46} variant="compass" className={isGravur ? "text-[#8A5A3B]" : "text-amber"} />
+      <p className={`mt-1 font-display text-2xl italic sm:text-3xl ${isGravur ? "text-[#241F19] font-gravur-serif" : "text-bright"}`}>{title}</p>
+      <p className={`font-mono text-[10px] uppercase tracking-[0.25em] ${isGravur ? "text-[#8A5A3B]" : "text-amber"}`}>{subtitle}</p>
+      <span className={`mt-2 animate-bounce-y font-mono text-[10.5px] uppercase tracking-[0.14em] motion-reduce:animate-none ${isGravur ? "text-[#5C5646]" : "text-muted"}`}>
         Zaman Kapsülünü Aç
       </span>
     </button>
@@ -35,6 +39,7 @@ export interface PageGateProps {
   subtitle: string;
   musicUrl: string | null;
   children: React.ReactNode;
+  isGravur?: boolean;
 }
 
 /**
@@ -44,7 +49,7 @@ export interface PageGateProps {
  * `children` is always mounted underneath — nothing extra to fetch or
  * animate in once the gate lifts, it's just uncovered.
  */
-export function PageGate({ title, subtitle, musicUrl, children }: PageGateProps) {
+export function PageGate({ title, subtitle, musicUrl, children, isGravur }: PageGateProps) {
   const [opened, setOpened] = useState(false);
   const contentRef = useRef<HTMLDivElement | null>(null);
   const reducedMotion = usePrefersReducedMotion();
@@ -75,7 +80,7 @@ export function PageGate({ title, subtitle, musicUrl, children }: PageGateProps)
           }
           transition={{ duration: 1.15, ease: [0.65, 0, 0.35, 1] }}
         >
-          <GateButton title={title} subtitle={subtitle} onOpen={() => setOpened(true)} />
+          <GateButton title={title} subtitle={subtitle} onOpen={() => setOpened(true)} isGravur={isGravur} />
         </motion.div>
       </div>
       <div ref={contentRef} aria-hidden={!opened}>
