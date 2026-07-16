@@ -1,12 +1,11 @@
 "use client";
 
-import { useRef, useState } from "react";
-import { motion, useScroll, useTransform } from "framer-motion";
+import { useState } from "react";
 import { StarChart } from "@/components/astrolab/StarChart";
 import type { SkyPalette } from "@/components/astrolab/palettes";
 import { LedgerRule } from "@/components/atlas/LedgerRule";
 import type { ComputeSkyResult } from "@/lib/astronomy/computeSky";
-import { usePrefersReducedMotion } from "@/lib/hooks/usePrefersReducedMotion";
+
 
 export interface SkyFocusSectionProps {
   sky: ComputeSkyResult | null;
@@ -22,12 +21,8 @@ export interface SkyFocusSectionProps {
 }
 
 /**
- * The page's cinematic centerpiece: the blurred ambient background sharpens
- * and scales up into this circular medallion as the section scrolls into
- * view — the sky going from wallpaper to the one crisp "object" on the page
- * — then the moment's message/coordinates settle in underneath it. Skips
- * the scroll-linked transform entirely under reduced motion, showing the
- * resolved end state right away.
+ * The page's cinematic centerpiece: the star chart medallion with coordinates,
+ * message and sky log. Fully visible on load — no scroll-linked animation.
  */
 export function SkyFocusSection({
   sky,
@@ -41,28 +36,16 @@ export function SkyFocusSection({
   title = "",
   dateLabel = "",
 }: SkyFocusSectionProps) {
-  const ref = useRef<HTMLDivElement>(null);
-  const reducedMotion = usePrefersReducedMotion();
-  const { scrollYProgress } = useScroll({ target: ref, offset: ["start end", "0.5 0.5"] });
-
   const [isSpinning, setIsSpinning] = useState(false);
   const [resetTrigger, setResetTrigger] = useState(0);
   const [isZoomed, setIsZoomed] = useState(false);
-
-  const blurPx = useTransform(scrollYProgress, [0, 1], [14, 0]);
-  const filter = useTransform(blurPx, (v) => `blur(${v}px)`);
-  const scale = useTransform(scrollYProgress, [0, 1], [0.8, 1]);
-  const ringOpacity = useTransform(scrollYProgress, [0, 0.4], [0, 1]);
-  const contentOpacity = useTransform(scrollYProgress, [0.55, 1], [0, 1]);
-  const contentY = useTransform(scrollYProgress, [0.55, 1], [22, 0]);
 
   const isGravur = palette.id === "gravur-atlas";
 
   if (isGravur) {
     return (
-      <div ref={ref} className="flex min-h-screen w-full max-w-xl flex-col items-center justify-center px-4 text-center">
-        <motion.div
-          style={{ opacity: reducedMotion ? 1 : ringOpacity, scale: reducedMotion ? 1 : scale }}
+      <div className="flex min-h-screen w-full max-w-xl flex-col items-center justify-center px-4 text-center">
+        <div
           className="relative w-full max-w-[420px] bg-[#E4DFCD] p-3.5 shadow-2xl shadow-black/50 border border-[#241F19]/10"
         >
           <div className="relative border-[1.5px] border-[#241F19] px-6 py-6 flex flex-col">
@@ -93,8 +76,7 @@ export function SkyFocusSection({
             </div>
 
             {/* Starmap Box */}
-            <motion.div
-              style={{ filter: reducedMotion ? "none" : filter }}
+            <div
               className="w-full aspect-[4/3] overflow-hidden border border-[#241F19] my-4 shadow-sm bg-[#E4DFCD] relative group cursor-zoom-in"
               onClick={() => setIsZoomed(true)}
             >
@@ -117,7 +99,7 @@ export function SkyFocusSection({
                   <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v6m3-3H7" />
                 </svg>
               </div>
-            </motion.div>
+            </div>
 
             {/* Plate Name & Date */}
             <h2 className="font-display font-medium text-2xl text-[#241F19] tracking-normal mb-1 font-gravur-serif">
@@ -156,7 +138,7 @@ export function SkyFocusSection({
               </div>
             </div>
           </div>
-        </motion.div>
+        </div>
 
         {interactive && (
           <div className="mt-6 flex items-center gap-3 z-20">
@@ -195,16 +177,13 @@ export function SkyFocusSection({
         )}
 
         {skyLog && (
-          <motion.div
-            style={{ opacity: reducedMotion ? 1 : contentOpacity, y: reducedMotion ? 0 : contentY }}
-            className="mt-10 flex max-w-md flex-col items-center gap-6"
-          >
+          <div className="mt-10 flex max-w-md flex-col items-center gap-6">
             <div className="w-[100px] h-[1px] bg-[#241F19]/25 mx-auto"></div>
             <div className="flex flex-col items-center gap-2">
               <p className="font-mono text-[9px] uppercase tracking-[0.25em] text-[#8A5A3B]">Gökyüzü Kaydı</p>
               <p className="font-display text-sm italic leading-relaxed text-[#5C5646] font-gravur-serif">{skyLog}</p>
             </div>
-          </motion.div>
+          </div>
         )}
 
         {/* Fullscreen Zoom Lightbox Modal */}
@@ -243,9 +222,8 @@ export function SkyFocusSection({
   }
 
   return (
-    <div ref={ref} className="flex min-h-screen w-full max-w-xl flex-col items-center justify-center px-4 text-center">
-      <motion.div
-        style={{ opacity: reducedMotion ? 1 : ringOpacity, scale: reducedMotion ? 1 : scale }}
+    <div className="flex min-h-screen w-full max-w-xl flex-col items-center justify-center px-4 text-center">
+      <div
         className="relative w-[88%] max-w-[420px] md:max-w-[460px]"
       >
         <div
@@ -254,8 +232,7 @@ export function SkyFocusSection({
           style={{ background: "radial-gradient(60% 60% at 50% 50%, rgba(230,184,119,0.18), transparent 70%)" }}
         />
         <div className="rounded-full border border-amber/[0.2] p-[7px] cursor-zoom-in group" onClick={() => setIsZoomed(true)}>
-          <motion.div
-            style={{ filter: reducedMotion ? "none" : filter }}
+          <div
             className="aspect-square overflow-hidden rounded-full border border-amber/40 shadow-[0_25px_70px_-24px_rgba(0,0,0,0.65)] relative"
           >
             <StarChart
@@ -278,9 +255,9 @@ export function SkyFocusSection({
                 </svg>
               </div>
             </div>
-          </motion.div>
+          </div>
         </div>
-      </motion.div>
+      </div>
 
       {interactive && (
         <div className="mt-6 flex items-center gap-3 z-20">
@@ -318,8 +295,7 @@ export function SkyFocusSection({
         </div>
       )}
 
-      <motion.div
-        style={{ opacity: reducedMotion ? 1 : contentOpacity, y: reducedMotion ? 0 : contentY }}
+      <div
         className="mt-10 flex max-w-md flex-col items-center gap-6"
       >
         <p className="font-mono text-[11px] uppercase tracking-widest text-subtle">{coordsLabel}</p>
@@ -335,7 +311,7 @@ export function SkyFocusSection({
             </div>
           </>
         )}
-      </motion.div>
+      </div>
 
       {/* Fullscreen Zoom Lightbox Modal */}
       {isZoomed && (

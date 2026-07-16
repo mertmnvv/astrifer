@@ -68,9 +68,17 @@ export interface StarMapViewProps {
   isOwner?: boolean;
   step?: number;
   furthestStep?: number;
+  isInlinePreview?: boolean;
 }
 
-export function StarMapView({ starMap, isPreview = false, isOwner = false, step, furthestStep }: StarMapViewProps) {
+export function StarMapView({
+  starMap,
+  isPreview = false,
+  isOwner = false,
+  step,
+  furthestStep,
+  isInlinePreview = false,
+}: StarMapViewProps) {
   const sky = computeSky({
     date: starMap.eventDateUtc,
     latitude: starMap.latitude,
@@ -113,9 +121,9 @@ export function StarMapView({ starMap, isPreview = false, isOwner = false, step,
         <MusicToggle />
       </div>
 
-      {isPreview && (
+      {isPreview && !isInlinePreview && (
         <>
-          <div className="watermark-overlay" />
+          <div className={`watermark-overlay ${isGravur ? "watermark-gravur" : ""}`} />
           <div className={`fixed inset-x-0 top-0 z-50 border-b px-4 py-3 backdrop-blur-md ${
             isGravur 
               ? "border-gravur-copper/20 bg-gravur-paper/95 text-gravur-ink" 
@@ -175,7 +183,7 @@ export function StarMapView({ starMap, isPreview = false, isOwner = false, step,
       )}
 
       <main className={`relative flex flex-col items-center px-4 py-12 sm:px-8 sm:py-16 ${
-        isPreview ? "pt-24 sm:pt-28" : ""
+        isPreview && !isInlinePreview ? "pt-24 sm:pt-28" : ""
       } ${
         isGravur ? "theme-gravur text-gravur-ink" : ""
       }`}>
@@ -251,42 +259,95 @@ export function StarMapView({ starMap, isPreview = false, isOwner = false, step,
           </div>
         )}
 
-        {/* Sesli Mesaj */}
-        {(starMap.voiceNoteUrl || isPreview) && (
-          <RevealOnScroll durationMs={1000} className="mt-24 w-full max-w-sm">
-            {starMap.voiceNoteUrl ? (
-              <VoiceNote url={starMap.voiceNoteUrl} />
+        {/* Sesli / Görüntülü Mesaj */}
+        {(starMap.videoUrl || starMap.voiceNoteUrl || isPreview) && (
+          <RevealOnScroll durationMs={1000} className="mt-24 w-full max-w-lg flex justify-center">
+            {starMap.videoUrl ? (
+              <div className="w-full max-w-md flex flex-col gap-3 rounded-2xl border border-text/10 bg-text/[0.035] p-5 backdrop-blur-md">
+                <video src={starMap.videoUrl} controls className="w-full rounded-xl bg-black shadow-lg" />
+                <div className="flex items-center gap-2">
+                  <span aria-hidden className={`h-1.5 w-1.5 rounded-full ${isGravur ? "bg-gravur-copper animate-pulse" : "bg-amber animate-pulse"}`} />
+                  <span className={`font-mono text-[9px] uppercase tracking-wider font-semibold ${isGravur ? "text-gravur-copper" : "text-amber"}`}>
+                    Görüntülü Zaman Kapsülü Mesajı
+                  </span>
+                </div>
+              </div>
+            ) : starMap.voiceNoteUrl ? (
+              <div className="w-full max-w-sm">
+                <VoiceNote url={starMap.voiceNoteUrl} />
+              </div>
             ) : (
-              <Link
-                href={editHref}
-                className={`flex items-center gap-4 rounded-2xl border border-dashed px-5 py-4 transition-colors group text-left ${
-                  isGravur
-                    ? "border-gravur-copper/40 bg-gravur-copper/[0.02] hover:bg-gravur-copper/[0.04]"
-                    : "border-amber/30 bg-amber/[0.02] hover:bg-amber/[0.04]"
-                }`}
-              >
-                <div className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-full border transition-all duration-300 ${
-                  isGravur
-                    ? "border-gravur-copper/40 bg-gravur-copper/5 text-gravur-copper group-hover:bg-gravur-copper group-hover:text-gravur-paper"
-                    : "border-amber/30 bg-amber/5 text-amber group-hover:bg-amber group-hover:text-ink"
-                }`}>
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="h-5 w-5">
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M12 18.75a6 6 0 0 0 6-6v-1.5m-6 7.5a6 6 0 0 1-6-6v-1.5m6 7.5v3.75m-3.75 0h7.5M12 15.75a3 3 0 0 1-3-3V4.5a3 3 0 1 1 6 0v8.25a3 3 0 0 1-3 3Z" />
-                  </svg>
-                </div>
-                <div className="flex-1 min-w-0">
-                  <p className={`font-mono text-[9px] uppercase tracking-wider font-bold ${
-                    isGravur ? "text-gravur-copper" : "text-amber"
-                  }`}>
-                    Sesli Mesaj Eklenmedi
-                  </p>
-                  <p className={`text-[11px] leading-normal mt-0.5 ${
-                    isGravur ? "text-gravur-ink-soft" : "text-subtle"
-                  }`}>
-                    Sesli bir mesaj kaydetmek veya yüklemek ister misiniz?
-                  </p>
-                </div>
-              </Link>
+              // Önizleme modu yer tutucuları
+              (() => {
+                const isVideoPreferred = typeof window !== "undefined" && new URLSearchParams(window.location.search).get("video") !== null;
+                if (isVideoPreferred) {
+                  return (
+                    <Link
+                      href={editHref}
+                      className={`flex w-full max-w-md items-center gap-4 rounded-2xl border border-dashed px-5 py-4 transition-colors group text-left ${
+                        isGravur
+                          ? "border-gravur-copper/40 bg-gravur-copper/[0.02] hover:bg-gravur-copper/[0.04]"
+                          : "border-amber/30 bg-amber/[0.02] hover:bg-amber/[0.04]"
+                      }`}
+                    >
+                      <div className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-full border transition-all duration-300 ${
+                        isGravur
+                          ? "border-gravur-copper/40 bg-gravur-copper/5 text-gravur-copper group-hover:bg-gravur-copper group-hover:text-gravur-paper"
+                          : "border-amber/30 bg-amber/5 text-amber group-hover:bg-amber group-hover:text-ink"
+                      }`}>
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="h-5 w-5">
+                          <path strokeLinecap="round" strokeLinejoin="round" d="m15.75 10.5 4.72-4.72a.75.75 0 0 1 1.28.53v11.38a.75.75 0 0 1-1.28.53l-4.72-4.72M4.5 18.75h9a2.25 2.25 0 0 0 2.25-2.25v-9a2.25 2.25 0 0 0-2.25-2.25h-9A2.25 2.25 0 0 0 2.25 7.5v9a2.25 2.25 0 0 0 2.25 2.25Z" />
+                        </svg>
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className={`font-mono text-[9px] uppercase tracking-wider font-bold ${
+                          isGravur ? "text-gravur-copper" : "text-amber"
+                        }`}>
+                          Video Mesaj Eklenmedi
+                        </p>
+                        <p className={`text-[11px] leading-normal mt-0.5 ${
+                          isGravur ? "text-gravur-ink-soft" : "text-subtle"
+                        }`}>
+                          Görüntülü bir anı mesajı kaydetmek veya yüklemek ister misiniz?
+                        </p>
+                      </div>
+                    </Link>
+                  );
+                } else {
+                  return (
+                    <Link
+                      href={editHref}
+                      className={`flex w-full max-w-sm items-center gap-4 rounded-2xl border border-dashed px-5 py-4 transition-colors group text-left ${
+                        isGravur
+                          ? "border-gravur-copper/40 bg-gravur-copper/[0.02] hover:bg-gravur-copper/[0.04]"
+                          : "border-amber/30 bg-amber/[0.02] hover:bg-amber/[0.04]"
+                      }`}
+                    >
+                      <div className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-full border transition-all duration-300 ${
+                        isGravur
+                          ? "border-gravur-copper/40 bg-gravur-copper/5 text-gravur-copper group-hover:bg-gravur-copper group-hover:text-gravur-paper"
+                          : "border-amber/30 bg-amber/5 text-amber group-hover:bg-amber group-hover:text-ink"
+                      }`}>
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="h-5 w-5">
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M12 18.75a6 6 0 0 0 6-6v-1.5m-6 7.5a6 6 0 0 1-6-6v-1.5m6 7.5v3.75m-3.75 0h7.5M12 15.75a3 3 0 0 1-3-3V4.5a3 3 0 1 1 6 0v8.25a3 3 0 0 1-3 3Z" />
+                        </svg>
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className={`font-mono text-[9px] uppercase tracking-wider font-bold ${
+                          isGravur ? "text-gravur-copper" : "text-amber"
+                        }`}>
+                          Sesli Mesaj Eklenmedi
+                        </p>
+                        <p className={`text-[11px] leading-normal mt-0.5 ${
+                          isGravur ? "text-gravur-ink-soft" : "text-subtle"
+                        }`}>
+                          Sesli bir mesaj kaydetmek veya yüklemek ister misiniz?
+                        </p>
+                      </div>
+                    </Link>
+                  );
+                }
+              })()
             )}
           </RevealOnScroll>
         )}

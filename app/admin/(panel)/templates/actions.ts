@@ -4,7 +4,7 @@ import { revalidatePath } from "next/cache";
 import { getDb } from "@/lib/firebase/admin";
 import type { TemplateCategory } from "@/types/firestore";
 
-const VALID_CATEGORIES: TemplateCategory[] = ["dogum", "yildonumu", "teklif", "mezuniyet", "anma"];
+const VALID_CATEGORIES: TemplateCategory[] = ["dogum", "yildonumu", "teklif", "mezuniyet", "anma", "dugun"];
 
 export async function toggleTemplateActiveAction(formData: FormData) {
   const slug = String(formData.get("slug") ?? "");

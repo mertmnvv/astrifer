@@ -4,7 +4,7 @@
 
 import type { Timestamp } from "firebase-admin/firestore";
 
-export type TemplateCategory = "dogum" | "yildonumu" | "teklif" | "mezuniyet" | "anma";
+export type TemplateCategory = "dogum" | "yildonumu" | "teklif" | "mezuniyet" | "anma" | "dugun";
 export type OrderStatus = "pending" | "paid" | "failed" | "refunded" | "fulfilled" | "shipped" | "cancelled";
 export type ProductType = "digital" | "journal" | "bundle";
 export type PaymentMethod = "manual" | "iyzico" | "paytr";
@@ -42,6 +42,7 @@ export interface StarMapDoc {
   locationName: string;
   musicUrl: string | null;
   voiceNoteUrl: string | null;
+  videoUrl?: string | null;
   /** Sky color scheme id — see components/astrolab/palettes.ts. */
   palette: string | null;
   /** Custom leather notebook theme id — see components/journal/night/journalTheme.ts. */

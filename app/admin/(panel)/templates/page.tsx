@@ -10,6 +10,7 @@ const CATEGORY_LABELS: Record<TemplateCategory, string> = {
   teklif: "Evlilik Teklifi",
   mezuniyet: "Mezuniyet",
   anma: "Anma",
+  dugun: "Düğün",
 };
 
 const CATEGORY_OPTIONS = Object.keys(CATEGORY_LABELS) as TemplateCategory[];

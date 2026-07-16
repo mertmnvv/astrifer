@@ -240,19 +240,6 @@ export function OrderReadyView({ order, starMap }: OrderReadyViewProps) {
             </div>
           )}
 
-          {/* Sayfayı Görüntüle Butonu */}
-          <Link
-            href={`/s/${order.starMapSlug}`}
-            target="_blank"
-            rel="noreferrer"
-            className="flex w-full items-center justify-center gap-2 rounded-full border border-amber/40 px-6 py-3 font-mono text-xs uppercase tracking-widest text-amber transition-colors hover:bg-amber/10 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-amber"
-          >
-            <svg viewBox="0 0 20 20" className="h-4 w-4" fill="currentColor">
-              <path d="M10 12.5a2.5 2.5 0 100-5 2.5 2.5 0 000 5z" />
-              <path fillRule="evenodd" d="M.664 9.576a1.002 1.002 0 010-.152 9.61 9.61 0 0118.672 0 1.002 1.002 0 010 .152 9.61 9.61 0 01-18.672 0zM10 14a4 4 0 100-8 4 4 0 000 8z" clipRule="evenodd" />
-            </svg>
-            Dijital Sayfayı Yeni Sekmede Aç
-          </Link>
         </div>
       </div>
     </div>

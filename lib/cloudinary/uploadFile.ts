@@ -1,4 +1,4 @@
-export type UploadFolder = "astrifer/starmaps/photos" | "astrifer/starmaps/voice";
+export type UploadFolder = "astrifer/starmaps/photos" | "astrifer/starmaps/voice" | "astrifer/starmaps/videos";
 
 interface SignResponse {
   signature: string;

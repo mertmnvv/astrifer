@@ -71,5 +71,14 @@ export function clearCart(): void {
 }
 
 export function cartTotal(items: CartItem[]): number {
-  return items.reduce((sum, item) => sum + item.price, 0);
+  const journalSlugs = new Set(
+    items.filter((i) => i.productType === "journal" && i.slug).map((i) => i.slug)
+  );
+
+  return items.reduce((sum, item) => {
+    if (item.productType === "digital" && item.slug && journalSlugs.has(item.slug)) {
+      return sum;
+    }
+    return sum + item.price;
+  }, 0);
 }

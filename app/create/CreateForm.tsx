@@ -3,15 +3,15 @@
 import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import { useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
-import { StarChart } from "@/components/astrolab/StarChart";
 import { computeSky } from "@/lib/astronomy/computeSky";
 import { PlaceCombobox } from "@/components/ui/PlaceCombobox";
 import { RadioCardGroup } from "@/components/ui/RadioCardGroup";
 import { PhotoPicker, type PickedPhoto } from "@/components/ui/PhotoPicker";
 import { VoiceRecorder, type VoiceRecorderValue } from "@/components/ui/VoiceRecorder";
+import { VideoPicker, type VideoPickerValue } from "@/components/ui/VideoPicker";
 import { SkyPaletteSwatchPicker } from "@/components/ui/SkyPaletteSwatchPicker";
 import { JournalThemeSwatchPicker } from "@/components/ui/JournalThemeSwatchPicker";
-import { SKY_PALETTES, DEFAULT_SKY_PALETTE, getSkyPalette } from "@/components/astrolab/palettes";
+import { SKY_PALETTES, DEFAULT_SKY_PALETTE } from "@/components/astrolab/palettes";
 import { NightCoverPage } from "@/components/journal/night/NightCoverPage";
 import { getJournalTheme, type JournalThemeId, PALETTE_TO_JOURNAL_THEME } from "@/components/journal/night/journalTheme";
 import { JournalThemeProvider } from "@/components/journal/JournalThemeContext";
@@ -27,11 +27,12 @@ import { BookFlip } from "@/components/journal/BookFlip";
 import { pickNumberedStars, splitSkyByAzimuth } from "@/components/journal/starMapSpread";
 import { buildSkyEssay, buildSkyNarrative } from "@/lib/astronomy/skyNarrative";
 import { ScaledPreview } from "@/components/ScaledPreview";
+import { StarMapView } from "@/components/starmap/StarMapView";
+import type { StarMapRecord } from "@/lib/starmaps";
 import { CreateStepIndicator, type CreateStep } from "@/components/create/CreateStepIndicator";
 import { JournalThemeSwatch } from "@/components/create/JournalThemeSwatch";
 import { BUILTIN_PLACES, type PlaceResult } from "@/lib/geocode/cities";
 import { zonedTimeToUtc, utcToZonedTime } from "@/lib/geocode/timezone";
-import { formatCoords } from "@/lib/geo/formatCoords";
 import { addToCart } from "@/lib/cart";
 import { getCreateDraft, setCreateDraft, clearCreateDraft } from "@/lib/createDraft";
 import { formatTRY } from "@/lib/pricing";
@@ -136,6 +137,12 @@ export interface CreateFormProps {
 export function CreateForm({ templates, pricing }: CreateFormProps) {
   const router = useRouter();
   const initial = defaultDateTime();
+  const [mounted, setMounted] = useState(false);
+  const [mobileTab, setMobileTab] = useState<"edit" | "preview">("edit");
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   const [date, setDate] = useState(initial.date);
   const [time, setTime] = useState(initial.time);
@@ -144,7 +151,9 @@ export function CreateForm({ templates, pricing }: CreateFormProps) {
   const [message, setMessage] = useState("");
   const [templateSlug, setTemplateSlug] = useState(templates[0]?.slug ?? "");
   const [photos, setPhotos] = useState<PickedPhoto[]>([]);
+  const [mediaOption, setMediaOption] = useState<"voice" | "video">("voice");
   const [voiceNote, setVoiceNote] = useState<VoiceRecorderValue | null>(null);
+  const [videoFile, setVideoFile] = useState<VideoPickerValue | null>(null);
   const [paletteId, setPaletteId] = useState(DEFAULT_SKY_PALETTE.id);
   const [journalThemeId, setJournalThemeId] = useState<JournalThemeId>("navy-gold");
   const [isJournalThemeManuallySelected, setIsJournalThemeManuallySelected] = useState(false);
@@ -234,6 +243,12 @@ export function CreateForm({ templates, pricing }: CreateFormProps) {
       const draft = getCreateDraft();
       if (!draft) return;
 
+      const draftTitleClean = (draft.title || "").trim().toLowerCase();
+      if (draftTitleClean === "deneme başlığı" || draftTitleClean === "deneme basligi") {
+        clearCreateDraft();
+        return;
+      }
+
       setTitle(draft.title);
       if (draft.message) setMessage(draft.message);
       setDate(draft.date);
@@ -259,6 +274,12 @@ export function CreateForm({ templates, pricing }: CreateFormProps) {
       }
       if (draft.voiceNoteUrl) {
         setVoiceNote({ url: draft.voiceNoteUrl, source: "upload", status: "done", remoteUrl: draft.voiceNoteUrl });
+      }
+      if (draft.videoUrl) {
+        setVideoFile({ url: draft.videoUrl, source: "upload", status: "done", remoteUrl: draft.videoUrl });
+      }
+      if (draft.mediaOption) {
+        setMediaOption(draft.mediaOption);
       }
       setJournalEnabled(draft.journalEnabled);
       if (draft.journalLetterText) setJournalLetterText(draft.journalLetterText);
@@ -328,7 +349,16 @@ export function CreateForm({ templates, pricing }: CreateFormProps) {
     }
 
     const voiceParam = params.get("voice");
-    if (voiceParam) setVoiceNote({ url: voiceParam, source: "upload", status: "done", remoteUrl: voiceParam });
+    if (voiceParam) {
+      setVoiceNote({ url: voiceParam, source: "upload", status: "done", remoteUrl: voiceParam });
+      setMediaOption("voice");
+    }
+
+    const videoParam = params.get("video");
+    if (videoParam) {
+      setVideoFile({ url: videoParam, source: "upload", status: "done", remoteUrl: videoParam });
+      setMediaOption("video");
+    }
 
     const musicParam = params.get("music");
     if (musicParam) {
@@ -398,7 +428,8 @@ export function CreateForm({ templates, pricing }: CreateFormProps) {
     });
     const photoUrls = photos.filter((photo) => photo.status === "done" && photo.url).map((photo) => photo.url as string);
     if (photoUrls.length > 0) params.set("photos", photoUrls.join(","));
-    if (voiceNote?.status === "done" && voiceNote.remoteUrl) params.set("voice", voiceNote.remoteUrl);
+    if (mediaOption === "voice" && voiceNote?.status === "done" && voiceNote.remoteUrl) params.set("voice", voiceNote.remoteUrl);
+    if (mediaOption === "video" && videoFile?.status === "done" && videoFile.remoteUrl) params.set("video", videoFile.remoteUrl);
     if (musicUrl) params.set("music", musicUrl);
     params.set("palette", paletteId);
     return params;
@@ -413,7 +444,35 @@ export function CreateForm({ templates, pricing }: CreateFormProps) {
     params.set("furthestStep", furthestStep.toString());
     return `/create/onizleme?${params.toString()}`;
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [place, eventDateUtc, title, message, photos, voiceNote, musicUrl, paletteId, previewSlug, currentStep, furthestStep]);
+  }, [place, eventDateUtc, title, message, photos, voiceNote, videoFile, mediaOption, musicUrl, paletteId, previewSlug, currentStep, furthestStep]);
+
+  const previewStarMap = useMemo<StarMapRecord>(() => {
+    const photoUrls = photos.filter((photo) => photo.status === "done" && photo.url).map((photo) => photo.url as string);
+    return {
+      slug: previewSlug,
+      title: title.trim() || "İsim & İsim",
+      message: message.trim() || null,
+      eventDateUtc: eventDateUtc || new Date(),
+      timezone: place?.timezone || "Europe/Istanbul",
+      latitude: place?.latitude ?? 41.0082,
+      longitude: place?.longitude ?? 28.9784,
+      locationName: place?.name ?? "İstanbul",
+      musicUrl: musicUrl,
+      voiceNoteUrl: mediaOption === "voice" && voiceNote?.status === "done" ? (voiceNote.remoteUrl ?? null) : null,
+      videoUrl: mediaOption === "video" && videoFile?.status === "done" ? (videoFile.remoteUrl ?? null) : null,
+      palette: paletteId,
+      createdAt: eventDateUtc || new Date(),
+      entries: [
+        {
+          id: "preview",
+          date: eventDateUtc || new Date(),
+          photos: photoUrls.map((url) => ({ url })),
+          note: null,
+          isInitial: true,
+        },
+      ],
+    };
+  }, [photos, previewSlug, title, message, eventDateUtc, place, musicUrl, voiceNote, videoFile, mediaOption, paletteId]);
 
   const bookPages = useMemo(() => {
     // Pick stars based on previewSky
@@ -465,10 +524,6 @@ export function CreateForm({ templates, pricing }: CreateFormProps) {
     ];
   }, [previewSky, title, photos, previewHref]);
 
-  const previewLabel = place
-    ? `${place.name} üzerinde ${date} ${time} anının gökyüzü`
-    : "Konum seçilince gökyüzü önizlemesi burada görünecek";
-
   const previewDateLine = useMemo(() => {
     if (!place || !eventDateUtc) return "Tarih ve konum bekleniyor";
     try {
@@ -483,15 +538,19 @@ export function CreateForm({ templates, pricing }: CreateFormProps) {
     }
   }, [place, eventDateUtc, date]);
 
-  const coordsLabel = place ? formatCoords(place.latitude, place.longitude) : "";
-
-
-
-  const totalPrice = pricing.digitalPrice + (journalEnabled ? pricing.journalPrice : 0);
+  const totalPrice = journalEnabled ? pricing.journalPrice : pricing.digitalPrice;
 
   const requiredFieldsValid = Boolean(place && date && time && title.trim() && templateSlug);
-  const uploadsPending = photos.some((photo) => photo.status === "uploading") || voiceNote?.status === "uploading";
-  const uploadsFailed = photos.some((photo) => photo.status === "error") || voiceNote?.status === "error";
+  const uploadsPending =
+    photos.some((photo) => photo.status === "uploading") ||
+    (mediaOption === "voice" && voiceNote?.status === "uploading") ||
+    (mediaOption === "video" && videoFile?.status === "uploading");
+
+  const uploadsFailed =
+    photos.some((photo) => photo.status === "error") ||
+    (mediaOption === "voice" && voiceNote?.status === "error") ||
+    (mediaOption === "video" && videoFile?.status === "error");
+
   const isValid = requiredFieldsValid && !uploadsPending && !uploadsFailed;
 
   const stepValidity: Record<number, boolean> = {
@@ -548,6 +607,8 @@ export function CreateForm({ templates, pricing }: CreateFormProps) {
         .filter((photo) => photo.status === "done" && photo.url)
         .map((photo) => ({ id: photo.id, url: photo.url as string, caption: photo.caption })),
       voiceNoteUrl: voiceNote?.status === "done" ? (voiceNote.remoteUrl ?? null) : null,
+      videoUrl: videoFile?.status === "done" ? (videoFile.remoteUrl ?? null) : null,
+      mediaOption,
       journalEnabled,
       journalLetterText,
       journalOpeningDate,
@@ -567,6 +628,8 @@ export function CreateForm({ templates, pricing }: CreateFormProps) {
     isJournalThemeManuallySelected,
     photos,
     voiceNote,
+    videoFile,
+    mediaOption,
     journalEnabled,
     journalLetterText,
     journalOpeningDate,
@@ -600,7 +663,8 @@ export function CreateForm({ templates, pricing }: CreateFormProps) {
         paletteId,
         journalThemeId,
         photoUrls,
-        voiceNoteUrl: voiceNote?.status === "done" ? (voiceNote.remoteUrl ?? null) : null,
+        voiceNoteUrl: mediaOption === "voice" && voiceNote?.status === "done" ? (voiceNote.remoteUrl ?? null) : null,
+        videoUrl: mediaOption === "video" && videoFile?.status === "done" ? (videoFile.remoteUrl ?? null) : null,
         musicUrl: musicUrl,
       });
 
@@ -636,7 +700,7 @@ export function CreateForm({ templates, pricing }: CreateFormProps) {
   return (
     <form onSubmit={handleSubmit} className="grid gap-10 lg:grid-cols-[minmax(0,28rem)_1fr] lg:items-start" noValidate>
       {/* STEP INDICATOR — always first: above the preview on mobile, spanning both columns on desktop */}
-      <div className="order-1 lg:order-1 lg:col-span-2">
+      <div className="order-1 lg:col-span-2">
         <CreateStepIndicator
           steps={STEPS}
           currentStep={currentStep}
@@ -645,8 +709,34 @@ export function CreateForm({ templates, pricing }: CreateFormProps) {
         />
       </div>
 
+      {/* MOBILE/TABLET TAB SWITCHER */}
+      <div className="order-2 col-span-full lg:hidden mx-auto flex w-full max-w-[280px] rounded-full border border-text/10 bg-text/[0.03] p-1 shadow-inner backdrop-blur-sm">
+        <button
+          type="button"
+          onClick={() => setMobileTab("edit")}
+          className={`flex-1 rounded-full py-2 font-mono text-[10px] uppercase tracking-widest transition-all duration-200 ${
+            mobileTab === "edit"
+              ? "bg-amber text-ink font-semibold shadow"
+              : "text-dim hover:text-bright"
+          }`}
+        >
+          Düzenle
+        </button>
+        <button
+          type="button"
+          onClick={() => setMobileTab("preview")}
+          className={`flex-1 rounded-full py-2 font-mono text-[10px] uppercase tracking-widest transition-all duration-200 ${
+            mobileTab === "preview"
+              ? "bg-amber text-ink font-semibold shadow"
+              : "text-dim hover:text-bright"
+          }`}
+        >
+          Önizleme
+        </button>
+      </div>
+
       {/* FORM */}
-      <div className="order-2 flex flex-col gap-9">
+      <div className={`order-3 flex flex-col gap-9 ${mobileTab === "edit" ? "block" : "hidden lg:block"}`}>
         <div className={currentStep === 1 ? "block" : "hidden"}>
           <SectionLabel n="01">Anı Seçin</SectionLabel>
           <RadioCardGroup
@@ -725,8 +815,39 @@ export function CreateForm({ templates, pricing }: CreateFormProps) {
           <p className="mb-2 text-xs text-dim">Fotoğraflar (en fazla 4)</p>
           <PhotoPicker photos={photos} onChange={setPhotos} />
 
-          <p className="mb-2 mt-4 text-xs text-dim">Sesli mesaj (opsiyonel)</p>
-          <VoiceRecorder value={voiceNote} onChange={setVoiceNote} />
+          <div className="mt-4 mb-2 flex items-center justify-between">
+            <span className="text-xs text-dim">Medya Ekle (Opsiyonel)</span>
+            <div className="flex gap-1.5 rounded-full border border-text/10 bg-text/[0.03] p-0.5">
+              <button
+                type="button"
+                onClick={() => setMediaOption("voice")}
+                className={`rounded-full px-2.5 py-0.5 font-mono text-[9px] uppercase tracking-wider transition-colors ${
+                  mediaOption === "voice"
+                    ? "bg-amber text-ink font-bold"
+                    : "text-dim hover:text-bright"
+                }`}
+              >
+                Ses Kaydı
+              </button>
+              <button
+                type="button"
+                onClick={() => setMediaOption("video")}
+                className={`rounded-full px-2.5 py-0.5 font-mono text-[9px] uppercase tracking-wider transition-colors ${
+                  mediaOption === "video"
+                    ? "bg-amber text-ink font-bold"
+                    : "text-dim hover:text-bright"
+                }`}
+              >
+                Video Yükle
+              </button>
+            </div>
+          </div>
+
+          {mediaOption === "voice" ? (
+            <VoiceRecorder value={voiceNote} onChange={setVoiceNote} />
+          ) : (
+            <VideoPicker value={videoFile} onChange={setVideoFile} />
+          )}
 
           <p className="mb-2 mt-4 text-xs text-dim">Arka plan müziği (YouTube - opsiyonel)</p>
           <div className="flex flex-col gap-2.5 rounded-2xl border border-text/10 bg-text/[0.02] p-4">
@@ -984,7 +1105,7 @@ export function CreateForm({ templates, pricing }: CreateFormProps) {
       </div>
 
       {/* LIVE PREVIEW */}
-      <div className="order-3 flex flex-col gap-4 lg:sticky lg:top-28 lg:self-start">
+      <div className={`order-4 flex flex-col gap-4 lg:sticky lg:top-28 lg:self-start ${mobileTab === "preview" ? "block" : "hidden lg:block"}`}>
         <div className="mx-auto w-full flex justify-center">
           <div className="relative">
             {/* Glowing background */}
@@ -1000,128 +1121,18 @@ export function CreateForm({ templates, pricing }: CreateFormProps) {
               </div>
 
               {/* Scrollable Screen Content */}
-              <div className="flex-1 overflow-y-auto overflow-x-hidden scrollbar-none pt-12 pb-6 px-3.5 space-y-8 select-none relative text-left scroll-smooth">
-                {/* Simulated Blur Background */}
-                <div aria-hidden className="absolute inset-0 -z-10 opacity-60 blur-[1.5px] pointer-events-none">
-                  <StarChart sky={sky} label="" className="h-full w-full object-cover" palette={getSkyPalette(paletteId)} showLabels={false} />
+              <div className="absolute inset-0 z-10 flex flex-col overflow-hidden" style={{ transform: "translate3d(0, 0, 0)" }}>
+                <div className="flex-1 overflow-y-auto overflow-x-hidden scrollbar-none select-none relative text-left scroll-smooth">
+                  {mounted && (
+                    <StarMapView
+                      starMap={previewStarMap}
+                      isPreview={true}
+                      isInlinePreview={true}
+                      step={currentStep}
+                      furthestStep={furthestStep}
+                    />
+                  )}
                 </div>
-                <div
-                  aria-hidden
-                  className="pointer-events-none absolute inset-0 -z-10 bg-[radial-gradient(circle_at_50%_35%,rgba(11,8,16,0.15)_0%,rgba(11,8,16,0.65)_70%,#0b0810_100%)]"
-                />
-
-                {/* Stage 1: Title Reveal */}
-                <div className="text-center pt-3 flex flex-col items-center">
-                  <span className="h-0.5 w-6 bg-amber/30 rounded" />
-                  <h3 className="mt-3.5 font-display text-lg italic text-bright leading-tight max-w-[200px] mx-auto">
-                    {title.trim() || "İsim & İsim"}
-                  </h3>
-                  <p className="mt-2 font-mono text-[8px] uppercase tracking-widest text-amber">
-                    {previewDateLine}
-                  </p>
-                  <p className="mt-0.5 font-mono text-[7px] text-dim">
-                    {coordsLabel}
-                  </p>
-                </div>
-
-                {/* Stage 2: Star Medallion & Message */}
-                <div className="flex flex-col items-center">
-                  <div className="relative aspect-square w-48 rounded-full border border-amber/20 p-1.5 shadow-[0_0_25px_rgba(230,163,92,0.15)] bg-void/50 backdrop-blur-sm">
-                    <div className="h-full w-full rounded-full overflow-hidden relative">
-                      <StarChart sky={sky} label={previewLabel} className="h-full w-full" palette={getSkyPalette(paletteId)} showLabels={false} />
-                    </div>
-                  </div>
-                  <div className="mt-4 text-center px-4 max-w-[210px]">
-                    <p className="font-display text-[10px] italic leading-relaxed text-subtle">
-                      &ldquo;{message.trim() || "Sen benim gökyüzümdeki en güzel yıldızımsın."}&rdquo;
-                    </p>
-                  </div>
-                </div>
-
-                {/* Stage 3: Star Key Legend Preview */}
-                <div className="mx-1 p-3 rounded-xl border border-amber/15 bg-void/75 backdrop-blur-sm text-center">
-                  <h5 className="font-mono text-[7px] uppercase tracking-widest text-amber">Yıldız Anahtarı</h5>
-                  <div className="mt-2 space-y-1.5 text-left max-w-[170px] mx-auto text-[7px] font-mono text-muted">
-                    <div className="flex justify-between border-b border-text/5 pb-0.5">
-                      <span>01. Sirius (Akyıldız)</span>
-                      <span className="text-amber">★ -1.46 mag</span>
-                    </div>
-                    <div className="flex justify-between border-b border-text/5 pb-0.5">
-                      <span>02. Vega</span>
-                      <span className="text-amber">★ 0.03 mag</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span>03. Altair</span>
-                      <span className="text-amber">★ 0.76 mag</span>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Stage 4: First Moment Photos (Live uploaded photos) */}
-                {photos.length > 0 && (
-                  <div className="flex flex-col items-center">
-                    <p className="font-mono text-[7px] uppercase tracking-[0.2em] text-dim mb-3">İlk An</p>
-                    <div className="flex flex-col gap-4 items-center">
-                      {photos.map((p, idx) => (
-                        <div key={p.id} className="w-36 overflow-hidden bg-[#fdfaf1] p-1.5 pb-3 shadow-lg shadow-black/40" style={{ transform: `rotate(${(idx % 2 === 0 ? 1.5 : -1.5)}deg)` }}>
-                          <div className="w-full aspect-square bg-[#eceae1] overflow-hidden rounded-sm relative">
-                            {/* eslint-disable-next-line @next/next/no-img-element */}
-                            <img src={p.previewUrl} alt="Yüklenen fotoğraf" className="w-full h-full object-cover" />
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                )}
-
-                {/* Stage 5: Timeline Placeholders */}
-                <div className="space-y-4 px-1 pt-2">
-                  <p className="text-center font-mono text-[7px] uppercase tracking-[0.2em] text-dim">Zaman Çizelgesi</p>
-                  <p className="text-center text-[8px] text-muted max-w-[190px] mx-auto leading-relaxed">
-                    Sayfanız oluştuktan sonra anılarınızı ekleyebileceğiniz zaman tüneliniz:
-                  </p>
-                  <div className="grid grid-cols-3 gap-2">
-                    <div className="flex flex-col items-center bg-[#fdfaf1]/[0.02] border border-dashed border-amber/20 p-1.5 pb-2 rounded-lg text-center scale-95">
-                      <div className="w-full aspect-square border border-dashed border-amber/10 bg-void/50 rounded flex items-center justify-center text-amber/30">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="h-4 w-4">
-                          <path d="M6.827 6.175A2.31 2.31 0 0 1 5.186 7.23c-.38.054-.757.112-1.134.175C2.999 7.58 2.25 8.507 2.25 9.574V18a2.25 2.25 0 0 0 2.25 2.25" />
-                        </svg>
-                      </div>
-                      <p className="mt-1 font-display text-[7px] italic text-amber/80">İlk Fotoğrafımız</p>
-                    </div>
-                    <div className="flex flex-col items-center bg-[#fdfaf1]/[0.02] border border-dashed border-amber/20 p-1.5 pb-2 rounded-lg text-center scale-95">
-                      <div className="w-full aspect-square border border-dashed border-amber/10 bg-void/50 rounded flex items-center justify-center text-amber/30">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="h-4 w-4">
-                          <path d="M6 12 3.269 3.125A59.769 59.769 0 0 1 21.485 12 59.768 59.768 0 0 1 3.27 20.875L5.999 12Zm0 0h7.5" />
-                        </svg>
-                      </div>
-                      <p className="mt-1 font-display text-[7px] italic text-amber/80">İlk Tatilimiz</p>
-                    </div>
-                    <div className="flex flex-col items-center bg-[#fdfaf1]/[0.02] border border-dashed border-amber/20 p-1.5 pb-2 rounded-lg text-center scale-95">
-                      <div className="w-full aspect-square border border-dashed border-amber/10 bg-void/50 rounded flex items-center justify-center text-amber/30">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="h-4 w-4">
-                          <path d="M21.75 6.75v10.5a2.25 2.25 0 0 1-2.25 2.25h-15a2.25 2.25 0 0 1-2.25-2.25" />
-                        </svg>
-                      </div>
-                      <p className="mt-1 font-display text-[7px] italic text-amber/80">Geleceğe Not</p>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Stage 6: Voice Record Player */}
-                {voiceNote && (
-                  <div className="mx-1 p-2.5 rounded-xl border border-amber/15 bg-void/75 backdrop-blur-sm flex items-center justify-between">
-                    <div className="flex items-center gap-1.5">
-                      <div className="h-5.5 w-5.5 rounded-full bg-amber/10 flex items-center justify-center text-amber animate-pulse">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="h-3 w-3">
-                          <path strokeLinecap="round" strokeLinejoin="round" d="M12 18.75a6 6 0 0 0 6-6v-1.5m-6 7.5a6 6 0 0 1-6-6v-1.5m6 7.5v3.75m-3.75 0h7.5M12 15.75a3 3 0 0 1-3-3V4.5a3 3 0 1 1 6 0v8.25a3 3 0 0 1-3 3Z" />
-                        </svg>
-                      </div>
-                      <div className="text-[7.5px] font-mono text-muted">Sesli_Mesaj.mp3</div>
-                    </div>
-                    <div className="text-[7.5px] font-mono text-amber">Kayıtlı</div>
-                  </div>
-                )}
               </div>
 
               {/* Home Indicator line */}
@@ -1134,10 +1145,19 @@ export function CreateForm({ templates, pricing }: CreateFormProps) {
           <div className="flex items-baseline justify-between">
             <span className="font-mono text-[10px] uppercase tracking-widest text-dim">Dijital Sayfa</span>
             <span className="font-mono text-sm text-text flex items-center gap-1.5">
-              {pricing.digitalOriginalPrice > pricing.digitalPrice && (
-                <span className="line-through text-dim text-xs">{formatTRY(pricing.digitalOriginalPrice)}</span>
+              {journalEnabled ? (
+                <>
+                  <span className="line-through text-dim text-xs">{formatTRY(pricing.digitalPrice)}</span>
+                  <span className="font-semibold text-green-400">Bedava</span>
+                </>
+              ) : (
+                <>
+                  {pricing.digitalOriginalPrice > pricing.digitalPrice && (
+                    <span className="line-through text-dim text-xs">{formatTRY(pricing.digitalOriginalPrice)}</span>
+                  )}
+                  <span>{formatTRY(pricing.digitalPrice)}</span>
+                </>
               )}
-              <span>{formatTRY(pricing.digitalPrice)}</span>
             </span>
           </div>
           {journalEnabled && (
@@ -1162,7 +1182,7 @@ export function CreateForm({ templates, pricing }: CreateFormProps) {
             href={previewHref}
             target="_blank"
             rel="noopener noreferrer"
-            className="w-full rounded-full border border-amber/40 px-6 py-3 text-center font-mono text-xs uppercase tracking-widest text-amber transition-colors hover:bg-amber/10 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-amber"
+            className="w-full block rounded-full border border-amber/40 px-6 py-3 text-center font-mono text-xs uppercase tracking-widest text-amber transition-colors hover:bg-amber/10 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-amber"
           >
             Dijital Sayfayı Önizle
           </a>

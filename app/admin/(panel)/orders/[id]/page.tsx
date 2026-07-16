@@ -188,10 +188,22 @@ export default async function AdminOrderDetailPage({ params }: { params: { id: s
                 )}
               </div>
 
-              {/* Sesli Mesaj */}
+              {/* Sesli / Görüntülü Mesaj */}
               <div className="border-t border-text/10 pt-4 space-y-2">
-                <p className="font-mono text-[9px] uppercase tracking-wider text-dim">Sesli Mesaj</p>
-                {starMap.voiceNoteUrl ? (
+                <p className="font-mono text-[9px] uppercase tracking-wider text-dim">Medya (Ses / Video)</p>
+                {starMap.videoUrl ? (
+                  <div className="rounded-xl border border-text/10 bg-void p-3 flex flex-col gap-2">
+                    <video src={starMap.videoUrl} controls className="w-full max-h-48 rounded-lg bg-black" />
+                    <a
+                      href={starMap.videoUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-[9px] font-mono text-dim hover:text-amber underline self-end"
+                    >
+                      Videoyu İndir
+                    </a>
+                  </div>
+                ) : starMap.voiceNoteUrl ? (
                   <div className="rounded-xl border border-text/10 bg-void p-3 flex flex-col gap-2">
                     <audio src={starMap.voiceNoteUrl} controls className="w-full h-8 bg-transparent" />
                     <a
@@ -200,11 +212,11 @@ export default async function AdminOrderDetailPage({ params }: { params: { id: s
                       rel="noopener noreferrer"
                       className="text-[9px] font-mono text-dim hover:text-amber underline self-end"
                     >
-                      Dosyayı İndir
+                      Ses Dosyasını İndir
                     </a>
                   </div>
                 ) : (
-                  <p className="text-xs text-subtle italic">Ses kaydı yüklenmedi.</p>
+                  <p className="text-xs text-subtle italic">Medya yüklenmedi.</p>
                 )}
               </div>
 

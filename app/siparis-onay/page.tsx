@@ -9,6 +9,7 @@ import { getStarMapBySlug, type StarMapRecord, type TimelineEntry, type StarMapP
 import type { OrderDoc } from "@/types/firestore";
 import type { Timestamp } from "firebase-admin/firestore";
 import { OrderReadyView } from "./OrderReadyView";
+import { ShareButton } from "@/components/create/ShareButton";
 
 export const dynamic = "force-dynamic";
 
@@ -241,19 +242,23 @@ export default async function OrderConfirmationPage({
             </div>
           </AtlasPanel>
 
-          {/* ── Digital page link ── */}
+          {/* ── Digital page actions ── */}
           {order?.starMapSlug && (
-            <Link
-              href={`/s/${order.starMapSlug}`}
-              target="_blank"
-              rel="noreferrer"
-              className="mt-6 inline-flex items-center gap-2 rounded-full border border-amber/40 px-6 py-3 font-mono text-xs uppercase tracking-widest text-amber transition-colors hover:bg-amber/10"
-            >
-              <svg viewBox="0 0 20 20" className="h-4 w-4" fill="currentColor">
-                <path d="M10 2a.75.75 0 01.75.75v5.59l1.95-2.1a.75.75 0 111.1 1.02l-3.25 3.5a.75.75 0 01-1.1 0L6.2 7.26a.75.75 0 111.1-1.02l1.95 2.1V2.75A.75.75 0 0110 2zM5.273 4.5a1.25 1.25 0 00-1.205.918l-1.523 5.52c-.006.02-.01.041-.015.062H6a1.25 1.25 0 011.176.833l.13.391a.25.25 0 00.236.166h4.916a.25.25 0 00.236-.166l.13-.39A1.25 1.25 0 0114 11h3.47a1.318 1.318 0 00-.015-.062l-1.523-5.52a1.25 1.25 0 00-1.205-.918h-.942a.75.75 0 010-1.5h.942a2.75 2.75 0 012.651 2.019l1.523 5.52c.066.239.099.485.099.732V15a2.75 2.75 0 01-2.75 2.75h-12.5A2.75 2.75 0 011 15v-3.21c0-.246.033-.492.099-.731l1.523-5.52A2.75 2.75 0 015.273 3.5h.942a.75.75 0 010 1.5h-.942z" />
-              </svg>
-              Dijital Sayfanızı Görüntüleyin
-            </Link>
+            <div className="mt-6 flex flex-col items-center gap-3 w-full sm:flex-row sm:justify-center">
+              <Link
+                href={`/s/${order.starMapSlug}`}
+                target="_blank"
+                rel="noreferrer"
+                className="inline-flex items-center gap-2 rounded-full border border-amber/40 px-6 py-3 font-mono text-xs uppercase tracking-widest text-amber transition-colors hover:bg-amber/10"
+              >
+                <svg viewBox="0 0 20 20" className="h-4 w-4" fill="currentColor">
+                  <path d="M10 12.5a2.5 2.5 0 100-5 2.5 2.5 0 000 5z" />
+                  <path fillRule="evenodd" d="M.664 9.576a1.002 1.002 0 010-.152 9.61 9.61 0 0118.672 0 1.002 1.002 0 010 .152 9.61 9.61 0 01-18.672 0zM10 14a4 4 0 100-8 4 4 0 000 8z" clipRule="evenodd" />
+                </svg>
+                Dijital Sayfanızı Görüntüleyin
+              </Link>
+              <ShareButton slug={order.starMapSlug} />
+            </div>
           )}
 
           {/* ── Back to home ── */}

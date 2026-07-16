@@ -39,6 +39,7 @@ export default async function CreatePreviewPage({
     locationName: location,
     musicUrl: null,
     voiceNoteUrl: get("voice") ?? null,
+    videoUrl: get("video") ?? null,
     palette: get("palette") ?? DEFAULT_SKY_PALETTE.id,
     // No real doc exists yet at preview time — synthesize the one entry
     // that /create's setup photos will become once submitted.

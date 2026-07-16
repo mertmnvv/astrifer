@@ -31,6 +31,7 @@ export interface StarMapRecord {
   musicUrl: string | null;
   /** Optional voice message. Absent for real records until Storage upload is wired up. */
   voiceNoteUrl: string | null;
+  videoUrl: string | null;
   /** Sky color scheme id — see components/astrolab/palettes.ts. */
   palette: string;
   /** Custom leather notebook theme id — see components/journal/night/journalTheme.ts. */
@@ -60,6 +61,7 @@ export const DEMO_STAR_MAP: StarMapRecord = {
   // file for the demo. Real behavior — section hidden until a real
   // recording exists — is exercised the same way it will be in production.
   voiceNoteUrl: null,
+  videoUrl: null,
   palette: DEFAULT_SKY_PALETTE.id,
   journalThemeId: null,
   createdAt: new Date("2024-06-21T18:45:00.000Z"),
@@ -98,6 +100,7 @@ function docToRecord(slug: string, doc: StarMapDoc, entries: TimelineEntry[]): S
     locationName: doc.locationName,
     musicUrl: doc.musicUrl,
     voiceNoteUrl: doc.voiceNoteUrl,
+    videoUrl: doc.videoUrl ?? null,
     palette: doc.palette ?? DEFAULT_SKY_PALETTE.id,
     journalThemeId: doc.journalThemeId ?? null,
     createdAt: doc.createdAt.toDate(),
@@ -155,6 +158,7 @@ export interface CreateStarMapInput {
   journalThemeId: string | null;
   photoUrls: string[];
   voiceNoteUrl: string | null;
+  videoUrl: string | null;
   musicUrl: string | null;
 }
 
@@ -179,11 +183,18 @@ export async function createStarMap(input: CreateStarMapInput): Promise<CreateSt
   const db = getDb();
 
   const base = slugify(input.title) || "sayfa";
-  let slug = base;
+  // 8 karakterlik URL-safe rastgele token — tahmin edilemez
+  const randomToken = () =>
+    Buffer.from(
+      Array.from({ length: 6 }, () => Math.floor(Math.random() * 256))
+    )
+      .toString("base64url")
+      .slice(0, 8);
+  let slug = `${base}-${randomToken()}`;
   for (let attempt = 0; attempt < 6; attempt++) {
     const existing = await db.collection("starMaps").doc(slug).get();
     if (!existing.exists) break;
-    slug = `${base}-${Math.random().toString(36).slice(2, 6)}`;
+    slug = `${base}-${randomToken()}`;
   }
 
   const now = new Date();
@@ -204,6 +215,7 @@ export async function createStarMap(input: CreateStarMapInput): Promise<CreateSt
       locationName: input.locationName,
       musicUrl: input.musicUrl,
       voiceNoteUrl: input.voiceNoteUrl,
+      videoUrl: input.videoUrl,
       palette: input.paletteId,
       journalThemeId: input.journalThemeId || null,
       isPublic: true,

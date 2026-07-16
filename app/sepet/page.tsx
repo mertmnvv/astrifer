@@ -52,47 +52,54 @@ export default function CartPage() {
               </p>
 
               <div className="mt-10 flex w-full flex-col gap-4">
-                {items.map((item) => (
-                  <AtlasPanel key={item.id} padding="lg" className="w-full">
-                    <div className="flex items-start justify-between gap-4">
-                      <div>
-                        <p className="font-mono text-[10px] uppercase tracking-[0.25em] text-amber">
-                          {item.productLabel}
-                        </p>
-                        <p className="mt-1 font-display text-lg italic text-bright">{item.title}</p>
-                        {item.summary.length > 0 && (
-                          <ul className="mt-2 space-y-0.5">
-                            {item.summary.map((line) => (
-                              <li key={line} className="text-xs text-subtle">
-                                {line}
-                              </li>
-                            ))}
-                          </ul>
-                        )}
-                        {item.slug && (
-                          <Link
-                            href={`/s/${item.slug}`}
-                            target="_blank"
-                            rel="noreferrer"
-                            className="mt-2 inline-block font-mono text-[10px] uppercase tracking-widest text-amber underline underline-offset-2 hover:text-bright"
-                          >
-                            Dijital sayfayı görüntüle
-                          </Link>
-                        )}
-                      </div>
-                      <div className="flex shrink-0 flex-col items-end gap-3">
-                        <span className="font-display text-xl italic text-amber">{formatTRY(item.price)}</span>
-                        <button
-                          type="button"
-                          onClick={() => removeFromCart(item.id)}
-                          className="font-mono text-[10px] uppercase tracking-widest text-subtle underline-offset-2 transition-colors hover:text-red-300 hover:underline"
-                        >
-                          Kaldır
-                        </button>
-                      </div>
-                    </div>
-                  </AtlasPanel>
-                ))}
+                {(() => {
+                  const journalSlugs = new Set(
+                    items.filter((i) => i.productType === "journal" && i.slug).map((i) => i.slug)
+                  );
+
+                  return items.map((item) => {
+                    const isFreeDigital = item.productType === "digital" && item.slug && journalSlugs.has(item.slug);
+
+                    return (
+                      <AtlasPanel key={item.id} padding="lg" className="w-full">
+                        <div className="flex items-start justify-between gap-4">
+                          <div>
+                            <p className="font-mono text-[10px] uppercase tracking-[0.25em] text-amber">
+                              {item.productLabel}
+                            </p>
+                            <p className="mt-1 font-display text-lg italic text-bright">{item.title}</p>
+                            {item.summary.length > 0 && (
+                              <ul className="mt-2 space-y-0.5">
+                                {item.summary.map((line) => (
+                                  <li key={line} className="text-xs text-subtle">
+                                    {line}
+                                  </li>
+                                ))}
+                              </ul>
+                            )}
+                          </div>
+                          <div className="flex shrink-0 flex-col items-end gap-3">
+                            {isFreeDigital ? (
+                              <div className="flex flex-col items-end">
+                                <span className="font-display text-sm italic text-dim line-through">{formatTRY(item.price)}</span>
+                                <span className="font-display text-xl italic text-green-400">Bedava</span>
+                              </div>
+                            ) : (
+                              <span className="font-display text-xl italic text-amber">{formatTRY(item.price)}</span>
+                            )}
+                            <button
+                              type="button"
+                              onClick={() => removeFromCart(item.id)}
+                              className="font-mono text-[10px] uppercase tracking-widest text-subtle underline-offset-2 transition-colors hover:text-red-300 hover:underline"
+                            >
+                              Kaldır
+                            </button>
+                          </div>
+                        </div>
+                      </AtlasPanel>
+                    );
+                  });
+                })()}
               </div>
 
               <div className="mt-6 flex w-full items-baseline justify-between px-1">

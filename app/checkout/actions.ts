@@ -81,13 +81,25 @@ export async function getCheckoutPaymentTokenAction(
     throw new Error("Deri Defter siparişi için kargo adresi doldurulmalıdır.");
   }
 
+  // Apply discount: if a journal item is present, the digital item with the same slug gets price = 0
+  const journalSlugs = new Set(
+    parsed.data.items.filter((item) => item.productType === "journal").map((item) => item.starMapSlug)
+  );
+
+  const adjustedItems = parsed.data.items.map((item) => {
+    if (item.productType === "digital" && journalSlugs.has(item.starMapSlug)) {
+      return { ...item, price: 0 };
+    }
+    return item;
+  });
+
   // 1. Write the order with 'pending' status to Firestore
   const { orderId, orderNumber } = await createOrder({
     customerName: parsed.data.customerName,
     customerEmail: parsed.data.customerEmail,
     customerPhone: parsed.data.customerPhone,
     starMapSlug: parsed.data.starMapSlug,
-    items: parsed.data.items as OrderItemDoc[],
+    items: adjustedItems as OrderItemDoc[],
     paymentMethod: "paytr",
     shippingAddress: parsed.data.shippingAddress,
   });
@@ -96,7 +108,7 @@ export async function getCheckoutPaymentTokenAction(
   const userIp = getClientIp();
 
   // 3. Format basket items array for the PayTR API
-  const basketItems: PaytrBasketItem[] = parsed.data.items.map((item) => ({
+  const basketItems: PaytrBasketItem[] = adjustedItems.map((item) => ({
     name: item.label,
     price: item.price.toFixed(2),
     quantity: 1,
@@ -113,7 +125,7 @@ export async function getCheckoutPaymentTokenAction(
   const merchantOkUrl = `${siteUrl}/siparis-onay?id=${encodeURIComponent(orderId)}&no=${encodeURIComponent(orderNumber)}`;
   const merchantFailUrl = `${siteUrl}/checkout?error=payment_failed`;
 
-  const totalAmount = parsed.data.items.reduce((sum, item) => sum + item.price, 0);
+  const totalAmount = adjustedItems.reduce((sum, item) => sum + item.price, 0);
 
   try {
     // 5. Query PayTR for the one-time iFrame token

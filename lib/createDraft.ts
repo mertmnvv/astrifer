@@ -30,6 +30,8 @@ export interface CreateDraft {
   isJournalThemeManuallySelected?: boolean;
   photos: CreateDraftPhoto[];
   voiceNoteUrl: string | null;
+  videoUrl?: string | null;
+  mediaOption?: "voice" | "video";
   journalEnabled: boolean;
   journalLetterText: string;
   journalOpeningDate: string;

@@ -159,22 +159,39 @@ function CheckoutForm() {
                 Sipariş Defteri
               </p>
               <div className="mt-4 divide-y divide-text/[0.08]">
-                {items.map((item) => (
-                  <div key={item.id} className="py-3">
-                    <div className="flex justify-between gap-4">
-                      <dt className="font-mono text-[11px] uppercase tracking-widest text-dim">
-                        {item.productLabel}
-                      </dt>
-                      <dd className="text-right font-mono text-sm font-medium text-amber">
-                        {formatTRY(item.price)}
-                      </dd>
-                    </div>
-                    <p className="mt-1 font-display text-base italic text-text">{item.title}</p>
-                    {item.summary.length > 0 && (
-                      <p className="mt-0.5 text-xs text-subtle">{item.summary.join(" · ")}</p>
-                    )}
-                  </div>
-                ))}
+                {(() => {
+                  const journalSlugs = new Set(
+                    items.filter((i) => i.productType === "journal" && i.slug).map((i) => i.slug)
+                  );
+
+                  return items.map((item) => {
+                    const isFreeDigital = item.productType === "digital" && item.slug && journalSlugs.has(item.slug);
+
+                    return (
+                      <div key={item.id} className="py-3">
+                        <div className="flex justify-between gap-4">
+                          <dt className="font-mono text-[11px] uppercase tracking-widest text-dim">
+                            {item.productLabel}
+                          </dt>
+                          <dd className="text-right font-mono text-sm font-medium text-amber">
+                            {isFreeDigital ? (
+                              <span className="flex flex-col items-end">
+                                <span className="text-xs text-dim line-through">{formatTRY(item.price)}</span>
+                                <span className="text-green-400">Bedava</span>
+                              </span>
+                            ) : (
+                              formatTRY(item.price)
+                            )}
+                          </dd>
+                        </div>
+                        <p className="mt-1 font-display text-base italic text-text">{item.title}</p>
+                        {item.summary.length > 0 && (
+                          <p className="mt-0.5 text-xs text-subtle">{item.summary.join(" · ")}</p>
+                        )}
+                      </div>
+                    );
+                  });
+                })()}
               </div>
               <div className="mt-4 flex justify-between gap-4 border-t border-text/[0.08] pt-4">
                 <dt className="font-mono text-xs uppercase tracking-widest text-dim">Toplam</dt>

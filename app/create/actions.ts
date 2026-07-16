@@ -15,6 +15,7 @@ export interface CreateStarMapActionInput {
   journalThemeId?: string | null;
   photoUrls: string[];
   voiceNoteUrl: string | null;
+  videoUrl: string | null;
   musicUrl: string | null;
 }
 
@@ -48,6 +49,7 @@ export async function createStarMapAction(input: CreateStarMapActionInput): Prom
     journalThemeId: input.journalThemeId || null,
     photoUrls: input.photoUrls,
     voiceNoteUrl: input.voiceNoteUrl,
+    videoUrl: input.videoUrl,
     musicUrl: input.musicUrl,
   });
 }

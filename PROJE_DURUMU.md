@@ -42,10 +42,26 @@ Bugünkü çalışma oturumunda, hem yönetici paneli kullanıcı deneyimini iyi
 * **Dynamic Yasal Sayfalar:** KVKK, Kullanım Koşulları, Mesafeli Satış Sözleşmesi ve Ön Bilgilendirme Formu yasal metinleri için `/sozlesmeler/[slug]` dinamik rotası oluşturuldu ve Footer'a linklendi.
 * **Ödeme Onay Kutuları:** Ödeme formunun sonuna zorunlu sözleşme onay checkbox'ları entegre edildi.
 
+### 8. Tasarım Düzeltmeleri, Video Yükleme/Kayıt ve Fiyat Kampanyası Entegrasyonu
+* **Önizleme Buton Kayması Düzeltildi:** Önizleme butonunun `a` etiketinin varsayılan `inline` stili `block` olarak güncellendi ve sepet butonuyla üst üste binme sorunu giderildi.
+* **Gravür Filigranı Netleştirildi:** Açık renkli Gravür temasında okunmayan beyaz filigran yerine, koyu kahverengi mürekkep tonlarında (`#241F19`) ve dengeli opaklıkta çalışan `.watermark-overlay.watermark-gravur` sınıfı entegre edildi.
+* **20 Saniyelik Video Yükleme ve Kayıt:** Dosya seçerek ya da tarayıcı kamerasından sesli video kaydedilmesini sağlayan `VideoPicker` bileşeni oluşturuldu. 20 saniye sınırı ve sayaç eklendi. Cloudinary ve cam tasarımlı HTML5 video oynatıcısı kullanıcı arayüzüne ve yönetici paneline eklendi.
+* **Defter Alana Dijital Sayfa Bedava:** Sepette aynı slug ile Deri Defter ve Dijital Sayfa bulunduğunda, dijital sayfa fiyatı 0 TL'ye (Bedava) indirilip asıl fiyatının üzeri çizilerek sepet, ödeme ve Firestore sipariş toplamı güncellendi.
+* **Düğün Şablonu & Zengin Notlar:** Yeni Düğün şablonu eklendi ve tüm kategorilerin hazır not listeleri 6'şar adet romantik/duygusal mesajla zenginleştirildi.
+
 ---
 
 ## Bilinen Eksikler ve Yapılacaklar (TODO)
 
+### Öncelikli Altyapı
 - **[ ] Ödeme (iyzico/PayTR) Entegrasyonu:** `/checkout` sayfası ödeme akışına yönlendirmeye hazır ancak iyzico/PayTR entegrasyon API'leri üretim ortamında aktif edilmeli.
 - **[ ] Domain Satın Alımı & Ayarları:** `astrifer.net` domain yönlendirmeleri tamamlanıp production deploy ortamındaki `NEXT_PUBLIC_SITE_URL` ayarları yapılmalı.
+
+### Yeni Dijital Sayfa Özellikleri (Roadmap)
+- **[ ] 3D Celestial Globe (Three.js Gök Küresi - Özellik 2):** İki boyutlu yıldız haritası madalyonu yerine parmakla döndürülebilen, takımyıldızların parıldadığı 3D dönebilir gök küresi.
+- **[ ] Ambient Audio Visualizer (Müzik Görselleştirici - Özellik 3):** Çalan arka plan müziğinin ritim ve bas tonlarına göre gökyüzündeki nebula ve yıldızların hafifçe titreşip parıldaması.
+- **[ ] AI Memory Narrative (AI Hikaye Asistanı - Özellik 4):** Yüklenen ses/video veya anahtar kelimelerden yararlanarak o anın duygusuna uygun edebi bir günlük/anı yazısı hazırlayan hafif yapay zeka servisi.
+- **[ ] Dynamic Day/Night Cycle (Gece/Gündüz Canlı Gökyüzü - Özellik 6):** Sayfanın açıldığı yerel saate göre gökyüzü atmosferinin gün doğumu, gündüz ve kozmik gece renklerine otomatik olarak bürünmesi.
+- **[ ] Cosmic Anniversary Sync (Astronomik Olay Vurgusu - Özellik 7):** Seçilen tarihte gökyüzünde gerçekleşen meteor yağmurları, dolunay gibi doğa olaylarının harita üzerinde özel bir ikon ve kutuyla vurgulanması.
+
 

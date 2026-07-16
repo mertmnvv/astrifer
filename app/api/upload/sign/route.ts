@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { v2 as cloudinary } from "cloudinary";
 import { getCloudinaryEnv, isCloudinaryConfigured } from "@/lib/cloudinary/config";
 
-const ALLOWED_FOLDERS = new Set(["astrifer/starmaps/photos", "astrifer/starmaps/voice"]);
+const ALLOWED_FOLDERS = new Set(["astrifer/starmaps/photos", "astrifer/starmaps/voice", "astrifer/starmaps/videos"]);
 
 /**
  * Mints a short-lived signature for a direct browser-to-Cloudinary upload.
