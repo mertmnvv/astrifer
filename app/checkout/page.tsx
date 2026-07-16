@@ -35,6 +35,9 @@ function CheckoutForm() {
   const [city, setCity] = useState("");
   const [district, setDistrict] = useState("");
 
+  const [agreedToTerms, setAgreedToTerms] = useState(false);
+  const [agreedToSales, setAgreedToSales] = useState(false);
+
   const [paytrToken, setPaytrToken] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [iframeLoading, setIframeLoading] = useState(true);
@@ -50,7 +53,7 @@ function CheckoutForm() {
     Boolean(shippingName.trim() && address.trim() && city.trim() && district.trim());
 
   const formValid = Boolean(
-    name.trim() && email.trim() && phone.trim() && items.length > 0 && starMapSlug && shippingValid
+    name.trim() && email.trim() && phone.trim() && items.length > 0 && starMapSlug && shippingValid && agreedToTerms && agreedToSales
   );
 
   const handleSubmit = async (event: FormEvent) => {
@@ -304,6 +307,35 @@ function CheckoutForm() {
                 </div>
               </AtlasPanel>
             )}
+
+            {/* ── Yasal onay kutuları ── */}
+            <div className="flex flex-col gap-3.5 rounded-2xl border border-text/10 bg-text/[0.01] p-4.5 text-left mb-4">
+              <label className="flex items-start gap-3 cursor-pointer text-[11px] leading-relaxed text-subtle hover:text-bright select-none">
+                <input
+                  type="checkbox"
+                  required
+                  checked={agreedToTerms}
+                  onChange={(e) => setAgreedToTerms(e.target.checked)}
+                  className="mt-0.5 h-3.5 w-3.5 shrink-0 rounded border-text/20 bg-void text-amber focus:ring-amber focus:ring-offset-void focus:outline-none accent-amber"
+                />
+                <span>
+                  <Link href="/sozlesmeler/kullanim-kosullari" target="_blank" className="text-amber underline hover:text-bright transition-colors font-medium">Kullanım Koşullarını</Link> ve <Link href="/sozlesmeler/kvkk" target="_blank" className="text-amber underline hover:text-bright transition-colors font-medium">KVKK Aydınlatma Metnini</Link> okudum, onaylıyorum.
+                </span>
+              </label>
+
+              <label className="flex items-start gap-3 cursor-pointer text-[11px] leading-relaxed text-subtle hover:text-bright select-none">
+                <input
+                  type="checkbox"
+                  required
+                  checked={agreedToSales}
+                  onChange={(e) => setAgreedToSales(e.target.checked)}
+                  className="mt-0.5 h-3.5 w-3.5 shrink-0 rounded border-text/20 bg-void text-amber focus:ring-amber focus:ring-offset-void focus:outline-none accent-amber"
+                />
+                <span>
+                  <Link href="/sozlesmeler/mesafeli-satis" target="_blank" className="text-amber underline hover:text-bright transition-colors font-medium">Mesafeli Satış Sözleşmesini</Link> ve <Link href="/sozlesmeler/on-bilgilendirme" target="_blank" className="text-amber underline hover:text-bright transition-colors font-medium">Ön Bilgilendirme Formunu</Link> okudum, onaylıyorum.
+                </span>
+              </label>
+            </div>
 
             {/* ── Hata mesajı ── */}
             {error && (

@@ -28,39 +28,30 @@ export function Hero({ sky }: HeroProps) {
 
   return (
     <section className="relative flex min-h-screen flex-col items-center justify-center overflow-hidden px-4 pb-12 pt-28 text-center sm:px-8 select-none bg-void">
-      <style>{`
-        @keyframes spin-cw {
-          from { transform: rotate(0deg); }
-          to { transform: rotate(360deg); }
-        }
-        @keyframes spin-ccw {
-          from { transform: rotate(0deg); }
-          to { transform: rotate(-360deg); }
-        }
-        .animate-spin-cw {
-          animation: spin-cw 180s linear infinite;
-        }
-        .animate-spin-ccw {
-          animation: spin-ccw 240s linear infinite;
-        }
-        .animate-spin-ccw-slow {
-          animation: spin-ccw 360s linear infinite;
-        }
-        @media (prefers-reduced-motion: reduce) {
-          .animate-spin-cw, .animate-spin-ccw, .animate-spin-ccw-slow {
-            animation: none !important;
-          }
-        }
-      `}</style>
+
+
+      {/* 1. Full-bleed slowly-drifting ambient StarChart background with shooting stars */}
+      <div className="absolute inset-0 z-0 opacity-[0.42] pointer-events-none">
+        <StarChart
+          sky={sky}
+          label="Örnek bir zaman kapsülünün arka plan gökyüzü"
+          palette={palette}
+          showLabels={false}
+          className="h-full w-full object-cover"
+        />
+      </div>
+
+      {/* 2. Ambient Gradient overlay to darken edges for text contrast */}
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(11,8,16,0.15)_0%,rgba(11,8,16,0.65)_60%,#0b0810_100%)] pointer-events-none z-0" />
       
-      {/* BACKGROUND ASTROLABE ASSEMBLY */}
-      <div className="absolute inset-0 flex items-center justify-center pointer-events-none overflow-hidden -z-10">
+      {/* 3. BACKGROUND ASTROLABE ASSEMBLY */}
+      <div className="absolute inset-0 flex items-center justify-center pointer-events-none overflow-hidden z-10">
         <div className="relative flex items-center justify-center w-[340px] h-[340px] sm:w-[540px] sm:h-[540px] lg:w-[640px] lg:h-[640px]">
           
           {/* Radial Ambient Glow Behind Astrolabe */}
           <div className="absolute inset-0 rounded-full bg-gradient-to-r from-amber/5 via-amber/[0.02] to-transparent blur-3xl" />
 
-          {/* 1. StarChart Medallion (Centerpiece, Interactive if hovered or clicked) */}
+          {/* StarChart Medallion (Centerpiece, Interactive if hovered or clicked) */}
           <div className="absolute w-[240px] h-[240px] sm:w-[380px] sm:h-[380px] lg:w-[440px] lg:h-[440px] rounded-full overflow-hidden border border-amber/15 shadow-[0_0_60px_rgba(230,163,92,0.08)] pointer-events-auto bg-void/90">
             <StarChart
               sky={sky}
@@ -73,8 +64,8 @@ export function Hero({ sky }: HeroProps) {
             />
           </div>
 
-          {/* 2. Outer Astrolabe Ring (Dotted scales, Rotates CCW slowly) */}
-          <div className="absolute w-full h-full flex items-center justify-center animate-spin-ccw">
+          {/* Outer Astrolabe Ring (Dotted scales, Static) */}
+          <div className="absolute w-full h-full flex items-center justify-center">
             <svg viewBox="0 0 100 100" className="w-[330px] h-[330px] sm:w-[525px] sm:h-[525px] lg:w-[620px] lg:h-[620px]">
               <circle cx="50" cy="50" r="49" fill="none" stroke="rgba(230,163,92,0.14)" strokeWidth="0.4" strokeDasharray="1.5 2.5" />
               <circle cx="50" cy="50" r="47.8" fill="none" stroke="rgba(230,163,92,0.06)" strokeWidth="0.2" />
@@ -82,8 +73,8 @@ export function Hero({ sky }: HeroProps) {
             </svg>
           </div>
 
-          {/* 3. Middle Astrolabe Ring (Pills, Degrees & Compass Points, Rotates CW) */}
-          <div className="absolute w-full h-full flex items-center justify-center animate-spin-cw">
+          {/* Middle Astrolabe Ring (Pills, Degrees & Compass Points, Static) */}
+          <div className="absolute w-full h-full flex items-center justify-center">
             <svg viewBox="0 0 100 100" className="w-[290px] h-[290px] sm:w-[460px] sm:h-[460px] lg:w-[540px] lg:h-[540px]">
               <circle cx="50" cy="50" r="48" fill="none" stroke="rgba(230,163,92,0.22)" strokeWidth="0.8" strokeDasharray="4 20" />
               <circle cx="50" cy="50" r="47.2" fill="none" stroke="rgba(230,163,92,0.12)" strokeWidth="0.2" />
@@ -102,8 +93,8 @@ export function Hero({ sky }: HeroProps) {
             </svg>
           </div>
 
-          {/* 4. Inner Fine Ring (Tick lines, Rotates CCW very slowly) */}
-          <div className="absolute w-full h-full flex items-center justify-center animate-spin-ccw-slow">
+          {/* Inner Fine Ring (Tick lines, Static) */}
+          <div className="absolute w-full h-full flex items-center justify-center">
             <svg viewBox="0 0 100 100" className="w-[260px] h-[260px] sm:w-[415px] sm:h-[415px] lg:w-[480px] lg:h-[480px]">
               <circle cx="50" cy="50" r="49.2" fill="none" stroke="rgba(230,163,92,0.35)" strokeWidth="0.5" />
               <circle cx="50" cy="50" r="48" fill="none" stroke="rgba(230,163,92,0.05)" strokeWidth="2.5" />
@@ -113,11 +104,8 @@ export function Hero({ sky }: HeroProps) {
         </div>
       </div>
 
-      {/* Ambient Gradient overlay to darken edges */}
-      <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(11,8,16,0.35)_0%,rgba(11,8,16,0.7)_60%,#0b0810_100%)] pointer-events-none" />
-
       {/* FLOATING ASTRONOMICAL COORDINATES */}
-      <div className="absolute inset-0 overflow-hidden pointer-events-none hidden sm:block">
+      <div className="absolute inset-0 overflow-hidden pointer-events-none hidden sm:block z-10">
         <div className="absolute left-[8%] top-[22%] font-mono text-[9px] tracking-[0.25em] text-dim select-none">
           RA 14h 15m 39.7s <br />
           DEC +19° 10′ 56″
@@ -141,7 +129,7 @@ export function Hero({ sky }: HeroProps) {
         variants={containerVariants}
         initial={reducedMotion ? "show" : "hidden"}
         animate="show"
-        className="relative z-10 w-full max-w-[92%] sm:max-w-[440px] lg:max-w-[480px] rounded-3xl border border-amber/15 bg-void/50 px-6 py-8 sm:px-10 sm:py-10 shadow-[0_50px_100px_-20px_rgba(0,0,0,0.85)] backdrop-blur-xl flex flex-col items-center group hover:border-amber/25 transition-colors duration-500"
+        className="relative z-20 w-full max-w-[92%] sm:max-w-[440px] lg:max-w-[480px] rounded-3xl border border-amber/15 bg-void/50 px-6 py-8 sm:px-10 sm:py-10 shadow-[0_50px_100px_-20px_rgba(0,0,0,0.85)] backdrop-blur-xl flex flex-col items-center group hover:border-amber/25 transition-colors duration-500"
       >
         {/* Subtle decorative corners inside the glass card */}
         <div className="absolute top-3.5 left-3.5 w-3.5 h-3.5 border-t border-l border-amber/30 pointer-events-none" />

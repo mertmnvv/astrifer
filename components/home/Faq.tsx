@@ -37,36 +37,47 @@ export function Faq() {
   };
 
   return (
-    <section className="px-4 py-24 sm:px-8">
+    <section className="px-4 py-28 sm:px-8 select-none relative overflow-hidden bg-void">
+      {/* Ambient background light */}
+      <div className="absolute bottom-0 right-10 w-96 h-96 rounded-full bg-amber/[0.01] blur-3xl pointer-events-none -z-10" />
+
       <div className="mx-auto max-w-2xl">
         <RevealOnScroll>
           <SectionHeading eyebrow="Destek" title="Sıkça Sorulan Sorular" />
         </RevealOnScroll>
 
-        <div className="mt-14">
+        <div className="mt-14 space-y-4">
           {FAQ_ITEMS.map((item, index) => {
             const isOpen = openIndex === index;
             return (
-              <RevealOnScroll key={index} delayMs={index * 80}>
-                <div className={`border-b border-text/10 ${index === 0 ? "border-t" : ""}`}>
+              <RevealOnScroll key={index} delayMs={index * 85}>
+                <div 
+                  className={`overflow-hidden rounded-2xl border transition-all duration-500 backdrop-blur-md ${
+                    isOpen
+                      ? "border-amber/40 bg-void/50 shadow-[0_0_20px_rgba(230,163,92,0.06)]"
+                      : "border-text/10 bg-void/25 hover:border-text/20"
+                  }`}
+                >
                   <button
                     onClick={() => toggleItem(index)}
                     aria-expanded={isOpen}
-                    className="flex w-full items-center gap-4 py-5 text-left transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-amber"
+                    className="flex w-full items-center gap-4 px-6 py-5 text-left transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-amber group"
                   >
-                    <span className="font-mono text-xs font-bold tracking-wider text-amber">
+                    <span className="font-mono text-xs font-bold tracking-widest text-amber">
                       {`Q0${index + 1}`}
                     </span>
-                    <span className="flex-1 font-display text-lg italic text-text">{item.question}</span>
-                    <span className="ml-4 shrink-0 text-amber">
+                    <span className="flex-1 font-display text-[16px] sm:text-lg italic text-bright group-hover:text-amber transition-colors duration-300">
+                      {item.question}
+                    </span>
+                    <span className="ml-4 shrink-0 text-amber/60 group-hover:text-amber transition-colors">
                       <motion.svg
                         animate={{ rotate: isOpen ? 180 : 0 }}
                         transition={{ duration: 0.25, ease: "easeInOut" }}
                         viewBox="0 0 24 24"
                         fill="none"
                         stroke="currentColor"
-                        strokeWidth="2"
-                        className="h-4 w-4"
+                        strokeWidth="2.5"
+                        className="h-4.5 w-4.5"
                       >
                         <path d="M19 9l-7 7-7-7" strokeLinecap="round" strokeLinejoin="round" />
                       </motion.svg>
@@ -79,9 +90,11 @@ export function Faq() {
                         initial={{ height: 0, opacity: 0 }}
                         animate={{ height: "auto", opacity: 1 }}
                         exit={{ height: 0, opacity: 0 }}
-                        transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
+                        transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
                       >
-                        <div className="pb-6 pl-[3.25rem] text-sm leading-relaxed text-subtle">{item.answer}</div>
+                        <div className="pb-6 pl-14 pr-6 text-xs sm:text-sm leading-relaxed text-subtle border-t border-text/[0.04] pt-4">
+                          {item.answer}
+                        </div>
                       </motion.div>
                     )}
                   </AnimatePresence>

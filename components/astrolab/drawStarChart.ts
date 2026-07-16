@@ -169,8 +169,8 @@ export function project(
 }
 
 export function starRadius(mag: number, scale: number): number {
-  // Yıldızları daha belirgin yapmak için taban boyutu artırıldı
-  return Math.max(1.3, 5.0 - mag * 0.72) * scale;
+  // Yıldızların net ve belirgin olması için taban boyutlar optimize edildi
+  return Math.max(1.3, 4.6 - mag * 0.7) * scale;
 }
 
 /** Soft radial gradient, never flat/pure black — easy on the eyes at any hour. */
@@ -334,9 +334,9 @@ function drawStar(
     const phase = (seed % 1000) / 1000;
     const speed = 1.4 + ((seed >> 3) % 500) / 500;
     const glowAlpha = reducedMotion
-      ? 0.55
-      : 0.35 + 0.45 * (0.5 + 0.5 * Math.sin(time * speed + phase * Math.PI * 2));
-    const glowR = r * 5.2; // Glow yarıçapı artırıldı
+      ? 0.28
+      : 0.18 + 0.18 * (0.5 + 0.5 * Math.sin(time * speed + phase * Math.PI * 2));
+    const glowR = r * 3.2; // Glow/Blur yarıçapı azaltılarak yıldızlar keskinleştirildi
     const glow = ctx.createRadialGradient(point.x, point.y, 0, point.x, point.y, glowR);
     glow.addColorStop(0, `rgba(${palette.starGlowRgb}, ${glowAlpha})`);
     glow.addColorStop(1, `rgba(${palette.starGlowRgb}, 0)`);
@@ -480,6 +480,7 @@ function drawMeteor(
   time: number,
   palette: SkyPalette,
 ) {
+  const scale = Math.min(width, height) / 640;
   const cycleIndex = Math.floor(time / METEOR_CYCLE_SECONDS);
   const cycleTime = time - cycleIndex * METEOR_CYCLE_SECONDS;
   if (cycleTime > METEOR_DURATION_SECONDS) return;
@@ -508,7 +509,7 @@ function drawMeteor(
   gradient.addColorStop(1, palette.meteor);
   ctx.strokeStyle = gradient;
   ctx.globalAlpha = alpha;
-  ctx.lineWidth = 1.6;
+  ctx.lineWidth = 2.4 * scale; // Meteor çizgisi kalınlaştırıldı
   ctx.lineCap = "round";
   ctx.beginPath();
   ctx.moveTo(tailX, tailY);
@@ -517,7 +518,7 @@ function drawMeteor(
 
   ctx.fillStyle = palette.meteor;
   ctx.beginPath();
-  ctx.arc(headX, headY, 1.6, 0, Math.PI * 2);
+  ctx.arc(headX, headY, 2.4 * scale, 0, Math.PI * 2); // Başlık boyutu kalınlaştırıldı
   ctx.fill();
   ctx.restore();
 }
