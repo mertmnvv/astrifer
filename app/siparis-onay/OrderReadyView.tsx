@@ -31,6 +31,7 @@ interface OrderReadyViewProps {
     longitude: number;
     locationName: string;
     palette: string;
+    journalThemeId?: string | null;
     photoUrls: string[];
     createdAt: string; // Serialized ISO string
   };

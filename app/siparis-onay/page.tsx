@@ -110,6 +110,7 @@ export default async function OrderConfirmationPage({
       longitude: starMap.longitude,
       locationName: starMap.locationName,
       palette: starMap.palette,
+      journalThemeId: starMap.journalThemeId ?? null,
       photoUrls: starMap.entries
         .find((e: TimelineEntry) => e.isInitial)?.photos
         .map((p: StarMapPhoto) => p.url)
