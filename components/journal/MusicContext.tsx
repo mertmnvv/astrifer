@@ -1,13 +1,14 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
-import { createContext, useContext, useMemo, useRef, useState, useEffect } from "react";
+import { createContext, useContext, useMemo, useRef, useState, useEffect, useCallback } from "react";
 
 interface MusicContextValue {
   hasTrack: boolean;
   playing: boolean;
   play: () => void;
   toggle: () => void;
+  getFrequencies: () => Uint8Array;
 }
 
 const MusicContext = createContext<MusicContextValue | null>(null);
@@ -26,19 +27,44 @@ export function getYoutubeId(url: string | null): string | null {
   return match ? match[1] : null;
 }
 
-/**
- * Owns the single <audio> element or hidden YouTube iframe player for a page's background track.
- * The open gate calls play() (a real click handler, satisfying autoplay policy);
- * MusicToggle elsewhere on the page reads the same playing state and can
- * pause/resume it — two controls, one media source.
- */
 export function MusicProvider({ src, children }: MusicProviderProps) {
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const ytPlayerRef = useRef<any>(null);
   const [playing, setPlaying] = useState(false);
 
+  // Web Audio refs for visualization
+  const audioContextRef = useRef<AudioContext | null>(null);
+  const analyserRef = useRef<AnalyserNode | null>(null);
+  const sourceRef = useRef<MediaElementAudioSourceNode | null>(null);
+  const simulatedDataRef = useRef<Uint8Array>(new Uint8Array(32));
+
   const ytVideoId = useMemo(() => getYoutubeId(src), [src]);
   const isYoutube = Boolean(ytVideoId);
+
+  const setupAudioContext = useCallback(() => {
+    if (isYoutube || !audioRef.current || audioContextRef.current) return;
+    try {
+      const AudioCtx = window.AudioContext || (window as any).webkitAudioContext;
+      if (!AudioCtx) return;
+
+      const ctx = new AudioCtx();
+      const analyser = ctx.createAnalyser();
+      analyser.fftSize = 64; // 32 frequency bins
+
+      // Enable CORS for analysis of hosted Cloudinary URLs
+      audioRef.current.crossOrigin = "anonymous";
+
+      const source = ctx.createMediaElementSource(audioRef.current);
+      source.connect(analyser);
+      analyser.connect(ctx.destination);
+
+      audioContextRef.current = ctx;
+      analyserRef.current = analyser;
+      sourceRef.current = source;
+    } catch (e) {
+      console.warn("Web Audio Analyser setup failed:", e);
+    }
+  }, [isYoutube]);
 
   useEffect(() => {
     if (!isYoutube || !ytVideoId) return;
@@ -101,6 +127,18 @@ export function MusicProvider({ src, children }: MusicProviderProps) {
     };
   }, [isYoutube, ytVideoId]);
 
+  useEffect(() => {
+    return () => {
+      if (audioContextRef.current) {
+        try {
+          void audioContextRef.current.close();
+        } catch (e) {
+          console.error(e);
+        }
+      }
+    };
+  }, []);
+
   const value = useMemo<MusicContextValue>(
     () => ({
       hasTrack: Boolean(src),
@@ -117,6 +155,10 @@ export function MusicProvider({ src, children }: MusicProviderProps) {
           }
         } else {
           if (!audioRef.current) return;
+          setupAudioContext();
+          if (audioContextRef.current && audioContextRef.current.state === "suspended") {
+            void audioContextRef.current.resume();
+          }
           void audioRef.current.play();
           setPlaying(true);
         }
@@ -139,6 +181,10 @@ export function MusicProvider({ src, children }: MusicProviderProps) {
         } else {
           const audio = audioRef.current;
           if (!audio) return;
+          setupAudioContext();
+          if (audioContextRef.current && audioContextRef.current.state === "suspended") {
+            void audioContextRef.current.resume();
+          }
           if (playing) {
             audio.pause();
           } else {
@@ -147,8 +193,26 @@ export function MusicProvider({ src, children }: MusicProviderProps) {
           setPlaying(!playing);
         }
       },
+      getFrequencies: () => {
+        if (!playing) {
+          return new Uint8Array(32);
+        }
+        if (isYoutube || !analyserRef.current) {
+          // Generate procedural sine-wave frequency spikes when YouTube is playing
+          const time = Date.now() * 0.001;
+          for (let i = 0; i < 32; i++) {
+            const val = Math.sin(time * 5 + i * 0.3) * 60 + Math.sin(time * 11 - i * 0.7) * 40 + 110;
+            simulatedDataRef.current[i] = Math.max(0, Math.min(255, val + Math.random() * 25));
+          }
+          return simulatedDataRef.current;
+        } else {
+          const dataArray = new Uint8Array(analyserRef.current.frequencyBinCount);
+          analyserRef.current.getByteFrequencyData(dataArray);
+          return dataArray;
+        }
+      }
     }),
-    [src, playing, isYoutube],
+    [src, playing, isYoutube, setupAudioContext],
   );
 
   return (

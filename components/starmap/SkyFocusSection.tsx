@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { StarChart } from "@/components/astrolab/StarChart";
+import { CelestialGlobe3D } from "./CelestialGlobe3D";
 import type { SkyPalette } from "@/components/astrolab/palettes";
 import { LedgerRule } from "@/components/atlas/LedgerRule";
 import type { ComputeSkyResult } from "@/lib/astronomy/computeSky";
@@ -39,6 +40,7 @@ export function SkyFocusSection({
   const [isSpinning, setIsSpinning] = useState(false);
   const [resetTrigger, setResetTrigger] = useState(0);
   const [isZoomed, setIsZoomed] = useState(false);
+  const [viewMode, setViewMode] = useState<"2d" | "3d">("2d");
 
   const isGravur = palette.id === "gravur-atlas";
 
@@ -77,27 +79,54 @@ export function SkyFocusSection({
 
             {/* Starmap Box */}
             <div
-              className="w-full aspect-[4/3] overflow-hidden border border-[#241F19] my-4 shadow-sm bg-[#E4DFCD] relative group cursor-zoom-in"
-              onClick={() => setIsZoomed(true)}
+              className="w-full aspect-[4/3] overflow-hidden border border-[#241F19] my-4 shadow-sm bg-[#E4DFCD] relative group"
             >
-              <StarChart
-                sky={sky}
-                label={previewLabel}
-                className="h-full w-full"
-                palette={palette}
-                interactive={interactive}
-                isPreviewMode={isPreviewMode}
-                isSpinningExternal={isSpinning}
-                onSpinChange={setIsSpinning}
-                resetTrigger={resetTrigger}
-                showControls={false}
-              />
-              <div className="absolute inset-0 bg-[#241F19]/[0.01] group-hover:bg-[#241F19]/[0.04] transition-colors pointer-events-none" />
-              {/* Zoom badge at top right */}
-              <div className="absolute top-2 right-2 bg-[#E4DFCD] border border-[#241F19]/15 p-1 rounded-md opacity-60 group-hover:opacity-100 transition-opacity">
-                <svg className="w-3.5 h-3.5 text-[#8A5A3B]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5">
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v6m3-3H7" />
-                </svg>
+              {viewMode === "2d" ? (
+                <div className="w-full h-full cursor-zoom-in" onClick={() => setIsZoomed(true)}>
+                  <StarChart
+                    sky={sky}
+                    label={previewLabel}
+                    className="h-full w-full"
+                    palette={palette}
+                    interactive={interactive}
+                    isPreviewMode={isPreviewMode}
+                    isSpinningExternal={isSpinning}
+                    onSpinChange={setIsSpinning}
+                    resetTrigger={resetTrigger}
+                    showControls={false}
+                  />
+                  <div className="absolute inset-0 bg-[#241F19]/[0.01] group-hover:bg-[#241F19]/[0.04] transition-colors pointer-events-none" />
+                  {/* Zoom badge at top right */}
+                  <div className="absolute top-2 right-2 bg-[#E4DFCD] border border-[#241F19]/15 p-1 rounded-md opacity-60 group-hover:opacity-100 transition-opacity">
+                    <svg className="w-3.5 h-3.5 text-[#8A5A3B]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5">
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v6m3-3H7" />
+                    </svg>
+                  </div>
+                </div>
+              ) : (
+                <CelestialGlobe3D sky={sky} palette={palette} className="w-full h-full" />
+              )}
+
+              {/* 2D/3D Toggle Pill Selector */}
+              <div className="absolute bottom-2 left-2 z-30 flex rounded-full border border-[#241F19]/15 bg-[#E4DFCD] p-0.5 shadow-sm">
+                <button
+                  type="button"
+                  onClick={(e) => { e.stopPropagation(); setViewMode("2d"); }}
+                  className={`rounded-full px-2 py-0.5 font-mono text-[8px] uppercase tracking-wider transition-colors ${
+                    viewMode === "2d" ? "bg-[#8A5A3B] text-[#E4DFCD] font-bold" : "text-[#5C5646] hover:text-[#241F19]"
+                  }`}
+                >
+                  2D
+                </button>
+                <button
+                  type="button"
+                  onClick={(e) => { e.stopPropagation(); setViewMode("3d"); }}
+                  className={`rounded-full px-2 py-0.5 font-mono text-[8px] uppercase tracking-wider transition-colors ${
+                    viewMode === "3d" ? "bg-[#8A5A3B] text-[#E4DFCD] font-bold" : "text-[#5C5646] hover:text-[#241F19]"
+                  }`}
+                >
+                  3D Küre
+                </button>
               </div>
             </div>
 
@@ -231,29 +260,57 @@ export function SkyFocusSection({
           className="pointer-events-none absolute -inset-10 -z-10 rounded-full"
           style={{ background: "radial-gradient(60% 60% at 50% 50%, rgba(230,184,119,0.18), transparent 70%)" }}
         />
-        <div className="rounded-full border border-amber/[0.2] p-[7px] cursor-zoom-in group" onClick={() => setIsZoomed(true)}>
+        <div className="rounded-full border border-amber/[0.2] p-[7px] group relative">
           <div
             className="aspect-square overflow-hidden rounded-full border border-amber/40 shadow-[0_25px_70px_-24px_rgba(0,0,0,0.65)] relative"
           >
-            <StarChart
-              sky={sky}
-              label={previewLabel}
-              className="h-full w-full"
-              palette={palette}
-              interactive={interactive}
-              isPreviewMode={isPreviewMode}
-              isSpinningExternal={isSpinning}
-              onSpinChange={setIsSpinning}
-              resetTrigger={resetTrigger}
-              showControls={false}
-            />
-            {/* Hover magnifying glass badge */}
-            <div className="absolute inset-0 bg-void/30 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center pointer-events-none">
-              <div className="bg-void/85 border border-amber/30 p-3 rounded-full text-amber shadow-lg">
-                <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5">
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v6m3-3H7" />
-                </svg>
+            {viewMode === "2d" ? (
+              <div className="w-full h-full cursor-zoom-in" onClick={() => setIsZoomed(true)}>
+                <StarChart
+                  sky={sky}
+                  label={previewLabel}
+                  className="h-full w-full"
+                  palette={palette}
+                  interactive={interactive}
+                  isPreviewMode={isPreviewMode}
+                  isSpinningExternal={isSpinning}
+                  onSpinChange={setIsSpinning}
+                  resetTrigger={resetTrigger}
+                  showControls={false}
+                />
+                {/* Hover magnifying glass badge */}
+                <div className="absolute inset-0 bg-void/30 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center pointer-events-none">
+                  <div className="bg-void/85 border border-amber/30 p-3 rounded-full text-amber shadow-lg">
+                    <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5">
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v6m3-3H7" />
+                    </svg>
+                  </div>
+                </div>
               </div>
+            ) : (
+              <CelestialGlobe3D sky={sky} palette={palette} className="w-full h-full" />
+            )}
+
+            {/* 2D/3D Toggle Pill Selector */}
+            <div className="absolute bottom-4 left-1/2 -translate-x-1/2 z-30 flex rounded-full border border-amber/30 bg-void/85 p-0.5 shadow-lg backdrop-blur-sm">
+              <button
+                type="button"
+                onClick={(e) => { e.stopPropagation(); setViewMode("2d"); }}
+                className={`rounded-full px-2.5 py-0.5 font-mono text-[8.5px] uppercase tracking-wider transition-colors ${
+                  viewMode === "2d" ? "bg-amber text-ink font-bold" : "text-muted hover:text-bright"
+                }`}
+              >
+                2D Harita
+              </button>
+              <button
+                type="button"
+                onClick={(e) => { e.stopPropagation(); setViewMode("3d"); }}
+                className={`rounded-full px-2.5 py-0.5 font-mono text-[8.5px] uppercase tracking-wider transition-colors ${
+                  viewMode === "3d" ? "bg-amber text-ink font-bold" : "text-muted hover:text-bright"
+                }`}
+              >
+                3D Küre
+              </button>
             </div>
           </div>
         </div>

@@ -135,3 +135,51 @@ export const DEFAULT_SKY_PALETTE = SKY_PALETTES[0];
 export function getSkyPalette(id: string | undefined): SkyPalette {
   return SKY_PALETTES.find((palette) => palette.id === id) ?? DEFAULT_SKY_PALETTE;
 }
+
+export function getTimedPalette(palette: SkyPalette, hour?: number): SkyPalette {
+  if (palette.id === "gravur-atlas") {
+    return palette; // Keep vintage paper style intact
+  }
+
+  const h = hour !== undefined ? hour : new Date().getHours();
+
+  // 1. Morning (06:00 - 10:00) - Deep Sunrise Rose
+  if (h >= 6 && h < 10) {
+    return {
+      ...palette,
+      skyCenter: "#3c1825",
+      skyEdge: "#11070e",
+      star: "#ffeae4",
+      starGlowRgb: "235,140,165",
+      meteor: "#eb8ca5",
+    };
+  }
+  // 2. Daytime (10:00 - 18:00) - Soft Sky Blue
+  if (h >= 10 && h < 18) {
+    return {
+      ...palette,
+      skyCenter: "#a2d2df",
+      skyEdge: "#245070",
+      star: "#ffffff",
+      starGlowRgb: "255,255,255",
+      moonLit: "#ffffff",
+      moonDark: "#789da8",
+      sun: "#fff2a3",
+      label: "#eef8fa",
+      meteor: "#ffffff",
+    };
+  }
+  // 3. Evening/Sunset (18:00 - 21:00) - Sunset Violet-Amber
+  if (h >= 18 && h < 21) {
+    return {
+      ...palette,
+      skyCenter: "#2d0f28",
+      skyEdge: "#0a030f",
+      star: "#ffeedf",
+      starGlowRgb: "242,166,126",
+      meteor: "#f2a67e",
+    };
+  }
+  // 4. Night (21:00 - 06:00) - Keep the original dark mode palette intact
+  return palette;
+}

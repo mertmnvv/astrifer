@@ -186,6 +186,39 @@ export function CreateForm({ templates, pricing }: CreateFormProps) {
   const [musicError, setMusicError] = useState<string | null>(null);
   const [showBookModal, setShowBookModal] = useState(false);
 
+  // AI Memory Message Generator States
+  const [showAiModal, setShowAiModal] = useState(false);
+  const [aiKeywords, setAiKeywords] = useState("");
+  const [isGeneratingAi, setIsGeneratingAi] = useState(false);
+  const [aiResult, setAiResult] = useState("");
+  const [aiError, setAiError] = useState<string | null>(null);
+
+  const handleGenerateAiMessage = async () => {
+    setIsGeneratingAi(true);
+    setAiError(null);
+    try {
+      const res = await fetch("/api/ai/generate-narrative", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          keywords: aiKeywords,
+          date,
+          location: place?.name,
+        }),
+      });
+      const data = await res.json();
+      if (data.success && data.text) {
+        setAiResult(data.text);
+      } else {
+        setAiError(data.error || "Mektup yazılamadı, lütfen tekrar deneyin.");
+      }
+    } catch {
+      setAiError("Sunucu hatası oluştu, lütfen tekrar deneyin.");
+    } finally {
+      setIsGeneratingAi(false);
+    }
+  };
+
   const handleYoutubeChange = (val: string) => {
     setYoutubeInput(val);
     setMusicError(null);
@@ -911,9 +944,18 @@ export function CreateForm({ templates, pricing }: CreateFormProps) {
           </div>
 
           <div className="mt-3">
-            <label htmlFor="message" className={FIELD_LABEL_CLASS}>
-              Kişisel Mesaj
-            </label>
+            <div className="flex items-center justify-between">
+              <label htmlFor="message" className={FIELD_LABEL_CLASS}>
+                Kişisel Mesaj
+              </label>
+              <button
+                type="button"
+                onClick={() => setShowAiModal(true)}
+                className="font-mono text-[9px] uppercase tracking-wider text-amber hover:underline flex items-center gap-1 focus:outline-none"
+              >
+                <span>✨ Yapay Zeka ile Yaz</span>
+              </button>
+            </div>
             <textarea
               id="message"
               rows={3}
@@ -1250,6 +1292,137 @@ export function CreateForm({ templates, pricing }: CreateFormProps) {
               </div>
             </motion.div>
           </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* AI Memory Message Generator Modal */}
+      <AnimatePresence>
+        {showAiModal && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-void/85 backdrop-blur-sm" onClick={() => setShowAiModal(false)}>
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.95 }}
+              className="relative w-full max-w-md rounded-2xl border border-text/10 bg-[#15101a] p-6 shadow-2xl"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <button
+                type="button"
+                onClick={() => {
+                  setShowAiModal(false);
+                  setAiError(null);
+                  setAiResult("");
+                }}
+                className="absolute top-4 right-4 text-dim hover:text-bright"
+              >
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.5} className="h-5 w-5">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+
+              <p className="font-mono text-[9px] uppercase tracking-[0.25em] text-amber mb-1">
+                ✨ Yapay Zeka Hikaye Asistanı
+              </p>
+              <h3 className="font-display text-xl italic text-bright mb-4">
+                Anılarınızı Şiirsel Bir Mektuba Dönüştürün
+              </h3>
+
+              <div className="space-y-4">
+                <div>
+                  <label htmlFor="aiKeywords" className={FIELD_LABEL_CLASS}>
+                    Anınızdan veya Aklınızdan Geçenler (İpucu/Kelime)
+                  </label>
+                  <textarea
+                    id="aiKeywords"
+                    rows={2}
+                    value={aiKeywords}
+                    onChange={(e) => setAiKeywords(e.target.value)}
+                    placeholder="ör. Yağmurlu bir günde Kadıköy iskelesinde ilk karşılaşmamız, gözlerindeki heyecan..."
+                    className={`${FIELD_CLASS} resize-none`}
+                  />
+                </div>
+
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <label className={FIELD_LABEL_CLASS}>Tarih</label>
+                    <input
+                      type="text"
+                      disabled
+                      value={date}
+                      className={`${FIELD_CLASS} opacity-60 cursor-not-allowed`}
+                    />
+                  </div>
+                  <div>
+                    <label className={FIELD_LABEL_CLASS}>Konum</label>
+                    <input
+                      type="text"
+                      disabled
+                      value={place?.name || "Belirtilmedi"}
+                      className={`${FIELD_CLASS} opacity-60 cursor-not-allowed`}
+                    />
+                  </div>
+                </div>
+
+                {aiError && (
+                  <p className="text-xs text-red-400 font-mono">{aiError}</p>
+                )}
+
+                {aiResult && (
+                  <div className="rounded-xl border border-amber/20 bg-amber/[0.03] p-4 flex flex-col gap-2">
+                    <p className="font-mono text-[9px] uppercase tracking-wider text-amber">Taslak Mektup</p>
+                    <p className="font-display text-sm italic text-bright leading-relaxed">
+                      &ldquo;{aiResult}&rdquo;
+                    </p>
+                  </div>
+                )}
+
+                <div className="flex gap-3 pt-2">
+                  {aiResult ? (
+                    <>
+                      <button
+                        type="button"
+                        onClick={handleGenerateAiMessage}
+                        disabled={isGeneratingAi}
+                        className="flex-1 rounded-full border border-text/20 bg-text/[0.02] py-2.5 font-mono text-[10px] uppercase tracking-widest text-subtle transition-colors hover:border-amber hover:text-amber disabled:opacity-40"
+                      >
+                        {isGeneratingAi ? "Yazılıyor..." : "Yeniden Yaz"}
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setMessage(aiResult);
+                          setShowAiModal(false);
+                          setAiResult("");
+                          setAiError(null);
+                        }}
+                        className="flex-1 rounded-full bg-amber py-2.5 font-mono text-[10px] uppercase tracking-widest text-ink font-semibold transition-colors hover:bg-amber-light active:scale-95"
+                      >
+                        Mektubu Kullan
+                      </button>
+                    </>
+                  ) : (
+                    <button
+                      type="button"
+                      onClick={handleGenerateAiMessage}
+                      disabled={isGeneratingAi || !aiKeywords.trim()}
+                      className="w-full rounded-full bg-amber py-2.5 font-mono text-[10px] uppercase tracking-widest text-ink font-semibold transition-colors hover:bg-amber-light disabled:opacity-40 active:scale-95 flex items-center justify-center gap-2"
+                    >
+                      {isGeneratingAi ? (
+                        <>
+                          <svg className="animate-spin h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                            <path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67" />
+                          </svg>
+                          Yazılıyor...
+                        </>
+                      ) : (
+                        "Şiirsel Mektup Yaz"
+                      )}
+                    </button>
+                  )}
+                </div>
+              </div>
+            </motion.div>
+          </div>
         )}
       </AnimatePresence>
     </form>

@@ -5,7 +5,7 @@ import { CrossSell } from "@/components/CrossSell";
 import { StarChart } from "@/components/astrolab/StarChart";
 import { StarKeyLegend } from "@/components/astrolab/StarKeyLegend";
 import { buildSkyLabels } from "@/components/astrolab/drawStarChart";
-import { getSkyPalette } from "@/components/astrolab/palettes";
+import { getSkyPalette, getTimedPalette } from "@/components/astrolab/palettes";
 import { AtlasPanel } from "@/components/atlas/AtlasPanel";
 import { LedgerRule } from "@/components/atlas/LedgerRule";
 import { PageGate } from "@/components/journal/PageGate";
@@ -14,6 +14,7 @@ import { MusicToggle } from "@/components/ui/MusicToggle";
 import { RevealOnScroll } from "@/components/ui/RevealOnScroll";
 import { computeSky } from "@/lib/astronomy/computeSky";
 import { buildSkyNarrative } from "@/lib/astronomy/skyNarrative";
+import { getCosmicEvents } from "@/lib/astronomy/cosmicEvents";
 import type { StarMapRecord } from "@/lib/starmaps";
 import { FirstMomentSection } from "./FirstMomentSection";
 import { SkyFocusSection } from "./SkyFocusSection";
@@ -88,7 +89,7 @@ export function StarMapView({
   const dateLabel = formatEventDate(starMap.eventDateUtc, starMap.timezone);
   const previewLabel = `${starMap.locationName} üzerinde ${dateLabel} anının gökyüzü`;
   const skyLog = buildSkyNarrative(sky);
-  const palette = getSkyPalette(starMap.palette);
+  const palette = getTimedPalette(getSkyPalette(starMap.palette));
   const isGravur = palette.id === "gravur-atlas";
   const hasStarKey = buildSkyLabels(sky).length > 0;
   const editHref = `/create?${buildEditParams(starMap, step, furthestStep).toString()}`;
@@ -203,6 +204,52 @@ export function StarMapView({
           title={starMap.title}
           dateLabel={dateLabel}
         />
+
+        {/* Kozmik Gökyüzü Olayları Kartı */}
+        {sky && (() => {
+          const cosmicEvents = getCosmicEvents(sky);
+          return (
+            <RevealOnScroll durationMs={1000} className="mt-16 w-full max-w-xl">
+              <AtlasPanel padding="lg" className={`flex flex-col gap-4 text-center ${isGravur ? "border-gravur-ink/10 bg-gravur-ink/[0.015]" : "border-amber/15 bg-amber/[0.02]"}`}>
+                <div className="flex flex-col items-center gap-1">
+                  <p className={`font-mono text-[9px] uppercase tracking-[0.25em] ${isGravur ? "text-gravur-copper" : "text-amber"}`}>
+                    🌌 Kozmik Gökyüzü Olayları
+                  </p>
+                  <div className={`w-[80px] h-[1px] ${isGravur ? "bg-gravur-copper/35" : "bg-amber/35"} mt-1.5`} />
+                </div>
+                <div className="grid gap-4 sm:grid-cols-2 text-left">
+                  <div className={`p-3.5 rounded-xl border ${isGravur ? "border-gravur-ink/10 bg-gravur-paper/40" : "border-text/5 bg-text/[0.015]"}`}>
+                    <p className={`font-mono text-[8.5px] uppercase tracking-wider ${isGravur ? "text-gravur-copper" : "text-amber"}`}>
+                      Ay Evresi: {cosmicEvents.moonPhaseName}
+                    </p>
+                    <p className={`text-xs mt-1 leading-normal ${isGravur ? "text-gravur-ink-soft" : "text-subtle"}`}>
+                      {cosmicEvents.moonDescription}
+                    </p>
+                  </div>
+                  {cosmicEvents.specialEvent ? (
+                    <div className={`p-3.5 rounded-xl border ${isGravur ? "border-gravur-ink/10 bg-gravur-paper/40" : "border-text/5 bg-text/[0.015]"}`}>
+                      <p className={`font-mono text-[8.5px] uppercase tracking-wider ${isGravur ? "text-gravur-copper" : "text-amber"}`}>
+                        Gök Olayı: {cosmicEvents.specialEvent}
+                      </p>
+                      <p className={`text-xs mt-1 leading-normal ${isGravur ? "text-gravur-ink-soft" : "text-subtle"}`}>
+                        {cosmicEvents.specialEventDescription}
+                      </p>
+                    </div>
+                  ) : (
+                    <div className={`p-3.5 rounded-xl border ${isGravur ? "border-gravur-ink/10 bg-gravur-paper/40" : "border-text/5 bg-text/[0.015]"}`}>
+                      <p className={`font-mono text-[8.5px] uppercase tracking-wider ${isGravur ? "text-gravur-copper" : "text-amber"}`}>
+                        Meteor Görünümü
+                      </p>
+                      <p className={`text-xs mt-1 leading-normal ${isGravur ? "text-gravur-ink-soft" : "text-subtle"}`}>
+                        Gökyüzü berrak ve durgun, sakin akan yıldız ışıklarıyla kaplı.
+                      </p>
+                    </div>
+                  )}
+                </div>
+              </AtlasPanel>
+            </RevealOnScroll>
+          );
+        })()}
 
         {/* Yıldız Anahtarı — haritadaki numaralı yıldız/gezegen işaretlerini gerçek adlarına bağlar */}
         {hasStarKey && (
