@@ -295,8 +295,8 @@ const GENERAL_FEATURES = [
         <path strokeLinecap="round" strokeLinejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 0 1 2.25-2.25h13.5A2.25 2.25 0 0 1 21 7.5v11.25m-18 0A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75m-18 0v-7.5A2.25 2.25 0 0 1 5.25 9h13.5A2.25 2.25 0 0 1 21 11.25v7.5" />
       </svg>
     ),
-    title: "Zaman Çizelgesi",
-    description: "Zamanla büyüyen dijital günlük. Her 6 ayda bir yeni fotoğraf ve not ekleyerek anınızı yaşayan bir hikayeye dönüştürün.",
+    title: "Aylık Zaman Çizelgesi",
+    description: "Her ay yeni bir fotoğraf ve not ekleyerek anınızı yaşayan bir hikayeye dönüştürebilirsiniz. Zamanla büyüyen dijital bir günlük.",
   },
   {
     icon: (
@@ -354,8 +354,7 @@ export default function DigitalProductPage() {
             </h1>
             <p className="mt-4 max-w-lg text-xs leading-relaxed text-subtle sm:text-sm">
               Hayatınızın herhangi bir anının gerçek yıldız haritasını, 8 farklı
-              tasarım temasıyla kişiselleştirin. Her renk, farklı bir duygu ve
-              atmosfer taşıyor.
+              tasarım temasıyla kişiselleştirin. <strong>Her ay yeni fotoğraflar ekleyerek</strong> yaşayan bir dijital anı günlüğüne dönüştürün.
             </p>
             <div className="mt-5 flex items-center gap-2">
               <span className="rounded-full border border-amber/30 bg-amber/5 px-4 py-1.5 font-mono text-[10px] uppercase tracking-widest text-amber">
@@ -485,24 +484,6 @@ export default function DigitalProductPage() {
                     ))}
                   </div>
                 </div>
-              </div>
-
-              {/* Price and CTA */}
-              <div className="flex flex-wrap items-center justify-between gap-6 rounded-2xl border border-text/10 bg-text/[0.02] p-5 sm:p-6">
-                <div>
-                  <p className="font-mono text-[9px] uppercase tracking-widest text-dim">
-                    Tek Seferlik Ödeme
-                  </p>
-                  <p className="mt-1 font-mono text-2xl font-semibold text-amber">
-                    {formatTRY(DIGITAL_PRICE)}
-                  </p>
-                </div>
-                <Link
-                  href={createHref}
-                  className="rounded-full bg-gradient-to-br from-amber-light to-amber-deep px-8 py-4 font-mono text-xs uppercase tracking-widest text-ink shadow-[0_10px_40px_-12px_rgba(230,163,92,0.6)] transition-all hover:scale-[1.02] hover:opacity-95"
-                >
-                  Bu Tasarımla Başla
-                </Link>
               </div>
             </div>
 
@@ -713,6 +694,64 @@ export default function DigitalProductPage() {
                   {/* Home Indicator */}
                   <div className="absolute bottom-1.5 left-1/2 -translate-x-1/2 w-28 h-1 bg-[#1d1d1f] rounded-full z-30" />
                 </div>
+              </div>
+            </div>
+          </div>
+
+          {/* ─── Price and CTA (below preview) ─── */}
+          <div className="relative mt-14 sm:mt-16">
+            {/* Decorative glow */}
+            <div
+              className="absolute inset-0 -z-10 rounded-3xl blur-2xl opacity-20 transition-all duration-700"
+              style={{
+                background: `radial-gradient(ellipse at 50% 50%, ${activePalette.skyCenter} 0%, transparent 70%)`,
+              }}
+            />
+
+            <div className="flex flex-col items-center text-center py-10 sm:py-14 px-6 rounded-3xl border border-text/[0.06] bg-gradient-to-b from-text/[0.02] to-transparent">
+              {/* Decorative star divider */}
+              <div className="flex items-center gap-3 mb-6">
+                <span className="h-px w-10 bg-gradient-to-r from-transparent to-amber/30" />
+                <svg viewBox="0 0 24 24" fill="currentColor" className="h-3 w-3 text-amber/40">
+                  <path d="M12 2l1.09 6.91L20 10l-6.91 1.09L12 18l-1.09-6.91L4 10l6.91-1.09L12 2z" />
+                </svg>
+                <span className="h-px w-10 bg-gradient-to-l from-transparent to-amber/30" />
+              </div>
+
+              <p className="font-display text-sm italic text-subtle sm:text-base">
+                Seçtiğiniz tasarımla başlayın
+              </p>
+
+              <div className="mt-4 flex items-baseline gap-1.5">
+                <span className="font-mono text-3xl font-semibold text-amber sm:text-4xl">
+                  {formatTRY(DIGITAL_PRICE)}
+                </span>
+                <span className="font-mono text-[9px] uppercase tracking-widest text-dim">
+                  / tek seferlik
+                </span>
+              </div>
+
+              <p className="mt-2 text-[11px] text-dim max-w-xs">
+                Ömür boyu erişim · Sınırsız düzenleme · Her Ay Fotoğraf Ekleme
+              </p>
+
+              <Link
+                href={createHref}
+                className="mt-7 group relative inline-flex items-center gap-2.5 rounded-full bg-gradient-to-br from-amber-light to-amber-deep px-10 py-4 font-mono text-xs uppercase tracking-widest text-ink shadow-[0_10px_40px_-12px_rgba(230,163,92,0.5)] transition-all duration-300 hover:scale-[1.03] hover:shadow-[0_14px_50px_-10px_rgba(230,163,92,0.65)]"
+              >
+                Bu Tasarımla Başla
+                <svg viewBox="0 0 20 20" fill="currentColor" className="h-3.5 w-3.5 transition-transform duration-300 group-hover:translate-x-0.5">
+                  <path fillRule="evenodd" d="M3 10a.75.75 0 0 1 .75-.75h10.638L10.23 5.29a.75.75 0 1 1 1.04-1.08l5.5 5.25a.75.75 0 0 1 0 1.08l-5.5 5.25a.75.75 0 1 1-1.04-1.08l4.158-3.96H3.75A.75.75 0 0 1 3 10Z" clipRule="evenodd" />
+                </svg>
+              </Link>
+
+              {/* Decorative bottom star divider */}
+              <div className="flex items-center gap-3 mt-8">
+                <span className="h-px w-6 bg-gradient-to-r from-transparent to-text/10" />
+                <svg viewBox="0 0 24 24" fill="currentColor" className="h-2 w-2 text-text/10">
+                  <path d="M12 2l1.09 6.91L20 10l-6.91 1.09L12 18l-1.09-6.91L4 10l6.91-1.09L12 2z" />
+                </svg>
+                <span className="h-px w-6 bg-gradient-to-l from-transparent to-text/10" />
               </div>
             </div>
           </div>
