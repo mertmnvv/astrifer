@@ -28,13 +28,24 @@ Bugünkü çalışma oturumunda, hem yönetici paneli kullanıcı deneyimini iyi
 * **Adım Koruma Mantığı:** Kullanıcının `/create` üzerinde kaldığı adım (`step` ve en uzak ulaştığı adım olan `furthestStep`) URL parametrelerine ve Firestore taslak verisine entegre edildi. Önizlemeden geri dönüldüğünde kullanıcı kaldığı adımdan devam edebiliyor.
 * **YouTube Müzik Entegrasyonu:** Arka plan müzikleri için YouTube linki girildiğinde mp3 dönüştürme aşaması kaldırıldı. YouTube Iframe Player API kullanılarak müzik doğrudan arka planda YouTube üzerinden çalınacak şekilde `MusicContext.tsx` güncellendi. Form içinde de YouTube müziği için şık bir önizleme oynatıcısı sunuldu.
 * **Defter Sayfa Dizilimi:** Sayfa sıralamasındaki blank sayfa dizilimleri düzeltildi. QR kodlu sayfa arka kapak öncesine (11. sayfa konumuna) taşındı.
+### 5. Bulut Depolama (Cloudflare R2) Göçü & Güvenlik
+* **Cloudflare R2 Migrasyonu:** AWS S3 SDK entegrasyonu tamamlandı. Firebase/GCS Storage kütüphanesi yerine `lib/r2.ts` yardımıyla tüm fotoğraf yüklemeleri ve presigned PDF baskı linkleri Cloudflare R2'ye taşındı.
+* **Yönetici Şifre Güvenliği:** Yönetici paneli şifresi üretim ortamı için güvenli bir değere (`22932293Me.`) güncellendi.
+
+### 6. Yıldız Haritası Parlaklık & Belirginlik İyileştirmeleri
+* **Yıldız Netleştirme:** Yıldızların etrafındaki aşırı bulanıklığa (blur) sebep olan parıldama haleleri (`glow`) ve yarıçap değerleri optimize edildi. Yıldızlar artık keskin, net dairesel noktalar halinde parıldıyor.
+* **Filigran Okunabilirliği:** Mobil görünümlerde "GEÇİCİ ÖNİZLEME" yazısı ve kilit ikonunun mikroskobik boyutlara küçülmesini engellemek için minimum sınırlar getirilip opaklık artırıldı.
+
+### 7. Anasayfa Tasarım Redesign & Yasal Sözleşmeler
+* **Yeni Cam Kart Tasarımları (Gece Camı & Kehribar Yaldız):** "Ne İnşa Ediyoruz", "Nasıl Çalışır" ve "FAQ" bölümleri, ince altın kontur parıltılarına sahip lüks glassmorphic kartlara dönüştürüldü.
+* **Yörünge Çizgisi Akışı:** "Nasıl Çalışır" bölümünün arkasına masaüstünde adımları bağlayan estetik bir gökyüzü yörünge çizgisi yerleştirildi.
+* **Dynamic Yasal Sayfalar:** KVKK, Kullanım Koşulları, Mesafeli Satış Sözleşmesi ve Ön Bilgilendirme Formu yasal metinleri için `/sozlesmeler/[slug]` dinamik rotası oluşturuldu ve Footer'a linklendi.
+* **Ödeme Onay Kutuları:** Ödeme formunun sonuna zorunlu sözleşme onay checkbox'ları entegre edildi.
 
 ---
 
 ## Bilinen Eksikler ve Yapılacaklar (TODO)
 
-- **[ ] Ödeme (iyzico) Entegrasyonu:** `/checkout` sayfası sepeti gösteriyor ancak ödeme aşaması henüz kapalı.
-- **[ ] Geçici Manuel Sipariş Akışı:** iyzico entegre edilene kadar banka havalesi (IBAN) ve WhatsApp üzerinden manuel sipariş onaylama adımlarının koda dökülmesi gerekiyor. Sipariş durumu `"ödeme bekleniyor"` olarak Firestore'a kaydedilmeli ve kullanıcıya banka bilgileri gösterilmeli.
-- **[ ] Firebase Storage Bucket Ayarı:** `.env.local` dosyasındaki `FIREBASE_STORAGE_BUCKET` alanı hâlâ boş. Bu alan doldurulmalı, aksi halde PDF baskı üretimi sırasında hata alınabilir.
-- **[ ] Domain Satın Alımı & Ayarları:** `astrifer.com` / `astrifer.net` domain yönlendirmeleri ve production deploy ortamındaki `NEXT_PUBLIC_SITE_URL` ayarları yapılmalı.
-- **[ ] Admin Güvenliği:** `.env.local` içinde test amacıyla `ADMIN_PASSWORD=0000` kullanılıyor. Canlıya geçmeden önce bu şifre güçlü bir değerle değiştirilmeli.
+- **[ ] Ödeme (iyzico/PayTR) Entegrasyonu:** `/checkout` sayfası ödeme akışına yönlendirmeye hazır ancak iyzico/PayTR entegrasyon API'leri üretim ortamında aktif edilmeli.
+- **[ ] Domain Satın Alımı & Ayarları:** `astrifer.net` domain yönlendirmeleri tamamlanıp production deploy ortamındaki `NEXT_PUBLIC_SITE_URL` ayarları yapılmalı.
+
