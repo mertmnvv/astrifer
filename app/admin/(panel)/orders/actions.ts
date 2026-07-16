@@ -2,12 +2,11 @@
 
 import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
-import { getBucket, getDb } from "@/lib/firebase/admin";
+import { getDb } from "@/lib/firebase/admin";
+import { getR2SignedUrl } from "@/lib/r2";
 import { renderJournalPrintFiles, renderLetterInsert } from "@/lib/journalPrintRender";
 import type { OrderDoc, OrderStatus } from "@/types/firestore";
 import { resolveItemSlug, STATUS_OPTIONS as VALID_STATUSES } from "./shared";
-
-const SIGNED_URL_TTL_MS = 5 * 60 * 1000;
 
 export async function updateOrderAction(formData: FormData) {
   const orderId = String(formData.get("orderId") ?? "");
@@ -80,9 +79,7 @@ export async function getJournalPrintPdfDownloadUrlAction(orderId: string): Prom
   const order = snapshot.data() as OrderDoc;
   if (!order.printPdfPath) throw new Error("Bu sipariş için henüz baskıya hazır PDF üretilmedi.");
 
-  const [url] = await getBucket()
-    .file(order.printPdfPath)
-    .getSignedUrl({ action: "read", expires: Date.now() + SIGNED_URL_TTL_MS });
+  const url = await getR2SignedUrl(order.printPdfPath, 300);
 
   return url;
 }
@@ -135,9 +132,7 @@ export async function getLetterInsertDownloadUrlAction(orderId: string): Promise
   const order = snapshot.data() as OrderDoc;
   if (!order.letterInsertPrintPath) throw new Error("Bu sipariş için henüz mektup eki üretilmedi.");
 
-  const [url] = await getBucket()
-    .file(order.letterInsertPrintPath)
-    .getSignedUrl({ action: "read", expires: Date.now() + SIGNED_URL_TTL_MS });
+  const url = await getR2SignedUrl(order.letterInsertPrintPath, 300);
 
   return url;
 }

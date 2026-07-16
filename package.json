@@ -10,6 +10,8 @@
     "seed:firebase": "node scripts/seed-firestore.mjs"
   },
   "dependencies": {
+    "@aws-sdk/client-s3": "^3.1088.0",
+    "@aws-sdk/s3-request-presigner": "^3.1088.0",
     "@distube/ytdl-core": "^4.16.12",
     "@sparticuz/chromium": "^149.0.0",
     "astronomy-engine": "^2.1.19",

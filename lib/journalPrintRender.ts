@@ -73,8 +73,7 @@ export async function renderJournalPrintFiles(slug: string): Promise<RenderJourn
   const bufferByKind = new Map<JournalPageKind, Buffer>();
 
   try {
-    const { getBucket } = await import("@/lib/firebase/admin");
-    const bucket = getBucket();
+    const { uploadToR2 } = await import("@/lib/r2");
     const timestamp = Date.now();
 
     for (const kind of JOURNAL_PAGE_KINDS) {
@@ -90,7 +89,7 @@ export async function renderJournalPrintFiles(slug: string): Promise<RenderJourn
         const buffer = (await targetHandle.screenshot({ type: "png" })) as Buffer;
 
         const storagePath = `starmaps-print/${slug}/journal-${kind}-${timestamp}.png`;
-        await bucket.file(storagePath).save(buffer, { metadata: { contentType: "image/png" } });
+        await uploadToR2(storagePath, buffer, "image/png");
         pathByKind.set(kind, storagePath);
         bufferByKind.set(kind, buffer);
       } finally {
@@ -107,7 +106,7 @@ export async function renderJournalPrintFiles(slug: string): Promise<RenderJourn
     const orderedBuffers = JOURNAL_PAGE_ORDER.map((kind) => bufferByKind.get(kind) as Buffer);
     const pdfBuffer = await assembleJournalPdf(orderedBuffers, JOURNAL_TRIM_CM);
     const pdfStoragePath = `starmaps-print/${slug}/journal-book-${timestamp}.pdf`;
-    await bucket.file(pdfStoragePath).save(pdfBuffer, { metadata: { contentType: "application/pdf" } });
+    await uploadToR2(pdfStoragePath, pdfBuffer, "application/pdf");
 
     return { manifest, pdfStoragePath };
   } finally {
@@ -153,9 +152,9 @@ export async function renderLetterInsert(
     const buffer = (await targetHandle.screenshot({ type: "png" })) as Buffer;
     const pdfBuffer = await assembleJournalPdf([buffer], JOURNAL_TRIM_CM);
 
-    const { getBucket } = await import("@/lib/firebase/admin");
+    const { uploadToR2 } = await import("@/lib/r2");
     const storagePath = `starmaps-print/${slug}/journal-letter-insert-${Date.now()}.pdf`;
-    await getBucket().file(storagePath).save(pdfBuffer, { metadata: { contentType: "application/pdf" } });
+    await uploadToR2(storagePath, pdfBuffer, "application/pdf");
 
     return { storagePath };
   } finally {
