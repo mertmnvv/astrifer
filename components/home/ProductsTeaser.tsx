@@ -247,24 +247,27 @@ export function ProductsTeaser({ pricing }: { pricing: PricingConfig }) {
                   transition={{ duration: 0.4, ease: "easeOut" }}
                   className="relative"
                 >
-                  {/* Glowing background behind phone */}
+                  {/* Glowing background behind card */}
                   <div
-                    className="absolute -inset-4 rounded-[48px] blur-xl -z-10"
+                    className="absolute -inset-4 rounded-[40px] blur-xl -z-10"
                     style={{
                       background: `radial-gradient(circle, ${activePalette.skyCenter}40 0%, transparent 70%)`,
                     }}
                   />
 
-                  {/* Smartphone Frame Mockup (Matches urun/dijital original iPhone layout) */}
-                  <div className="relative w-[260px] h-[520px] rounded-[38px] border-[8px] border-[#1d1d1f] bg-[#0b0810] shadow-[0_20px_50px_rgba(0,0,0,0.8)] ring-1 ring-white/10 flex flex-col overflow-hidden">
-                    
-                    {/* Screen Notch / Dynamic Island */}
-                    <div className="absolute top-2.5 left-1/2 -translate-x-1/2 w-24 h-5 bg-[#1d1d1f] rounded-full z-30 flex items-center justify-center">
-                      <div className="w-1 h-1 rounded-full bg-void/70 absolute left-3" />
-                      <div className="w-8 h-0.5 bg-[#2d2d2f] rounded-full" />
+                  {/* Page Preview Card (no device chrome) */}
+                  <div className="relative w-[260px] h-[520px] rounded-[28px] border border-amber/25 bg-[#0b0810] shadow-[0_20px_50px_rgba(0,0,0,0.8)] ring-1 ring-white/10 flex flex-col overflow-hidden">
+
+                    {/* Plaque header instead of a notch */}
+                    <div className="absolute top-0 left-0 right-0 h-8 z-30 flex items-center justify-center gap-2 pointer-events-none">
+                      <span className="h-px w-6 bg-amber/30" />
+                      <span className="font-mono text-[6px] uppercase tracking-[0.3em] text-amber/70">
+                        Dijital Sayfa
+                      </span>
+                      <span className="h-px w-6 bg-amber/30" />
                     </div>
 
-                    {/* Fixed Background Layer inside Phone */}
+                    {/* Fixed Background Layer inside card */}
                     <div className="absolute inset-0 -z-10 pointer-events-none">
                       {/* Background Star Chart */}
                       <div aria-hidden className="absolute inset-0 opacity-95 pointer-events-none">
@@ -298,8 +301,12 @@ export function ProductsTeaser({ pricing }: { pricing: PricingConfig }) {
                       <div className="absolute top-[80px] right-[-40px] w-[1.5px] h-[50px] bg-gradient-to-b from-bright to-transparent animate-shooting-2 opacity-0 pointer-events-none" />
                     </div>
 
-                    {/* Scrollable Screen Content */}
-                    <div className="flex-1 overflow-y-auto overflow-x-hidden scrollbar-none pt-10 pb-4 px-3 space-y-6 select-none relative text-left scroll-smooth bg-transparent">
+                    {/* Auto-scrolling content — no click/scroll needed to see it */}
+                    <div className="flex-1 overflow-hidden pt-10 pb-4 px-3 relative text-left bg-transparent">
+                    <div
+                      className="space-y-6 select-none animate-auto-scroll"
+                      style={{ "--auto-scroll-distance": "-42%" } as React.CSSProperties}
+                    >
 
                       {/* Title block */}
                       <div className="text-center pt-2 flex flex-col items-center">
@@ -387,9 +394,7 @@ export function ProductsTeaser({ pricing }: { pricing: PricingConfig }) {
                       </div>
 
                     </div>
-
-                    {/* Home Indicator */}
-                    <div className="absolute bottom-1 left-1/2 -translate-x-1/2 w-24 h-0.5 bg-[#1d1d1f] rounded-full z-30" />
+                    </div>
                   </div>
                 </motion.div>
               ) : (

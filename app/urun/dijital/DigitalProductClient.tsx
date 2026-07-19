@@ -501,25 +501,35 @@ export default function DigitalProductClient({ pricing }: { pricing: PricingConf
             {/* Right Column: iPhone Mockup Preview */}
             <div className="lg:col-span-5 flex justify-center">
               <div className="relative">
-                {/* Glowing background behind phone */}
+                {/* Glowing background behind card */}
                 <div
-                  className="absolute -inset-4 rounded-[48px] blur-xl -z-10 transition-all duration-700"
+                  className="absolute -inset-4 rounded-[40px] blur-xl -z-10 transition-all duration-700"
                   style={{
                     background: `radial-gradient(circle, ${activePalette.skyCenter}40 0%, transparent 70%)`,
                   }}
                 />
 
-                {/* iPhone Frame */}
-                <div className="relative w-[300px] h-[600px] rounded-[44px] border-[10px] border-[#1d1d1f] bg-[#0b0810] shadow-[0_30px_70px_-10px_rgba(0,0,0,0.9)] ring-1 ring-white/10 flex flex-col overflow-hidden">
+                {/* Page Preview Card (no device chrome) */}
+                <div className="relative w-[300px] h-[600px] rounded-[32px] border border-amber/25 bg-[#0b0810] shadow-[0_30px_70px_-10px_rgba(0,0,0,0.9)] ring-1 ring-white/10 flex flex-col overflow-hidden">
 
-                  {/* Dynamic Island */}
-                  <div className="absolute top-3.5 left-1/2 -translate-x-1/2 w-28 h-5.5 bg-[#1d1d1f] rounded-full z-30 flex items-center justify-center">
-                    <div className="w-1.5 h-1.5 rounded-full bg-void/70 absolute left-3.5" />
-                    <div className="w-10 h-0.5 bg-[#2d2d2f] rounded-full" />
+                  {/* Plaque header instead of a notch */}
+                  <div className="absolute top-0 left-0 right-0 h-10 z-30 flex items-center justify-center gap-2 pointer-events-none">
+                    <span className="h-px w-8" style={{ backgroundColor: `${activePalette.label}40` }} />
+                    <span
+                      className="font-mono text-[7px] uppercase tracking-[0.3em]"
+                      style={{ color: `${activePalette.label}b0` }}
+                    >
+                      Dijital Sayfa
+                    </span>
+                    <span className="h-px w-8" style={{ backgroundColor: `${activePalette.label}40` }} />
                   </div>
 
-                  {/* Scrollable Screen Content */}
-                  <div className="flex-1 overflow-y-auto overflow-x-hidden scrollbar-none pt-12 pb-6 px-3.5 space-y-8 select-none relative text-left scroll-smooth">
+                  {/* Auto-scrolling content — no click/scroll needed to see it */}
+                  <div className="flex-1 overflow-hidden pt-14 pb-6 px-3.5 relative text-left">
+                  <div
+                    className="space-y-8 select-none animate-auto-scroll"
+                    style={{ "--auto-scroll-distance": "-45%" } as React.CSSProperties}
+                  >
                     {/* Background Star Chart */}
                     <div
                       aria-hidden
@@ -701,9 +711,7 @@ export default function DigitalProductClient({ pricing }: { pricing: PricingConf
                       </div>
                     </div>
                   </div>
-
-                  {/* Home Indicator */}
-                  <div className="absolute bottom-1.5 left-1/2 -translate-x-1/2 w-28 h-1 bg-[#1d1d1f] rounded-full z-30" />
+                  </div>
                 </div>
               </div>
             </div>

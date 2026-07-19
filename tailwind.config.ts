@@ -64,6 +64,10 @@ const config: Config = {
           from: { transform: "rotate(0deg)" },
           to: { transform: "rotate(360deg)" },
         },
+        "auto-scroll": {
+          "0%, 12%": { transform: "translateY(0)" },
+          "88%, 100%": { transform: "translateY(var(--auto-scroll-distance, -40%))" },
+        },
       },
       animation: {
         twinkle: "twinkle 4s ease-in-out infinite",
@@ -72,6 +76,7 @@ const config: Config = {
         "voice-bar": "voice-bar 0.9s ease-in-out infinite",
         "logo-spin": "spin 14s linear infinite",
         "logo-spin-slow": "spin 16s linear infinite",
+        "auto-scroll": "auto-scroll 18s ease-in-out infinite",
       },
     },
   },
