@@ -3,6 +3,7 @@ import { DEMO_STAR_MAP } from "@/lib/starmaps";
 import { SiteHeader } from "@/components/layout/SiteHeader";
 import { SiteFooter } from "@/components/layout/SiteFooter";
 import { Hero } from "@/components/home/Hero";
+import { FeatureShowcase } from "@/components/home/FeatureShowcase";
 import { ConceptSection } from "@/components/home/ConceptSection";
 import { HowItWorks } from "@/components/home/HowItWorks";
 import { ProductsTeaser } from "@/components/home/ProductsTeaser";
@@ -27,6 +28,7 @@ export default async function HomePage() {
       <SiteHeader />
       <main>
         <Hero sky={sky} />
+        <FeatureShowcase />
         <ConceptSection />
         <HowItWorks />
         <ProductsTeaser pricing={pricing} />
