@@ -27,8 +27,6 @@ import { BookFlip } from "@/components/journal/BookFlip";
 import { pickNumberedStars, splitSkyByAzimuth } from "@/components/journal/starMapSpread";
 import { buildSkyEssay, buildSkyNarrative } from "@/lib/astronomy/skyNarrative";
 import { ScaledPreview } from "@/components/ScaledPreview";
-import { StarMapView } from "@/components/starmap/StarMapView";
-import type { StarMapRecord } from "@/lib/starmaps";
 import { CreateStepIndicator, type CreateStep } from "@/components/create/CreateStepIndicator";
 import { JournalThemeSwatch } from "@/components/create/JournalThemeSwatch";
 import { BUILTIN_PLACES, type PlaceResult } from "@/lib/geocode/cities";
@@ -137,12 +135,6 @@ export interface CreateFormProps {
 export function CreateForm({ templates, pricing }: CreateFormProps) {
   const router = useRouter();
   const initial = defaultDateTime();
-  const [mounted, setMounted] = useState(false);
-  const [mobileTab, setMobileTab] = useState<"edit" | "preview">("edit");
-
-  useEffect(() => {
-    setMounted(true);
-  }, []);
 
   const [date, setDate] = useState(initial.date);
   const [time, setTime] = useState(initial.time);
@@ -479,34 +471,6 @@ export function CreateForm({ templates, pricing }: CreateFormProps) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [place, eventDateUtc, title, message, photos, voiceNote, videoFile, mediaOption, musicUrl, paletteId, previewSlug, currentStep, furthestStep]);
 
-  const previewStarMap = useMemo<StarMapRecord>(() => {
-    const photoUrls = photos.filter((photo) => photo.status === "done" && photo.url).map((photo) => photo.url as string);
-    return {
-      slug: previewSlug,
-      title: title.trim() || "İsim & İsim",
-      message: message.trim() || null,
-      eventDateUtc: eventDateUtc || new Date(),
-      timezone: place?.timezone || "Europe/Istanbul",
-      latitude: place?.latitude ?? 41.0082,
-      longitude: place?.longitude ?? 28.9784,
-      locationName: place?.name ?? "İstanbul",
-      musicUrl: musicUrl,
-      voiceNoteUrl: mediaOption === "voice" && voiceNote?.status === "done" ? (voiceNote.remoteUrl ?? null) : null,
-      videoUrl: mediaOption === "video" && videoFile?.status === "done" ? (videoFile.remoteUrl ?? null) : null,
-      palette: paletteId,
-      createdAt: eventDateUtc || new Date(),
-      entries: [
-        {
-          id: "preview",
-          date: eventDateUtc || new Date(),
-          photos: photoUrls.map((url) => ({ url })),
-          note: null,
-          isInitial: true,
-        },
-      ],
-    };
-  }, [photos, previewSlug, title, message, eventDateUtc, place, musicUrl, voiceNote, videoFile, mediaOption, paletteId]);
-
   const bookPages = useMemo(() => {
     // Pick stars based on previewSky
     const page1Stars = pickNumberedStars(splitSkyByAzimuth(previewSky, 0, 180), 6, 1);
@@ -742,35 +706,17 @@ export function CreateForm({ templates, pricing }: CreateFormProps) {
         />
       </div>
 
-      {/* MOBILE/TABLET TAB SWITCHER */}
-      <div className="order-2 col-span-full lg:hidden mx-auto flex w-full max-w-[280px] rounded-full border border-text/10 bg-text/[0.03] p-1 shadow-inner backdrop-blur-sm">
-        <button
-          type="button"
-          onClick={() => setMobileTab("edit")}
-          className={`flex-1 rounded-full py-2 font-mono text-[10px] uppercase tracking-widest transition-all duration-200 ${
-            mobileTab === "edit"
-              ? "bg-amber text-ink font-semibold shadow"
-              : "text-dim hover:text-bright"
-          }`}
+      {/* FORM — floats as a panel over the always-visible preview below/beside it */}
+      <div className="order-3 flex flex-col gap-9 rounded-3xl border border-text/[0.08] bg-void/40 p-6 backdrop-blur-sm">
+      <AnimatePresence mode="wait">
+        {currentStep === 1 && (
+        <motion.div
+          key={1}
+          initial={{ opacity: 0, filter: "blur(6px)" }}
+          animate={{ opacity: 1, filter: "blur(0px)" }}
+          exit={{ opacity: 0, filter: "blur(6px)" }}
+          transition={{ duration: 0.35, ease: "easeOut" }}
         >
-          Düzenle
-        </button>
-        <button
-          type="button"
-          onClick={() => setMobileTab("preview")}
-          className={`flex-1 rounded-full py-2 font-mono text-[10px] uppercase tracking-widest transition-all duration-200 ${
-            mobileTab === "preview"
-              ? "bg-amber text-ink font-semibold shadow"
-              : "text-dim hover:text-bright"
-          }`}
-        >
-          Önizleme
-        </button>
-      </div>
-
-      {/* FORM */}
-      <div className={`order-3 flex flex-col gap-9 ${mobileTab === "edit" ? "block" : "hidden lg:block"}`}>
-        <div className={currentStep === 1 ? "block" : "hidden"}>
           <SectionLabel n="01">Anı Seçin</SectionLabel>
           <RadioCardGroup
             name="template"
@@ -785,9 +731,17 @@ export function CreateForm({ templates, pricing }: CreateFormProps) {
               description: template.description,
             }))}
           />
-        </div>
+        </motion.div>
+        )}
 
-        <div className={currentStep === 2 ? "block" : "hidden"}>
+        {currentStep === 2 && (
+        <motion.div
+          key={2}
+          initial={{ opacity: 0, filter: "blur(6px)" }}
+          animate={{ opacity: 1, filter: "blur(0px)" }}
+          exit={{ opacity: 0, filter: "blur(6px)" }}
+          transition={{ duration: 0.35, ease: "easeOut" }}
+        >
           <SectionLabel n="02">Zaman &amp; Konum</SectionLabel>
           <div className="grid grid-cols-2 gap-3">
             <div>
@@ -834,15 +788,31 @@ export function CreateForm({ templates, pricing }: CreateFormProps) {
               </button>
             ))}
           </div>
-        </div>
+        </motion.div>
+        )}
 
-        <div className={currentStep === 3 ? "block" : "hidden"}>
+        {currentStep === 3 && (
+        <motion.div
+          key={3}
+          initial={{ opacity: 0, filter: "blur(6px)" }}
+          animate={{ opacity: 1, filter: "blur(0px)" }}
+          exit={{ opacity: 0, filter: "blur(6px)" }}
+          transition={{ duration: 0.35, ease: "easeOut" }}
+        >
           <SectionLabel n="03">Gökyüzü Rengi</SectionLabel>
           <SkyPaletteSwatchPicker name="palette" palettes={SKY_PALETTES} value={paletteId} onChange={setPaletteId} />
           <JournalThemeSwatch paletteId={paletteId} journalThemeId={journalThemeId} isManuallySelected={isJournalThemeManuallySelected} />
-        </div>
+        </motion.div>
+        )}
 
-        <div className={currentStep === 4 ? "block" : "hidden"}>
+        {currentStep === 4 && (
+        <motion.div
+          key={4}
+          initial={{ opacity: 0, filter: "blur(6px)" }}
+          animate={{ opacity: 1, filter: "blur(0px)" }}
+          exit={{ opacity: 0, filter: "blur(6px)" }}
+          transition={{ duration: 0.35, ease: "easeOut" }}
+        >
           <SectionLabel n="04">Kişiselleştir</SectionLabel>
 
           <p className="mb-2 text-xs text-dim">Fotoğraflar (en fazla 4)</p>
@@ -988,9 +958,17 @@ export function CreateForm({ templates, pricing }: CreateFormProps) {
               </div>
             )}
           </div>
-        </div>
+        </motion.div>
+        )}
 
-        <div className={currentStep === 5 ? "block" : "hidden"}>
+        {currentStep === 5 && (
+        <motion.div
+          key={5}
+          initial={{ opacity: 0, filter: "blur(6px)" }}
+          animate={{ opacity: 1, filter: "blur(0px)" }}
+          exit={{ opacity: 0, filter: "blur(6px)" }}
+          transition={{ duration: 0.35, ease: "easeOut" }}
+        >
           <SectionLabel n="05">Fiziksel Olarak da Saklayın</SectionLabel>
           <p className="mb-4 text-sm leading-relaxed text-subtle">
             Bu anı fiziksel olarak da saklamak ister misiniz?
@@ -1104,7 +1082,9 @@ export function CreateForm({ templates, pricing }: CreateFormProps) {
               </div>
             </div>
           </div>
-        </div>
+        </motion.div>
+        )}
+      </AnimatePresence>
 
         <div className="flex items-center gap-3 border-t border-text/10 pt-6">
           {currentStep > 1 && (
@@ -1149,109 +1129,101 @@ export function CreateForm({ templates, pricing }: CreateFormProps) {
         )}
       </div>
 
-      {/* LIVE PREVIEW */}
-      <div className={`order-4 flex flex-col gap-4 lg:sticky lg:top-28 lg:self-start ${mobileTab === "preview" ? "block" : "hidden lg:block"}`}>
-        <div className="mx-auto w-full flex justify-center">
-          <div className="relative">
-            {/* Glowing background */}
-            <div className="absolute -inset-4 rounded-[48px] bg-gradient-to-r from-amber/10 to-transparent blur-xl -z-10 animate-pulse" />
+      {/* ORDER PLAQUE — decorative gravur-style summary & CTA */}
+      <div className="order-2 lg:order-4 lg:sticky lg:top-28 lg:self-start mx-auto w-full max-w-sm lg:mx-0">
+        <div className="relative rounded-[26px] border border-amber/25 bg-gradient-to-b from-text/[0.04] via-transparent to-transparent p-7 shadow-[0_30px_70px_-30px_rgba(0,0,0,0.7)]">
+          {/* Corner flourishes */}
+          <span aria-hidden className="pointer-events-none absolute left-4 top-4 h-4 w-4 border-l border-t border-amber/40" />
+          <span aria-hidden className="pointer-events-none absolute right-4 top-4 h-4 w-4 border-r border-t border-amber/40" />
+          <span aria-hidden className="pointer-events-none absolute bottom-4 left-4 h-4 w-4 border-b border-l border-amber/40" />
+          <span aria-hidden className="pointer-events-none absolute bottom-4 right-4 h-4 w-4 border-b border-r border-amber/40" />
 
-            {/* iPhone Frame Wrapper */}
-            <div className="relative w-[300px] h-[600px] rounded-[44px] border-[10px] border-[#1d1d1f] bg-[#0b0810] shadow-[0_30px_70px_-10px_rgba(0,0,0,0.9)] ring-1 ring-white/10 flex flex-col overflow-hidden">
-              
-              {/* Dynamic Island / Notch */}
-              <div className="absolute top-3.5 left-1/2 -translate-x-1/2 w-28 h-5.5 bg-[#1d1d1f] rounded-full z-30 flex items-center justify-center">
-                <div className="w-1.5 h-1.5 rounded-full bg-void/70 absolute left-3.5" />
-                <div className="w-10 h-0.5 bg-[#2d2d2f] rounded-full" />
-              </div>
-
-              {/* Scrollable Screen Content */}
-              <div className="absolute inset-0 z-10 flex flex-col overflow-hidden" style={{ transform: "translate3d(0, 0, 0)" }}>
-                <div className="flex-1 overflow-y-auto overflow-x-hidden scrollbar-none select-none relative text-left scroll-smooth">
-                  {mounted && (
-                    <StarMapView
-                      starMap={previewStarMap}
-                      isPreview={true}
-                      isInlinePreview={true}
-                      step={currentStep}
-                      furthestStep={furthestStep}
-                    />
-                  )}
-                </div>
-              </div>
-
-              {/* Home Indicator line */}
-              <div className="absolute bottom-1.5 left-1/2 -translate-x-1/2 w-28 h-1 bg-[#1d1d1f] rounded-full z-30" />
-            </div>
+          {/* Plaque header */}
+          <div className="flex flex-col items-center gap-2 pb-5 text-center">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.2" className="h-5 w-5 text-amber">
+              <path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z" />
+            </svg>
+            <h3 className="font-display italic text-lg text-bright">Sipariş Özeti</h3>
+            <span className="h-px w-16 bg-gradient-to-r from-transparent via-amber/50 to-transparent" />
           </div>
-        </div>
 
-        <div className="flex flex-col gap-2 border-t border-text/10 pt-4">
-          <div className="flex items-baseline justify-between">
-            <span className="font-mono text-[10px] uppercase tracking-widest text-dim">Dijital Sayfa</span>
-            <span className="font-mono text-sm text-text flex items-center gap-1.5">
-              {journalEnabled ? (
-                <>
-                  <span className="line-through text-dim text-xs">{formatTRY(pricing.digitalPrice)}</span>
-                  <span className="font-semibold text-green-400">Bedava</span>
-                </>
-              ) : (
-                <>
-                  {pricing.digitalOriginalPrice > pricing.digitalPrice && (
-                    <span className="line-through text-dim text-xs">{formatTRY(pricing.digitalOriginalPrice)}</span>
-                  )}
-                  <span>{formatTRY(pricing.digitalPrice)}</span>
-                </>
-              )}
-            </span>
-          </div>
-          {journalEnabled && (
+          {/* Line items */}
+          <div className="flex flex-col gap-3">
             <div className="flex items-baseline justify-between">
-              <span className="font-mono text-[10px] uppercase tracking-widest text-dim">Deri Defter</span>
+              <span className="font-mono text-[10px] uppercase tracking-widest text-dim">Dijital Sayfa</span>
               <span className="font-mono text-sm text-text flex items-center gap-1.5">
-                {pricing.journalOriginalPrice > pricing.journalPrice && (
-                  <span className="line-through text-dim text-xs">{formatTRY(pricing.journalOriginalPrice)}</span>
+                {journalEnabled ? (
+                  <>
+                    <span className="line-through text-dim text-xs">{formatTRY(pricing.digitalPrice)}</span>
+                    <span className="font-semibold text-green-400">Bedava</span>
+                  </>
+                ) : (
+                  <>
+                    {pricing.digitalOriginalPrice > pricing.digitalPrice && (
+                      <span className="line-through text-dim text-xs">{formatTRY(pricing.digitalOriginalPrice)}</span>
+                    )}
+                    <span>{formatTRY(pricing.digitalPrice)}</span>
+                  </>
                 )}
-                <span>{formatTRY(pricing.journalPrice)}</span>
               </span>
             </div>
-          )}
-          <div className="flex items-baseline justify-between border-t border-text/10 pt-2">
-            <span className="font-mono text-xs uppercase tracking-widest text-bright">Toplam</span>
-            <span className="font-mono text-lg text-amber">{formatTRY(totalPrice)}</span>
+            {journalEnabled && (
+              <div className="flex items-baseline justify-between">
+                <span className="font-mono text-[10px] uppercase tracking-widest text-dim">Deri Defter</span>
+                <span className="font-mono text-sm text-text flex items-center gap-1.5">
+                  {pricing.journalOriginalPrice > pricing.journalPrice && (
+                    <span className="line-through text-dim text-xs">{formatTRY(pricing.journalOriginalPrice)}</span>
+                  )}
+                  <span>{formatTRY(pricing.journalPrice)}</span>
+                </span>
+              </div>
+            )}
+
+            <div className="flex items-center gap-2 pt-1">
+              <span className="h-px flex-1 bg-text/10" />
+              <span className="text-[9px] text-amber/60">✦</span>
+              <span className="h-px flex-1 bg-text/10" />
+            </div>
+
+            <div className="flex items-baseline justify-between">
+              <span className="font-mono text-xs uppercase tracking-widest text-bright">Toplam</span>
+              <span className="font-mono text-xl text-amber">{formatTRY(totalPrice)}</span>
+            </div>
+          </div>
+
+          <div className="mt-6 flex flex-col gap-3">
+            {previewHref ? (
+              <a
+                href={previewHref}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="w-full block rounded-full border border-amber/40 px-6 py-3 text-center font-mono text-xs uppercase tracking-widest text-amber transition-colors hover:bg-amber/10 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-amber"
+              >
+                Dijital Sayfayı Önizle
+              </a>
+            ) : (
+              <button
+                type="button"
+                disabled
+                title="Önizlemek için tarih, saat, konum ve isim alanlarını doldurun."
+                className="w-full cursor-not-allowed rounded-full border border-text/10 px-6 py-3 text-center font-mono text-xs uppercase tracking-widest text-dim opacity-50"
+              >
+                Dijital Sayfayı Önizle
+              </button>
+            )}
+
+            <button
+              type="submit"
+              disabled={uploadsPending || isSubmitting || currentStep !== STEPS.length}
+              className="w-full rounded-full bg-gradient-to-br from-amber-light to-amber-deep px-6 py-3.5 font-mono text-xs uppercase tracking-widest text-ink shadow-[0_12px_40px_-14px_rgba(230,163,92,0.6)] transition-opacity hover:opacity-90 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-amber disabled:opacity-40"
+            >
+              {isSubmitting ? "Oluşturuluyor…" : uploadsPending ? "Yükleniyor…" : "Sepete Ekle"}
+            </button>
+            {currentStep !== STEPS.length && (
+              <p className="text-center text-[11px] text-dim">Son adıma (05) gelince aktifleşir.</p>
+            )}
           </div>
         </div>
-
-        {previewHref ? (
-          <a
-            href={previewHref}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="w-full block rounded-full border border-amber/40 px-6 py-3 text-center font-mono text-xs uppercase tracking-widest text-amber transition-colors hover:bg-amber/10 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-amber"
-          >
-            Dijital Sayfayı Önizle
-          </a>
-        ) : (
-          <button
-            type="button"
-            disabled
-            title="Önizlemek için tarih, saat, konum ve isim alanlarını doldurun."
-            className="w-full cursor-not-allowed rounded-full border border-text/10 px-6 py-3 text-center font-mono text-xs uppercase tracking-widest text-dim opacity-50"
-          >
-            Dijital Sayfayı Önizle
-          </button>
-        )}
-
-        <button
-          type="submit"
-          disabled={uploadsPending || isSubmitting || currentStep !== STEPS.length}
-          className="w-full rounded-full bg-gradient-to-br from-amber-light to-amber-deep px-6 py-3.5 font-mono text-xs uppercase tracking-widest text-ink shadow-[0_12px_40px_-14px_rgba(230,163,92,0.6)] transition-opacity hover:opacity-90 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-amber disabled:opacity-40"
-        >
-          {isSubmitting ? "Oluşturuluyor…" : uploadsPending ? "Yükleniyor…" : "Sepete Ekle"}
-        </button>
-        {currentStep !== STEPS.length && (
-          <p className="text-center text-[11px] text-dim">Son adıma (05) gelince aktifleşir.</p>
-        )}
       </div>
 
       {/* 3D Book Preview Modal */}
