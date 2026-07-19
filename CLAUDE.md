@@ -10,6 +10,13 @@ evresi, gezegen konumları) hesaplanır ve kalıcı bir dijital sayfa +
 Bu projede kullanıcıyla **her zaman Türkçe** konuş — yanıtlar, ilerleme
 güncellemeleri, özetler, hepsi Türkçe olacak.
 
+## Dev sunucusu
+
+`npm run dev` sunucusunu kullanıcı açıkça istemedikçe **kendin başlatma**
+— sunucuyu kullanıcı kendisi açıyor. Bir değişikliği doğrulamak için
+sunucuyu başlatman gerekirse, test bittikten hemen sonra kapat (portu
+kullanan process'i taskkill ile sonlandır).
+
 ## Tech stack
 
 - **Next.js 14 (App Router), TypeScript, Tailwind CSS**
@@ -19,10 +26,20 @@ güncellemeleri, özetler, hepsi Türkçe olacak.
   Supabase'ten Firebase'e geçildi (Supabase artık kullanılmıyor).
 - **Astronomik hesaplama:** `astronomy-engine` — gerçek efemeris verisi,
   dekoratif/tahmini değil (`lib/astronomy/computeSky.ts`).
-- **Fotoğraf/ses yükleme: Cloudinary** (imzalı, kısa ömürlü upload —
-  `app/api/upload/sign/route.ts`). Firebase Storage bucket'ı bu iş için
-  kurulmadı (Blaze plan gerektiriyordu); Firebase Storage yalnızca 300
-  DPI baskı dosyaları için kullanılıyor (aşağıya bkz.).
+- **Fotoğraf/ses yükleme: Cloudinary** (imzalı, kısa ömürlü upload — `app/api/upload/sign/route.ts`). 
+  **Cloudflare R2 (AWS S3 SDK):** `lib/r2.ts` entegrasyonu ile tüm PDF baskı dosyaları ve presigned 
+  indirme linkleri R2'ye taşınmıştır. Firebase Storage artık kullanılmamaktadır.
+- **3D Celestial Globe (Three.js):** Yıldızlar ve gök cisimleri `Three.js` ile çizilen interaktif 3D gök 
+  küresi üzerinde (`components/starmap/CelestialGlobe3D.tsx`) gerçek koordinatlarıyla gösterilir.
+- **Müzik Görselleştirici (Audio Reactivity):** `MusicContext.tsx` aracılığıyla normal ses dosyalarında 
+  Web Audio API (`AnalyserNode`), YouTube videolarında ise Iframe API ve özel frekans simülasyonu 
+  kullanılarak ritme göre yıldız ve takımyıldız parlaklığı/boyutu modüle edilir.
+- **AI Hikaye Asistanı (Groq Llama 3.1):** `/api/ai/generate-narrative` rotasında Groq API 
+  (`llama-3.1-8b-instant` modeli, Gemini 1.5 Flash ve OpenAI GPT-4o-mini yedekli) ile romantik/edebi 
+  Türkçe mektup taslakları üretilir.
+- **Kozmik Senkronizasyon & Gün Döngüsü:** Gün dilimi tespitiyle 4 farklı kozmik gradyan geçişi 
+  (Sabah, Gündüz, Akşam, Gece) ve o günkü Ay evresi ile meteor yağmurlarını hesaplayan 
+  `lib/astronomy/cosmicEvents.ts` entegre edilmiştir.
 - **Ödeme: iyzico — henüz entegre değil.** `/checkout` bir stub;
   ödeme akışı ayrı bir işte bağlanacak. `.env`'de `IYZICO_*`
   değişkenleri var ama kod tarafında kullanılmıyor.
@@ -122,6 +139,7 @@ components/
   journal/                  Deri Defter'e özgü görseller (kapak, deri doku, içerik önizlemeleri),
                              JournalThemeContext.tsx (3 renk temasının dağıtımı) + night/journalTheme.ts
   create/                  /create sihirbazına özgü küçük bileşenler (CreateStepIndicator, JournalThemeSwatch, PageLinkCard)
+  home/                    Ana sayfa bölümleri (Hero, FeatureShowcase, ConceptSection, HowItWorks, ProductsTeaser, Testimonials, Faq, FinalCta)
   ui/                       Paylaşılan form bileşenleri (PhotoPicker, VoiceRecorder, ...)
 lib/
   starmaps.ts                StarMapRecord/TimelineEntry tipleri + Firestore okuma/yazma

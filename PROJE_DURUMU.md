@@ -1,4 +1,4 @@
-# Proje Durumu — 16 Temmuz 2026
+# Proje Durumu — 19 Temmuz 2026
 
 Bu dosya, Astrifer projesinin **güncel durumunu, son yapılan geliştirmeleri ve bekleyen işleri** takip etmek için kullanılır. Yapısal/kalıcı bilgiler için `CLAUDE.md` dosyasına bakabilirsiniz.
 
@@ -48,11 +48,30 @@ Bugünkü çalışma oturumunda, hem yönetici paneli kullanıcı deneyimini iyi
 * **20 Saniyelik Video Yükleme ve Kayıt:** Dosya seçerek ya da tarayıcı kamerasından sesli video kaydedilmesini sağlayan `VideoPicker` bileşeni oluşturuldu. 20 saniye sınırı ve sayaç eklendi. Cloudinary ve cam tasarımlı HTML5 video oynatıcısı kullanıcı arayüzüne ve yönetici paneline eklendi.
 * **Defter Alana Dijital Sayfa Bedava:** Sepette aynı slug ile Deri Defter ve Dijital Sayfa bulunduğunda, dijital sayfa fiyatı 0 TL'ye (Bedava) indirilip asıl fiyatının üzeri çizilerek sepet, ödeme ve Firestore sipariş toplamı güncellendi.
 * **Düğün Şablonu & Zengin Notlar:** Yeni Düğün şablonu eklendi ve tüm kategorilerin hazır not listeleri 6'şar adet romantik/duygusal mesajla zenginleştirildi.
-### 9. 3D Gök Küresi Odaklı Arayüz, Groq AI Entegrasyonu, SVG İkon Geçişi ve Yıldız Tozu Efekti
-* **Sadece 3D Gök Küresi Madalyonu:** 2D Harita madalyonu, 2D/3D geçiş butonları ve 2D döndürme butonları kaldırıldı. Madalyon ve Gravür kutularında varsayılan olarak interaktif, döndürülebilir 3D Gök Küresi (`CelestialGlobe3D`) yerleştirildi. Büyüteç butonuna basıldığında açılan tam ekran modalda da 3D Küre render edilmektedir.
-* **Groq Llama 3.1 AI Mektup Entegrasyonu:** AI mektup üretici API endpoint'i güncellenerek Groq altyapısına bağlandı. Son derece hızlı ve akıcı Türkçe yanıtlar üreten `llama-3.1-8b-instant` modeli entegre edildi.
-* **SVG İkon Modernizasyonu:** Tüm sayfalarda yer alan emojiler (sürükleme, kozmik başlıklar, AI butonları ve video kaydedici butonları) temizlenerek platformun minimalist tasarım çizgisine uygun lüks SVG vektör ikonlarla değiştirildi.
-* **Yıldız Tozu İmleç Efekti (`CosmicCursorTrail`):** Kullanıcı fareyi hareket ettirdikçe veya ekrana dokundukça süzülen, yavaşça sönen yıldız tozu parçacıkları efekti yazıldı ve yalnızca modern kozmik temalı sayfalarda aktif olacak şekilde entegre edildi.
+### 9. Yeni Nesil İnteraktif Özellikler: 3D Gök Küresi, Müzik Görselleştirici, AI Hikaye Asistanı, Gün Döngüsü ve Kozmik Olaylar
+* **3D Celestial Globe (Three.js Gök Küresi):** Eski 2D harita sisteminden tamamen vazgeçilerek, Three.js ile geliştirilen tam etkileşimli 3D gök küresi (`CelestialGlobe3D`) entegre edildi. Küre üzerinde yıldızlar, takımyıldız çizgileri, Güneş, Ay ve gezegenler gerçek koordinatlarına göre 3D uzayda konumlandırılır. Fare veya dokunmatik ekran sürüklemeleriyle serbestçe döndürülebilir; yıldızlara tıklandığında kamera o yıldıza odaklanıp pürüzsüzce yakınlaşır (`lerp` zoom). Unmount anında bellek sızıntısını önlemek için tüm `dispose` temizlik fonksiyonları yazılmıştır.
+* **Ambient Audio Visualizer (Müzik Görselleştirici):** Tarayıcı `AudioContext` ve `AnalyserNode` API'leri entegre edilerek, çalan müziğin frekans verisini anlık okuyan bir görselleştirici sistemi kuruldu. YouTube API üzerinden çalan arka plan müzikleri için de özel sinüs tabanlı frekans simülasyonu yazıldı. Müzik çalarken yıldızların boyutları ve takımyıldız çizgilerinin parlaklıkları ritme göre dinamik olarak dalgalanmaktadır.
+* **AI Memory Narrative (AI Mektup Asistanı):** Kullanıcıların sihirbaz adımlarında mektup yazmalarını kolaylaştıran bir AI yardımcısı eklendi. `/api/ai/generate-narrative` API ucu üzerinden çalışan sistem; Groq altyapısındaki `llama-3.1-8b-instant` modelini (Gemini 1.5 Flash ve OpenAI GPT-4o-mini yedekli) kullanarak girilen ipuçları, tarih ve konuma uygun lüks, romantik Türkçe mektup taslakları üretir ve tek tıkla form editörüne aktarır.
+* **Dynamic Day/Night Cycle (Gece/Gündüz Gökyüzü Döngüsü):** Ziyaretçinin yerel saatine göre gökyüzü renkleri otomatik güncellenir. Sabah (Sunrise Rose), Gündüz (Soft Sky Blue), Akşam (Sunset Violet-Amber) ve Gece (Cosmic Dark) modları arasında dinamik geçişler yapılır. Gündüz modunda metin okunabilirliği için etiket ve yıldız kontrastları otomatik optimize edilir.
+* **Cosmic Anniversary Sync (Kozmik Olay Senkronizasyonu):** Seçilen tarihteki gökyüzü olaylarını hesaplayan `lib/astronomy/cosmicEvents.ts` modülü yazıldı. Sayfaya o günkü Ay evresini (hilal, dolunay vb.) ve eğer varsa tarihi meteor yağmurlarını (Perseid, Geminid vb.) veya gezegen hizalanmalarını açıklayan şık bir detay kutusu yerleştirildi. Ayrıca 2D arka plan animasyonunda o güne özel akan yıldız (meteor) efektleri tetiklenmektedir.
+* **SVG İkon Modernizasyonu & Yıldız Tozu Efekti:** Tüm emojiler minimalist tasarıma uygun lüks SVG vektör ikonlarla değiştirildi. Ayrıca fare hareket ettirildikçe ekranda süzülüp sönen estetik bir yıldız tozu imleç izi efekti (`CosmicCursorTrail`) modern temalara dahil edildi.
+
+### 10. Ana Sayfa: Hero Altına Özellik Vitrini Paneli
+* **`FeatureShowcase.tsx`:** Hero'nun hemen altına, tamamlanan 3D Gök Küresi / Müzik Görselleştirici / AI Hikaye Asistanı / Gün Döngüsü / Kozmik Senkron özelliklerini küçük amber-çerçeveli ikon kartları halinde sergileyen yeni bir bölüm eklendi (`app/page.tsx`). Hero ile aynı tasarım dilini kullanır: `bg-void` zemin, `amber` vurgu, `RevealOnScroll` ile kademeli giriş animasyonu, `font-display italic` başlıklar, `font-mono uppercase` mikro etiket.
+
+---
+
+## Yol Haritası — Yeni Nesil Fikirler
+
+Roadmap'teki önceki nesil özellikler (3D Gök Küresi, Müzik Görselleştirici,
+AI Hikaye Asistanı, Gün Döngüsü, Kozmik Senkron) tamamlandı. Detaylı, adım
+adım yeni backlog `todo.md`'de tutuluyor; buradaki özet sadece üst başlıklar:
+
+1. **Öncelikli altyapı:** iyzico ödeme entegrasyonu (tek kritik eksik), domain/prod ortam ayarları.
+2. **Paylaşım & sosyal:** dinamik OG image, Instagram Story kartı, bağımsız QR kartı indirme.
+3. **Kişiselleştirme derinliği:** çoklu önemli an/tarih, özel takımyıldız adlandırma, iki dilli sayfa.
+4. **Etkileşim & hatırlatma:** 6 aylık an ekleme e-postası, yıldönümü hatırlatması, opsiyonel haftalık kozmik bülten.
+5. **Büyüme altyapısı:** indirim kodu/kupon sistemi, hediye kartı akışı.
 
 ---
 
@@ -62,5 +81,6 @@ Bugünkü çalışma oturumunda, hem yönetici paneli kullanıcı deneyimini iyi
 - **[ ] Ödeme (iyzico/PayTR) Entegrasyonu:** `/checkout` sayfası ödeme akışına yönlendirmeye hazır ancak iyzico/PayTR entegrasyon API'leri üretim ortamında aktif edilmeli.
 - **[ ] Domain Satın Alımı & Ayarları:** `astrifer.net` domain yönlendirmeleri tamamlanıp production deploy ortamındaki `NEXT_PUBLIC_SITE_URL` ayarları yapılmalı.
 
+Detaylı yeni özellik backlog'u için bkz. `todo.md`.
 
 
