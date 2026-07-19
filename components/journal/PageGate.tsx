@@ -19,15 +19,15 @@ function GateButton({ title, subtitle, onOpen, isGravur }: { title: string; subt
       }}
       aria-label="Aç"
       className={`flex h-full w-full cursor-pointer flex-col items-center justify-center gap-3 px-6 text-center ${
-        isGravur 
-          ? "bg-[#E4DFCD] text-[#241F19]" 
+        isGravur
+          ? "bg-gravur-paper text-gravur-ink"
           : "bg-[radial-gradient(circle_at_50%_40%,#15101a_0%,#0b0810_70%)]"
       }`}
     >
-      <LogoMark size={46} variant="compass" className={isGravur ? "text-[#8A5A3B]" : "text-amber"} />
-      <p className={`mt-1 font-display text-2xl italic sm:text-3xl ${isGravur ? "text-[#241F19] font-gravur-serif" : "text-bright"}`}>{title}</p>
-      <p className={`font-mono text-[10px] uppercase tracking-[0.25em] ${isGravur ? "text-[#8A5A3B]" : "text-amber"}`}>{subtitle}</p>
-      <span className={`mt-2 animate-bounce-y font-mono text-[10.5px] uppercase tracking-[0.14em] motion-reduce:animate-none ${isGravur ? "text-[#5C5646]" : "text-muted"}`}>
+      <LogoMark size={46} variant="compass" className={isGravur ? "text-gravur-copper" : "text-amber"} />
+      <p className={`mt-1 font-display text-2xl italic sm:text-3xl ${isGravur ? "text-gravur-ink font-gravur-serif" : "text-bright"}`}>{title}</p>
+      <p className={`font-mono text-[10px] uppercase tracking-[0.25em] ${isGravur ? "text-gravur-copper" : "text-amber"}`}>{subtitle}</p>
+      <span className={`mt-2 animate-bounce-y font-mono text-[10.5px] uppercase tracking-[0.14em] motion-reduce:animate-none ${isGravur ? "text-gravur-ink-soft" : "text-muted"}`}>
         Zaman Kapsülünü Aç
       </span>
     </button>

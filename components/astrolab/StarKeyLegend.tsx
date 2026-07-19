@@ -34,11 +34,12 @@ const row = {
 export function StarKeyLegend({ sky, palette, minAltitude, title = "Yıldız Anahtarı", className }: StarKeyLegendProps) {
   const labels = buildSkyLabels(sky, minAltitude);
   const reducedMotion = usePrefersReducedMotion();
+  const isGravur = palette.id === "gravur-atlas";
   if (labels.length === 0) return null;
 
   return (
     <div className={className}>
-      <p className="font-mono text-[10px] uppercase tracking-[0.3em] text-dim">{title}</p>
+      <p className={`font-mono text-[10px] uppercase tracking-[0.3em] ${isGravur ? "text-gravur-ink-soft" : "text-dim"}`}>{title}</p>
       <motion.div
         variants={list}
         initial={reducedMotion ? "show" : "hidden"}
@@ -50,7 +51,7 @@ export function StarKeyLegend({ sky, palette, minAltitude, title = "Yıldız Ana
           <motion.div
             key={entry.code}
             variants={row}
-            className="flex items-baseline gap-1.5 font-mono text-[11px] text-subtle"
+            className={`flex items-baseline gap-1.5 font-mono text-[11px] ${isGravur ? "text-gravur-ink-soft" : "text-subtle"}`}
           >
             <span className="font-semibold" style={{ color: palette.sun }}>
               {entry.code}

@@ -68,6 +68,10 @@ const config: Config = {
           "0%, 12%": { transform: "translateY(0)" },
           "88%, 100%": { transform: "translateY(var(--auto-scroll-distance, -40%))" },
         },
+        "glow-pulse": {
+          "0%, 100%": { opacity: "0.6" },
+          "50%": { opacity: "1" },
+        },
       },
       animation: {
         twinkle: "twinkle 4s ease-in-out infinite",
@@ -77,6 +81,7 @@ const config: Config = {
         "logo-spin": "spin 14s linear infinite",
         "logo-spin-slow": "spin 16s linear infinite",
         "auto-scroll": "auto-scroll 18s ease-in-out infinite",
+        "glow-pulse": "glow-pulse 6s ease-in-out infinite",
       },
     },
   },

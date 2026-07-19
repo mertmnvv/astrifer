@@ -36,45 +36,50 @@ export function SkyFocusSection({
   const [isZoomed, setIsZoomed] = useState(false);
 
   const isGravur = palette.id === "gravur-atlas";
+  const t = {
+    plateBg: "bg-gravur-paper",
+    plateBorder: "border-gravur-ink/10",
+    ink: "text-gravur-ink",
+    inkSoft: "text-gravur-ink-soft",
+    copper: "text-gravur-copper",
+  };
 
   if (isGravur) {
     return (
-      <div className="flex min-h-screen w-full max-w-xl flex-col items-center justify-center px-4 text-center">
+      <div className="flex min-h-screen w-full max-w-2xl flex-col items-center justify-center px-4 text-center">
         <div
-          className="relative w-full max-w-[420px] bg-[#E4DFCD] p-3.5 shadow-2xl shadow-black/50 border border-[#241F19]/10"
+          className={`relative w-full max-w-[460px] sm:max-w-[520px] ${t.plateBg} p-2.5 sm:p-3.5 shadow-2xl shadow-black/50 border ${t.plateBorder}`}
         >
-          <div className="relative border-[1.5px] border-[#241F19] px-6 py-6 flex flex-col">
+          <div className="relative border-[1.5px] border-gravur-ink px-4 py-5 sm:px-6 sm:py-6 flex flex-col">
             {/* Corner Ornaments */}
-            <div className="absolute top-[-1.5px] left-[-1.5px] w-5.5 h-5.5">
+            <div className="absolute top-[-1.5px] left-[-1.5px] w-[22px] h-[22px]">
               <svg viewBox="0 0 22 22"><path d="M1 21 V6 Q1 1 6 1 H21" fill="none" stroke="#241F19" strokeWidth="1.2"/><circle cx="6" cy="6" r="1.5" fill="#8A5A3B"/></svg>
             </div>
-            <div className="absolute top-[-1.5px] right-[-1.5px] w-5.5 h-5.5 scale-x-[-1]">
+            <div className="absolute top-[-1.5px] right-[-1.5px] w-[22px] h-[22px] scale-x-[-1]">
               <svg viewBox="0 0 22 22"><path d="M1 21 V6 Q1 1 6 1 H21" fill="none" stroke="#241F19" strokeWidth="1.2"/><circle cx="6" cy="6" r="1.5" fill="#8A5A3B"/></svg>
             </div>
-            <div className="absolute bottom-[-1.5px] left-[-1.5px] w-5.5 h-5.5 scale-y-[-1]">
+            <div className="absolute bottom-[-1.5px] left-[-1.5px] w-[22px] h-[22px] scale-y-[-1]">
               <svg viewBox="0 0 22 22"><path d="M1 21 V6 Q1 1 6 1 H21" fill="none" stroke="#241F19" strokeWidth="1.2"/><circle cx="6" cy="6" r="1.5" fill="#8A5A3B"/></svg>
             </div>
-            <div className="absolute bottom-[-1.5px] right-[-1.5px] w-5.5 h-5.5 scale-[-1]">
+            <div className="absolute bottom-[-1.5px] right-[-1.5px] w-[22px] h-[22px] scale-[-1]">
               <svg viewBox="0 0 22 22"><path d="M1 21 V6 Q1 1 6 1 H21" fill="none" stroke="#241F19" strokeWidth="1.2"/><circle cx="6" cy="6" r="1.5" fill="#8A5A3B"/></svg>
             </div>
 
             {/* Cartouche Header */}
             <div className="cartouche flex flex-col items-center mb-1">
               <div className="rule-top flex items-center justify-center gap-2.5 mb-1.5 w-full">
-                <div className="w-11 h-[1px] bg-[#8A5A3B]"></div>
+                <div className="w-11 h-[1px] bg-gravur-copper"></div>
                 <svg viewBox="0 0 14 14" className="w-3.5 h-3.5 shrink-0"><path d="M7 0 L8.5 5.5 L14 7 L8.5 8.5 L7 14 L5.5 8.5 L0 7 L5.5 5.5 Z" fill="#8A5A3B"/></svg>
-                <div className="w-11 h-[1px] bg-[#8A5A3B]"></div>
+                <div className="w-11 h-[1px] bg-gravur-copper"></div>
               </div>
-              <div className="font-mono text-[8.5px] tracking-[0.16em] text-[#8A5A3B] uppercase">
+              <div className={`font-mono text-[9.5px] tracking-[0.16em] uppercase ${t.copper}`}>
                 Levha No. {coordsLabel.split(" · ")[0] || "41°01′K"}
               </div>
             </div>
 
             {/* Starmap Box (3D Celestial Globe Only) */}
             <div className="relative w-full my-4 group">
-              <div
-                className="w-full aspect-[4/3] overflow-hidden border border-[#241F19] shadow-sm bg-[#E4DFCD] relative"
-              >
+              <div className={`w-full aspect-[4/3] overflow-hidden border border-gravur-ink shadow-sm ${t.plateBg} relative`}>
                 <div className="w-full h-full relative">
                   <CelestialGlobe3D sky={sky} palette={palette} className="w-full h-full" />
                 </div>
@@ -83,40 +88,40 @@ export function SkyFocusSection({
               <button
                 type="button"
                 onClick={() => setIsZoomed(true)}
-                className="absolute -bottom-3 right-4 z-40 bg-[#E4DFCD] border border-[#241F19] px-4 py-1.5 rounded-sm text-[#241F19] hover:bg-[#241F19]/5 transition-all shadow-md flex items-center gap-1.5"
+                className={`absolute -bottom-3 right-4 z-40 ${t.plateBg} border border-gravur-ink px-4 py-1.5 rounded-sm ${t.ink} hover:bg-gravur-ink/5 transition-all shadow-md flex items-center gap-1.5`}
               >
                 <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5">
                   <path strokeLinecap="round" strokeLinejoin="round" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4" />
                 </svg>
-                <span className="font-mono text-[9px] tracking-widest uppercase font-bold">Genişlet</span>
+                <span className="font-mono text-[9.5px] tracking-widest uppercase font-bold">Genişlet</span>
               </button>
             </div>
 
             {/* Plate Name & Date */}
-            <h2 className="font-display font-medium text-2xl text-[#241F19] tracking-normal mb-1 font-gravur-serif">
+            <h2 className={`font-display font-medium text-2xl tracking-normal mb-1 font-gravur-serif ${t.ink}`}>
               {title}
             </h2>
-            <div className="font-display text-[11.5px] tracking-[0.06em] text-[#5C5646] uppercase font-gravur-sc">
+            <div className={`font-display text-[11px] tracking-[0.06em] uppercase font-gravur-sc ${t.inkSoft}`}>
               {dateLabel}
             </div>
 
             {/* Separation Rule */}
             <div className="flex items-center justify-center gap-2 my-3">
-              <div className="w-8 h-[1px] bg-[#241F19]"></div>
-              <div className="w-1.5 h-1.5 rounded-full bg-[#8A5A3B]"></div>
-              <div className="w-8 h-[1px] bg-[#241F19]"></div>
+              <div className="w-8 h-[1px] bg-gravur-ink"></div>
+              <div className="w-1.5 h-1.5 rounded-full bg-gravur-copper"></div>
+              <div className="w-8 h-[1px] bg-gravur-ink"></div>
             </div>
 
             {/* Plate Message */}
             {message && (
-              <p className="font-display italic text-[14.5px] leading-relaxed text-[#38332A] px-2 mb-4 font-gravur-serif">
+              <p className={`font-display italic text-[14.5px] leading-relaxed px-2 mb-4 font-gravur-serif ${t.inkSoft}`}>
                 &ldquo;{message}&rdquo;
               </p>
             )}
 
             {/* Plate Foot */}
-            <div className="flex justify-between items-center border-t border-[#241F19] pt-3.5 mt-2 w-full text-left">
-              <div className="font-display text-[10px] leading-normal text-[#5C5646] uppercase font-gravur-sc">
+            <div className="flex justify-between items-center border-t border-gravur-ink pt-3.5 mt-2 w-full text-left">
+              <div className={`font-display text-[10px] leading-normal uppercase font-gravur-sc ${t.inkSoft}`}>
                 {coordsLabel.split(" · ")[1] || "ÜSKÜDAR İSTANBUL"}
               </div>
               <div className="w-9 h-9 shrink-0">
@@ -131,25 +136,23 @@ export function SkyFocusSection({
           </div>
         </div>
 
-
-
         {skyLog && (
           <div className="mt-10 flex max-w-md flex-col items-center gap-6">
-            <div className="w-[100px] h-[1px] bg-[#241F19]/25 mx-auto"></div>
+            <LedgerRule className="mx-auto max-w-[8rem]" ruleClassName="border-gravur-ink/15" accentClassName={t.copper} />
             <div className="flex flex-col items-center gap-2">
-              <p className="font-mono text-[9px] uppercase tracking-[0.25em] text-[#8A5A3B]">Gökyüzü Kaydı</p>
-              <p className="font-display text-sm italic leading-relaxed text-[#5C5646] font-gravur-serif">{skyLog}</p>
+              <p className={`font-mono text-[9px] uppercase tracking-[0.25em] ${t.copper}`}>Gökyüzü Kaydı</p>
+              <p className={`font-display text-sm italic leading-relaxed font-gravur-serif ${t.inkSoft}`}>{skyLog}</p>
             </div>
           </div>
         )}
 
         {/* Fullscreen Zoom Lightbox Modal */}
         {isZoomed && (
-          <div className="fixed inset-0 z-[100] flex flex-col items-center justify-center bg-[#E4DFCD] backdrop-blur-md">
+          <div className={`fixed inset-0 z-[100] flex flex-col items-center justify-center ${t.plateBg} backdrop-blur-md`}>
             <button
               type="button"
               onClick={() => setIsZoomed(false)}
-              className="absolute top-[max(1.5rem,env(safe-area-inset-top))] right-4 md:right-6 z-[110] bg-[#241F19]/10 rounded-full p-3 text-[#241F19] hover:bg-[#241F19]/25 transition-colors"
+              className={`absolute top-[max(1.5rem,env(safe-area-inset-top))] right-4 md:right-6 z-[110] bg-gravur-ink/10 rounded-full p-3 ${t.ink} hover:bg-gravur-ink/25 transition-colors`}
               aria-label="Kapat"
             >
               <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5">
@@ -166,14 +169,14 @@ export function SkyFocusSection({
   }
 
   return (
-    <div className="flex min-h-screen w-full max-w-xl flex-col items-center justify-center px-4 text-center">
+    <div className="flex min-h-screen w-full max-w-2xl flex-col items-center justify-center px-4 text-center">
       <div
-        className="relative w-[88%] max-w-[420px] md:max-w-[460px]"
+        className="relative w-[92%] max-w-[480px] sm:max-w-[540px] md:max-w-[600px]"
       >
         <div
           aria-hidden
-          className="pointer-events-none absolute -inset-10 -z-10 rounded-full"
-          style={{ background: "radial-gradient(60% 60% at 50% 50%, rgba(230,184,119,0.18), transparent 70%)" }}
+          className="pointer-events-none absolute -inset-14 -z-10 rounded-full animate-glow-pulse"
+          style={{ background: "radial-gradient(60% 60% at 50% 50%, rgba(230,184,119,0.22), transparent 70%)" }}
         />
         <div className="rounded-full border border-amber/[0.2] p-[7px] relative group">
           <div
@@ -186,7 +189,7 @@ export function SkyFocusSection({
           <button
             type="button"
             onClick={() => setIsZoomed(true)}
-            className="absolute -bottom-4 left-1/2 -translate-x-1/2 z-40 bg-[#07050a] border border-amber/40 px-6 py-2.5 rounded-full text-amber hover:text-bright hover:bg-amber/10 transition-all shadow-[0_0_20px_rgba(230,184,119,0.2)] flex items-center gap-2 backdrop-blur-md"
+            className="absolute -bottom-4 left-1/2 -translate-x-1/2 z-40 bg-void border border-amber/40 px-6 py-2.5 rounded-full text-amber hover:text-bright hover:bg-amber/10 transition-all shadow-[0_0_20px_rgba(230,184,119,0.2)] flex items-center gap-2 backdrop-blur-md"
           >
             <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5">
               <path strokeLinecap="round" strokeLinejoin="round" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4" />
@@ -218,7 +221,7 @@ export function SkyFocusSection({
 
       {/* Fullscreen Zoom Lightbox Modal */}
       {isZoomed && (
-        <div className="fixed inset-0 z-[100] flex flex-col items-center justify-center bg-[#07050a] backdrop-blur-md">
+        <div className="fixed inset-0 z-[100] flex flex-col items-center justify-center bg-void backdrop-blur-md">
           <button
             type="button"
             onClick={() => setIsZoomed(false)}

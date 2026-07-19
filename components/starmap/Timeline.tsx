@@ -3,9 +3,9 @@
 import { useState } from "react";
 import { PhotoSlot } from "@/components/journal/PhotoSlot";
 import { Lightbox } from "@/components/ui/Lightbox";
-import { useInViewOnce } from "@/lib/hooks/useInViewOnce";
-import { usePrefersReducedMotion } from "@/lib/hooks/usePrefersReducedMotion";
+import { RevealOnScroll } from "@/components/ui/RevealOnScroll";
 import type { TimelineEntry } from "@/lib/starmaps";
+import type { SkyPalette } from "@/components/astrolab/palettes";
 import { isAddWindowOpen } from "@/lib/starmapTimeline";
 import { AddEntryForm } from "./AddEntryForm";
 
@@ -49,6 +49,7 @@ export interface TimelineProps {
   slug: string;
   createdAt: Date;
   entries: TimelineEntry[];
+  palette: SkyPalette;
   /** True only when a valid owner cookie was verified server-side — visitors with just the share link never see add controls. */
   isOwner: boolean;
   isPreviewMode?: boolean;
@@ -59,31 +60,44 @@ function formatEntryDate(date: Date): string {
 }
 
 /** Growing photo timeline for the digital page — supersedes the old static MemoriesGallery. */
-export function Timeline({ slug, createdAt, entries, isOwner, isPreviewMode = false }: TimelineProps) {
+export function Timeline({ slug, createdAt, entries, palette, isOwner, isPreviewMode = false }: TimelineProps) {
   const [showForm, setShowForm] = useState(false);
   const [prefilledNote, setPrefilledNote] = useState<string | undefined>(undefined);
   const [activePhoto, setActivePhoto] = useState<{ url: string; caption: string } | null>(null);
-  const reducedMotion = usePrefersReducedMotion();
-  const { ref, inView } = useInViewOnce<HTMLDivElement>();
-  const revealed = reducedMotion || inView;
   const windowOpen = isOwner && isAddWindowOpen(createdAt, entries);
+  const isGravur = palette.id === "gravur-atlas";
+  const t = {
+    eyebrow: isGravur ? "text-gravur-ink-soft" : "text-dim",
+    body: isGravur ? "text-gravur-ink-soft" : "text-subtle",
+    accentText: isGravur ? "text-gravur-copper" : "text-amber",
+    accentBorder: isGravur ? "border-gravur-copper/40" : "border-amber/40",
+    accentBg: isGravur ? "bg-gravur-copper/10" : "bg-amber/10",
+    accentDot: isGravur ? "bg-gravur-copper" : "bg-amber",
+    accentButtonHover: isGravur ? "hover:bg-gravur-copper hover:text-gravur-paper" : "hover:bg-amber hover:text-ink",
+    dashedCard: isGravur
+      ? "border-gravur-copper/40 bg-gravur-copper/[0.02] hover:border-gravur-copper hover:bg-gravur-copper/[0.05]"
+      : "border-amber/30 bg-amber/[0.02] hover:border-amber hover:bg-amber/[0.05]",
+    dashedInner: isGravur ? "border-gravur-copper/20 text-gravur-copper/40 group-hover:text-gravur-copper/80" : "border-amber/20 text-amber/40 group-hover:text-amber/80",
+    accentTextSoft: isGravur ? "text-gravur-copper/90 group-hover:text-gravur-copper" : "text-amber/90 group-hover:text-amber",
+    pinDot: isGravur ? "bg-gravur-copper" : "bg-gradient-to-r from-amber-light to-amber-deep",
+  };
 
   if (entries.length === 0 && !isOwner) return null;
   const isTimelineEmpty = entries.length === 0;
 
   return (
-    <div ref={ref}>
-      <p className="text-center font-mono text-[10px] uppercase tracking-[0.3em] text-dim">Zaman Çizelgesi</p>
+    <div>
+      <p className={`text-center font-mono text-[10px] uppercase tracking-[0.3em] ${t.eyebrow}`}>Zaman Çizelgesi</p>
 
       {isOwner && windowOpen && (
         <div className="mt-5 flex flex-col items-center gap-3">
           {!showForm && (
-            <div className="flex items-center gap-2.5 rounded-full border border-amber/40 bg-amber/10 px-4 py-2">
+            <div className={`flex items-center gap-2.5 rounded-full border px-4 py-2 ${t.accentBorder} ${t.accentBg}`}>
               <span
                 aria-hidden
-                className="h-1.5 w-1.5 shrink-0 animate-pulse rounded-full bg-amber motion-reduce:animate-none"
+                className={`h-1.5 w-1.5 shrink-0 animate-pulse rounded-full motion-reduce:animate-none ${t.accentDot}`}
               />
-              <span className="font-mono text-[10px] uppercase tracking-[0.16em] text-amber">
+              <span className={`font-mono text-[10px] uppercase tracking-[0.16em] ${t.accentText}`}>
                 Yeni bir an eklemenin zamanı geldi
               </span>
             </div>
@@ -96,7 +110,7 @@ export function Timeline({ slug, createdAt, entries, isOwner, isPreviewMode = fa
                 setPrefilledNote(undefined);
               }
             }}
-            className="rounded-full border border-amber/40 px-4 py-2 font-mono text-[10px] uppercase tracking-widest text-amber transition-colors hover:bg-amber hover:text-ink"
+            className={`rounded-full border px-4 py-2 font-mono text-[10px] uppercase tracking-widest transition-colors ${t.accentBorder} ${t.accentText} ${t.accentButtonHover}`}
           >
             {showForm ? "Vazgeç" : "+ Yeni An Ekle"}
           </button>
@@ -117,7 +131,7 @@ export function Timeline({ slug, createdAt, entries, isOwner, isPreviewMode = fa
 
       {isTimelineEmpty && isOwner && windowOpen && (
         <div className="mt-8">
-          <p className="text-center text-xs text-subtle mb-6 max-w-md mx-auto leading-relaxed">
+          <p className={`text-center text-xs mb-6 max-w-md mx-auto leading-relaxed ${t.body}`}>
             Zaman çizelgeniz henüz boş. Sevdiğiniz anıları ekleyerek sayfanızı zenginleştirebilirsiniz. İlham almak için aşağıdaki şablonlardan birine tıklayın:
           </p>
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 max-w-xl mx-auto px-4">
@@ -135,26 +149,26 @@ export function Timeline({ slug, createdAt, entries, isOwner, isPreviewMode = fa
                       (document.getElementById("entry-note") as HTMLTextAreaElement)?.focus();
                     }, 100);
                   }}
-                  className="group relative flex flex-col items-center bg-[#fdfaf1]/[0.03] border border-dashed border-amber/30 p-3 pb-5 rounded-xl shadow-lg transition-all duration-300 hover:border-amber hover:bg-amber/[0.05] hover:-translate-y-1 text-center"
+                  className={`group relative flex flex-col items-center border border-dashed p-3 pb-5 rounded-xl shadow-lg transition-all duration-300 hover:-translate-y-1 text-center ${t.dashedCard}`}
                   style={{ transform: `rotate(${rotation}deg)` }}
                 >
                   {/* Pin/Raptiye detayı */}
                   <span
                     aria-hidden
-                    className="absolute -top-1.5 left-1/2 h-2 w-2 -translate-x-1/2 rounded-full shadow bg-gradient-to-r from-amber-light to-amber-deep opacity-60 group-hover:opacity-100 transition-opacity"
+                    className={`absolute -top-1.5 left-1/2 h-2 w-2 -translate-x-1/2 rounded-full shadow opacity-60 group-hover:opacity-100 transition-opacity ${t.pinDot}`}
                   />
                   {/* Fotoğraf Yer Tutucusu */}
-                  <div className="w-full aspect-square border border-dashed border-amber/20 bg-void/50 rounded-lg flex flex-col items-center justify-center text-amber/40 group-hover:text-amber/80 transition-colors">
+                  <div className={`w-full aspect-square border border-dashed rounded-lg flex flex-col items-center justify-center transition-colors ${t.dashedInner}`}>
                     {card.icon}
                     <span className="mt-2 font-mono text-[8px] uppercase tracking-wider opacity-60">
                       Fotoğraf Ekle
                     </span>
                   </div>
                   {/* Şablon Başlığı */}
-                  <h4 className="mt-3.5 font-display text-[13px] italic text-amber/90 group-hover:text-amber transition-colors">
+                  <h4 className={`mt-3.5 font-display text-[13px] italic transition-colors ${t.accentTextSoft}`}>
                     {card.title}
                   </h4>
-                  <p className="mt-1 text-[10px] text-dim leading-relaxed">
+                  <p className={`mt-1 text-[10px] leading-relaxed ${t.eyebrow}`}>
                     Tıkla ve oluştur
                   </p>
                 </button>
@@ -166,18 +180,12 @@ export function Timeline({ slug, createdAt, entries, isOwner, isPreviewMode = fa
 
       <div className="mt-8 space-y-8">
         {entries.map((entry, entryIndex) => (
-          <div
-            key={entry.id}
-            className={`transition-all duration-500 ease-out ${
-              revealed ? "translate-y-0 opacity-100" : "translate-y-4 opacity-0"
-            }`}
-            style={{ transitionDelay: revealed ? `${entryIndex * 120}ms` : "0ms" }}
-          >
-            <p className="text-center font-mono text-[9px] uppercase tracking-[0.25em] text-amber">
+          <RevealOnScroll key={entry.id} delayMs={entryIndex * 120} durationMs={500}>
+            <p className={`text-center font-mono text-[9px] uppercase tracking-[0.25em] ${t.accentText}`}>
               {formatEntryDate(entry.date)}
             </p>
             {entry.note && (
-              <p className="mx-auto mt-2 max-w-md text-center font-display text-sm italic leading-relaxed text-subtle">
+              <p className={`mx-auto mt-2 max-w-md text-center font-display text-sm italic leading-relaxed ${t.body}`}>
                 &ldquo;{entry.note}&rdquo;
               </p>
             )}
@@ -195,7 +203,7 @@ export function Timeline({ slug, createdAt, entries, isOwner, isPreviewMode = fa
                 ))}
               </div>
             )}
-          </div>
+          </RevealOnScroll>
         ))}
       </div>
 
