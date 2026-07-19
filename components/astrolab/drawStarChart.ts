@@ -23,6 +23,8 @@ export interface DrawStarChartOptions {
   manualRotationDeg?: number;
   /** Controls if the spin state is active to override reduced motion static checks. */
   isSpinning?: boolean;
+  /** Scales ambient drift speed and twinkle amplitude/frequency for livelier decorative backdrops. Defaults to 1 (unchanged). */
+  intensity?: number;
 }
 
 const CONSTELLATION_LINES = [
@@ -324,19 +326,23 @@ function drawStar(
   reducedMotion: boolean,
   seed: number,
   palette: SkyPalette,
+  intensity = 1,
 ) {
-  const r = starRadius(mag, scale);
+  const r = starRadius(mag, scale) * (1 + (intensity - 1) * 0.12);
 
-  // Bright stars (mag < 2.5) get a soft pulsing glow halo — the "sparkle."
-  // Positions and core dots never move or resize from this; only the glow's
-  // opacity animates, and only when the viewer allows motion.
-  if (mag < 2.5 && palette.id !== "gravur-atlas") {
+  // Bright stars get a soft pulsing glow halo — the "sparkle." Positions and
+  // core dots never move or resize from this; only the glow's opacity
+  // animates, and only when the viewer allows motion. `intensity` widens how
+  // many stars twinkle and how strongly, for livelier decorative backdrops.
+  const twinkleThreshold = 2.5 + (intensity - 1) * 1.6;
+  if (mag < twinkleThreshold && palette.id !== "gravur-atlas") {
     const phase = (seed % 1000) / 1000;
-    const speed = 1.4 + ((seed >> 3) % 500) / 500;
+    const speed = (1.4 + ((seed >> 3) % 500) / 500) * (1 + (intensity - 1) * 0.6);
+    const ampBase = 0.18 * Math.min(2, intensity);
     const glowAlpha = reducedMotion
       ? 0.28
-      : 0.18 + 0.18 * (0.5 + 0.5 * Math.sin(time * speed + phase * Math.PI * 2));
-    const glowR = r * 3.2; // Glow/Blur yarıçapı azaltılarak yıldızlar keskinleştirildi
+      : ampBase + ampBase * (0.5 + 0.5 * Math.sin(time * speed + phase * Math.PI * 2));
+    const glowR = r * (3.2 + (intensity - 1) * 0.6); // Glow/Blur yarıçapı azaltılarak yıldızlar keskinleştirildi
     const glow = ctx.createRadialGradient(point.x, point.y, 0, point.x, point.y, glowR);
     glow.addColorStop(0, `rgba(${palette.starGlowRgb}, ${glowAlpha})`);
     glow.addColorStop(1, `rgba(${palette.starGlowRgb}, 0)`);
@@ -541,7 +547,8 @@ export function drawStarChart(
   const palette = options.palette ?? DEFAULT_SKY_PALETTE;
   const manualRot = options.manualRotationDeg ?? 0;
   const isSpinning = options.isSpinning ?? false;
-  const driftDeg = ((reducedMotion && !isSpinning) ? 0 : (time * DRIFT_DEG_PER_SEC) % 360) + manualRot;
+  const intensity = options.intensity ?? 1;
+  const driftDeg = ((reducedMotion && !isSpinning) ? 0 : (time * DRIFT_DEG_PER_SEC * intensity) % 360) + manualRot;
   const scale = Math.min(width, height) / 640;
   const cx = width / 2;
   const cy = height / 2;
@@ -599,7 +606,7 @@ export function drawStarChart(
         isLightTheme: palette.id === "gravur-atlas",
       });
     } else {
-      drawStar(ctx, point, star.mag, scale, time, reducedMotion, hash(star.name), palette);
+      drawStar(ctx, point, star.mag, scale, time, reducedMotion, hash(star.name), palette, intensity);
     }
   }
 

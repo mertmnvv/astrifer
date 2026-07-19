@@ -7,8 +7,8 @@ import { formatTRY } from "@/lib/pricing";
 import { getStarMapBySlug } from "@/lib/starmaps";
 import type { OrderDoc } from "@/types/firestore";
 import { DownloadPdfButton } from "@/components/admin/DownloadPdfButton";
+import { DeleteOrderButton } from "./DeleteOrderButton";
 import {
-  deleteOrderAction,
   renderJournalPrintFilesAction,
   renderLetterInsertAction,
   updateOrderAction,
@@ -31,9 +31,9 @@ function formatDate(timestamp: OrderDoc["createdAt"]): string {
 }
 
 const ACTION_BUTTON_CLASS =
-  "rounded-full border border-text/20 bg-text/[0.02] px-4 py-2 font-mono text-[10px] uppercase tracking-widest text-subtle transition-all hover:border-amber hover:text-amber disabled:cursor-not-allowed disabled:opacity-40";
+  "rounded-full border border-text/20 bg-text/[0.02] px-4 py-2 font-mono text-[10px] uppercase tracking-widest text-subtle transition-all hover:border-iris hover:text-iris-light disabled:cursor-not-allowed disabled:opacity-40";
 const DOWNLOAD_BUTTON_CLASS =
-  "rounded-full border border-amber/40 bg-amber/5 px-4 py-2 font-mono text-[10px] uppercase tracking-widest text-amber transition-all hover:bg-amber hover:text-ink";
+  "rounded-full border border-iris/40 bg-iris/5 px-4 py-2 font-mono text-[10px] uppercase tracking-widest text-iris-light transition-all hover:bg-iris hover:text-white";
 
 export default async function AdminOrderDetailPage({ params }: { params: { id: string } }) {
   if (!isFirebaseConfigured()) {
@@ -64,7 +64,7 @@ export default async function AdminOrderDetailPage({ params }: { params: { id: s
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
-        <Link href="/admin/orders" className="font-mono text-xs uppercase tracking-widest text-subtle hover:text-amber transition-colors">
+        <Link href="/admin/orders" className="font-mono text-xs uppercase tracking-widest text-subtle hover:text-iris-light transition-colors">
           ← Siparişler
         </Link>
       </div>
@@ -108,7 +108,7 @@ export default async function AdminOrderDetailPage({ params }: { params: { id: s
                 <select
                   name="status"
                   defaultValue={order.status}
-                  className="w-full rounded-lg border border-text/15 bg-void px-3 py-2 text-xs text-text focus:border-amber/40 focus:outline-none"
+                  className="w-full rounded-lg border border-text/15 bg-void px-3 py-2 text-xs text-text focus:border-iris/40 focus:outline-none"
                 >
                   {STATUS_OPTIONS.map((status) => (
                     <option key={status} value={status} className="bg-panel text-text">
@@ -124,31 +124,18 @@ export default async function AdminOrderDetailPage({ params }: { params: { id: s
                   name="trackingNumber"
                   defaultValue={order.trackingNumber ?? ""}
                   placeholder="Kargo takip no"
-                  className="w-full rounded-lg border border-text/15 bg-void px-3 py-2 text-xs text-text placeholder:text-subtle focus:border-amber/40 focus:outline-none"
+                  className="w-full rounded-lg border border-text/15 bg-void px-3 py-2 text-xs text-text placeholder:text-subtle focus:border-iris/40 focus:outline-none"
                 />
               </div>
               <button
                 type="submit"
-                className="w-full mt-1.5 rounded-full bg-amber text-ink py-2.5 font-mono text-xs uppercase tracking-widest font-bold transition-all hover:bg-amber-light shadow-lg"
+                className="w-full mt-1.5 rounded-full bg-iris text-white py-2.5 font-mono text-xs uppercase tracking-widest font-bold transition-all hover:bg-iris-light shadow-lg"
               >
                 Değişiklikleri Kaydet
               </button>
             </form>
 
-            <form action={deleteOrderAction} className="mt-3">
-              <input type="hidden" name="orderId" value={order.id} />
-              <button
-                type="submit"
-                className="w-full rounded-full border border-red-500/40 bg-red-500/5 py-2.5 font-mono text-[10px] uppercase tracking-widest text-red-500 transition-all hover:bg-red-500 hover:text-white"
-                onClick={(e) => {
-                  if (!window.confirm("Bu siparişi kalıcı olarak silmek istediğinize emin misiniz? Bu işlem geri alınamaz.")) {
-                    e.preventDefault();
-                  }
-                }}
-              >
-                Siparişi Sil
-              </button>
-            </form>
+            <DeleteOrderButton orderId={order.id} />
           </div>
 
           {/* ── Müşteri Dosyaları (Fotoğraf/Ses) ── */}
@@ -198,7 +185,7 @@ export default async function AdminOrderDetailPage({ params }: { params: { id: s
                       href={starMap.videoUrl}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="text-[9px] font-mono text-dim hover:text-amber underline self-end"
+                      className="text-[9px] font-mono text-dim hover:text-iris-light underline self-end"
                     >
                       Videoyu İndir
                     </a>
@@ -210,7 +197,7 @@ export default async function AdminOrderDetailPage({ params }: { params: { id: s
                       href={starMap.voiceNoteUrl}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="text-[9px] font-mono text-dim hover:text-amber underline self-end"
+                      className="text-[9px] font-mono text-dim hover:text-iris-light underline self-end"
                     >
                       Ses Dosyasını İndir
                     </a>
@@ -230,7 +217,7 @@ export default async function AdminOrderDetailPage({ params }: { params: { id: s
                       href={starMap.musicUrl}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="text-[9px] font-mono text-dim hover:text-amber underline self-end"
+                      className="text-[9px] font-mono text-dim hover:text-iris-light underline self-end"
                     >
                       Dosyayı İndir
                     </a>
@@ -273,7 +260,7 @@ export default async function AdminOrderDetailPage({ params }: { params: { id: s
                   href={`/s/${starMap.slug}`}
                   target="_blank"
                   rel="noreferrer"
-                  className="font-mono text-[10px] uppercase tracking-widest text-amber underline underline-offset-2 hover:text-bright"
+                  className="font-mono text-[10px] uppercase tracking-widest text-iris-light underline underline-offset-2 hover:text-bright"
                 >
                   Dijital Sayfayı Yeni Sekmede Aç ↗
                 </Link>
@@ -354,7 +341,7 @@ export default async function AdminOrderDetailPage({ params }: { params: { id: s
                       <span className="font-mono text-[11px] uppercase tracking-widest text-bright">
                         {item.label}
                       </span>
-                      <span className="text-right font-mono text-sm text-amber font-semibold">
+                      <span className="text-right font-mono text-sm text-iris-light font-semibold">
                         {formatTRY(item.price)}
                       </span>
                     </div>

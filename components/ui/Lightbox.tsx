@@ -48,14 +48,14 @@ export function Lightbox({ url, caption, onClose }: LightboxProps) {
             animate={{ scale: 1 }}
             exit={{ scale: 0.95 }}
             transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
-            className="relative max-w-full max-h-[85vh] overflow-hidden rounded-lg shadow-2xl flex flex-col items-center"
+            className="relative max-w-sm sm:max-w-md w-full max-h-[70vh] overflow-hidden rounded-lg shadow-2xl flex flex-col items-center"
             onClick={(e) => e.stopPropagation()} // Prevent closing when clicking the image
           >
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
               src={url}
               alt={caption ?? "Büyütülmüş fotoğraf"}
-              className="max-w-full max-h-[80vh] object-contain rounded-lg"
+              className="max-w-full max-h-[62vh] object-contain rounded-lg"
             />
             {caption && (
               <div className="w-full bg-neutral-900/90 border-t border-white/5 py-3 px-4 text-center">

@@ -27,6 +27,8 @@ export interface StarChartProps {
   showControls?: boolean;
   /** Event triggered when the spinning state changes. */
   onSpinChange?: (spinning: boolean) => void;
+  /** Scales ambient drift speed and twinkle amplitude/frequency for livelier decorative backdrops. Defaults to 1 (unchanged). */
+  intensity?: number;
 }
 
 export function StarChart({
@@ -41,6 +43,7 @@ export function StarChart({
   resetTrigger,
   showControls = true,
   onSpinChange,
+  intensity,
 }: StarChartProps) {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const containerRef = useRef<HTMLDivElement | null>(null);
@@ -109,6 +112,7 @@ export function StarChart({
         isPreviewMode,
         manualRotationDeg: manualRotation.current,
         isSpinning: isSpinningRef.current,
+        intensity,
       });
     };
 
@@ -211,7 +215,7 @@ export function StarChart({
         window.removeEventListener("touchend", onEnd);
       }
     };
-  }, [sky, reducedMotion, showLabels, palette, interactive, isPreviewMode, isSpinning, resetTrigger]);
+  }, [sky, reducedMotion, showLabels, palette, interactive, isPreviewMode, isSpinning, resetTrigger, intensity]);
 
   return (
     <div className={`flex flex-col items-center gap-4 ${className ?? ""}`}>

@@ -4,7 +4,7 @@ import React, { useState } from "react";
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
 import { RevealOnScroll } from "@/components/ui/RevealOnScroll";
-import { SectionHeading } from "@/components/atlas/SectionHeading";
+import { HomeSectionHeading } from "@/components/home/HomeSectionHeading";
 import { formatTRY } from "@/lib/pricing";
 import type { PricingConfig } from "@/lib/pricingConfig";
 
@@ -48,7 +48,7 @@ const DIGITAL_STARS = [
 ];
 
 function FeatureIcon({ iconKey }: { iconKey: string }) {
-  const baseClass = "h-4 w-4 text-amber shrink-0";
+  const baseClass = "h-4 w-4 text-iris-light shrink-0";
   
   switch (iconKey) {
     case "web":
@@ -224,13 +224,13 @@ export function ProductsTeaser({ pricing }: { pricing: PricingConfig }) {
   const selectedProduct = products.find((p) => p.id === activeTab)!;
 
   return (
-    <section id="urunler" className="scroll-mt-20 px-4 py-24 sm:px-8 bg-void relative overflow-hidden">
+    <section id="urunler" className="scroll-mt-20 px-4 py-24 sm:px-8 bg-nebula relative overflow-hidden">
       {/* Background radial glow */}
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-amber/5 rounded-full blur-[120px] pointer-events-none -z-10" />
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-gradient-to-br from-iris/10 to-flare/10 rounded-full blur-[120px] pointer-events-none -z-10" />
 
       <div className="mx-auto max-w-5xl">
         <RevealOnScroll>
-          <SectionHeading eyebrow="Koleksiyon" title="Dijital, ya da elle tutulur." />
+          <HomeSectionHeading eyebrow="Koleksiyon" title="Dijital, ya da elle tutulur." />
         </RevealOnScroll>
 
         <div className="mt-16 grid gap-12 lg:grid-cols-12 items-center">
@@ -256,15 +256,15 @@ export function ProductsTeaser({ pricing }: { pricing: PricingConfig }) {
                   />
 
                   {/* Page Preview Card (no device chrome) */}
-                  <div className="relative w-[260px] h-[520px] rounded-[28px] border border-amber/25 bg-[#0b0810] shadow-[0_20px_50px_rgba(0,0,0,0.8)] ring-1 ring-white/10 flex flex-col overflow-hidden">
+                  <div className="relative w-[260px] h-[520px] rounded-[28px] border border-iris/25 bg-[#0b0810] shadow-[0_20px_50px_rgba(0,0,0,0.8)] ring-1 ring-white/10 flex flex-col overflow-hidden">
 
                     {/* Plaque header instead of a notch */}
                     <div className="absolute top-0 left-0 right-0 h-8 z-30 flex items-center justify-center gap-2 pointer-events-none">
-                      <span className="h-px w-6 bg-amber/30" />
-                      <span className="font-mono text-[6px] uppercase tracking-[0.3em] text-amber/70">
+                      <span className="h-px w-6 bg-iris/30" />
+                      <span className="font-mono text-[6px] uppercase tracking-[0.3em] text-iris-light/70">
                         Dijital Sayfa
                       </span>
-                      <span className="h-px w-6 bg-amber/30" />
+                      <span className="h-px w-6 bg-flare/30" />
                     </div>
 
                     {/* Fixed Background Layer inside card */}
@@ -461,13 +461,13 @@ export function ProductsTeaser({ pricing }: { pricing: PricingConfig }) {
                     key={product.id}
                     onClick={() => setActiveTab(product.id)}
                     className={`relative px-5 py-2.5 rounded-full font-mono text-[9px] uppercase tracking-widest transition-colors duration-300 z-10 flex-1 text-center ${
-                      isSelected ? "text-ink font-bold" : "text-subtle hover:text-text"
+                      isSelected ? "text-white font-bold" : "text-subtle hover:text-text"
                     }`}
                   >
                     {isSelected && (
                       <motion.div
                         layoutId="activeProductTab"
-                        className="absolute inset-0 bg-gradient-to-br from-amber-light to-amber-deep rounded-full -z-10 shadow-sm"
+                        className="absolute inset-0 bg-gradient-to-br from-iris to-flare rounded-full -z-10 shadow-sm"
                         transition={{ type: "spring", stiffness: 350, damping: 28 }}
                       />
                     )}
@@ -493,7 +493,7 @@ export function ProductsTeaser({ pricing }: { pricing: PricingConfig }) {
                     <div className="flex items-center gap-3">
                       <h3 className="font-display text-3xl sm:text-4xl italic text-text">{selectedProduct.title}</h3>
                       {selectedProduct.badge && (
-                        <span className="rounded-full bg-gradient-to-br from-amber-light to-amber-deep px-2.5 py-0.5 font-mono text-[8px] font-bold uppercase tracking-widest text-ink select-none">
+                        <span className="rounded-full bg-gradient-to-br from-iris to-flare px-2.5 py-0.5 font-mono text-[8px] font-bold uppercase tracking-widest text-white select-none">
                           {selectedProduct.badge}
                         </span>
                       )}
@@ -531,7 +531,7 @@ export function ProductsTeaser({ pricing }: { pricing: PricingConfig }) {
                               <span className="font-mono text-xs line-through text-dim">
                                 {formatTRY(pricing.digitalOriginalPrice)}
                               </span>
-                              <span className="font-mono text-lg sm:text-xl font-medium text-amber font-semibold">
+                              <span className="font-mono text-lg sm:text-xl font-medium text-iris-light font-semibold">
                                 {formatTRY(pricing.digitalPrice)}
                               </span>
                               <span className="rounded bg-green-500/10 px-1.5 py-0.5 font-mono text-[8px] font-bold text-green-400">
@@ -539,7 +539,7 @@ export function ProductsTeaser({ pricing }: { pricing: PricingConfig }) {
                               </span>
                             </>
                           ) : (
-                            <span className="font-mono text-lg sm:text-xl font-medium text-amber font-semibold">
+                            <span className="font-mono text-lg sm:text-xl font-medium text-iris-light font-semibold">
                               {formatTRY(pricing.digitalPrice)}
                             </span>
                           )
@@ -549,7 +549,7 @@ export function ProductsTeaser({ pricing }: { pricing: PricingConfig }) {
                               <span className="font-mono text-xs line-through text-dim">
                                 {formatTRY(pricing.journalOriginalPrice)}
                               </span>
-                              <span className="font-mono text-lg sm:text-xl font-medium text-amber font-semibold">
+                              <span className="font-mono text-lg sm:text-xl font-medium text-iris-light font-semibold">
                                 {formatTRY(pricing.journalPrice)}
                               </span>
                               <span className="rounded bg-green-500/10 px-1.5 py-0.5 font-mono text-[8px] font-bold text-green-400">
@@ -557,7 +557,7 @@ export function ProductsTeaser({ pricing }: { pricing: PricingConfig }) {
                               </span>
                             </>
                           ) : (
-                            <span className="font-mono text-lg sm:text-xl font-medium text-amber font-semibold">
+                            <span className="font-mono text-lg sm:text-xl font-medium text-iris-light font-semibold">
                               {formatTRY(pricing.journalPrice)}
                             </span>
                           )
@@ -567,7 +567,7 @@ export function ProductsTeaser({ pricing }: { pricing: PricingConfig }) {
 
                     <Link
                       href={selectedProduct.href}
-                      className="relative inline-flex items-center justify-center overflow-hidden rounded-full bg-gradient-to-r from-amber to-amber-deep px-6 sm:px-8 py-3 sm:py-3.5 font-mono text-[9px] sm:text-[10px] uppercase tracking-widest text-ink transition-transform hover:scale-[1.02] active:scale-[0.98] shadow-md group font-bold"
+                      className="relative inline-flex items-center justify-center overflow-hidden rounded-full bg-gradient-to-r from-iris to-flare px-6 sm:px-8 py-3 sm:py-3.5 font-mono text-[9px] sm:text-[10px] uppercase tracking-widest text-white transition-transform hover:scale-[1.02] active:scale-[0.98] shadow-md group font-bold"
                     >
                       {/* Button glint */}
                       <div className="absolute inset-0 -translate-x-full group-hover:translate-x-full transition-transform duration-1000 bg-gradient-to-r from-transparent via-white/25 to-transparent" />

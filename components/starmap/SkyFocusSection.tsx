@@ -169,27 +169,25 @@ export function SkyFocusSection({
   }
 
   return (
-    <div className="flex min-h-screen w-full max-w-2xl flex-col items-center justify-center px-4 text-center">
-      <div
-        className="relative w-[92%] max-w-[480px] sm:max-w-[540px] md:max-w-[600px]"
-      >
+    <div className="flex min-h-[100svh] w-full max-w-4xl flex-col items-center justify-center px-4 text-center">
+      <p className="font-mono text-[9.5px] font-medium uppercase tracking-[0.38em] text-[rgb(var(--accent-rgb))]">
+        O Anın Gökyüzü
+      </p>
+      <div className="relative mt-6 w-full max-w-3xl">
         <div
           aria-hidden
-          className="pointer-events-none absolute -inset-14 -z-10 rounded-full animate-glow-pulse"
-          style={{ background: "radial-gradient(60% 60% at 50% 50%, rgba(230,184,119,0.22), transparent 70%)" }}
+          className="pointer-events-none absolute -inset-10 -z-10 rounded-[2.5rem] animate-glow-pulse bg-[radial-gradient(60%_60%_at_50%_45%,rgb(var(--accent-rgb)/0.2),transparent_70%)]"
         />
-        <div className="rounded-full border border-amber/[0.2] p-[7px] relative group">
-          <div
-            className="aspect-square overflow-hidden rounded-full border border-amber/40 shadow-[0_25px_70px_-24px_rgba(0,0,0,0.65)] relative"
-          >
+        <div className="relative rounded-[2rem] border border-[rgb(var(--accent-rgb)/0.2)] bg-panel/30 p-2 backdrop-blur-md group">
+          <div className="aspect-[4/3] sm:aspect-[16/10] overflow-hidden rounded-[1.6rem] border border-[rgb(var(--accent-rgb)/0.35)] shadow-[0_35px_90px_-30px_rgba(0,0,0,0.7)] relative">
             <CelestialGlobe3D sky={sky} palette={palette} className="w-full h-full" />
           </div>
-          
+
           {/* Prominent Fullscreen Expand Button (Placed outside the overflow-hidden mask) */}
           <button
             type="button"
             onClick={() => setIsZoomed(true)}
-            className="absolute -bottom-4 left-1/2 -translate-x-1/2 z-40 bg-void border border-amber/40 px-6 py-2.5 rounded-full text-amber hover:text-bright hover:bg-amber/10 transition-all shadow-[0_0_20px_rgba(230,184,119,0.2)] flex items-center gap-2 backdrop-blur-md"
+            className="absolute -bottom-4 left-1/2 -translate-x-1/2 z-40 bg-nebula border border-[rgb(var(--accent-rgb)/0.4)] px-6 py-2.5 rounded-full text-[rgb(var(--accent-rgb))] hover:text-bright hover:bg-[rgb(var(--accent-rgb)/0.1)] transition-all shadow-[0_0_20px_rgb(var(--accent-rgb)/0.2)] flex items-center gap-2 backdrop-blur-md"
           >
             <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5">
               <path strokeLinecap="round" strokeLinejoin="round" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4" />
@@ -198,7 +196,6 @@ export function SkyFocusSection({
           </button>
         </div>
       </div>
-
 
 
       <div
@@ -212,7 +209,7 @@ export function SkyFocusSection({
           <>
             <LedgerRule className="mx-auto max-w-[8rem]" />
             <div className="flex flex-col items-center gap-2">
-              <p className="font-mono text-[9px] uppercase tracking-[0.25em] text-dim">Gökyüzü Kaydı</p>
+              <p className="font-mono text-[9px] uppercase tracking-[0.25em] text-[rgb(var(--accent-rgb))]">Gökyüzü Kaydı</p>
               <p className="font-display text-sm italic leading-relaxed text-subtle">{skyLog}</p>
             </div>
           </>
@@ -221,7 +218,7 @@ export function SkyFocusSection({
 
       {/* Fullscreen Zoom Lightbox Modal */}
       {isZoomed && (
-        <div className="fixed inset-0 z-[100] flex flex-col items-center justify-center bg-void backdrop-blur-md">
+        <div className="fixed inset-0 z-[100] flex flex-col items-center justify-center bg-nebula backdrop-blur-md">
           <button
             type="button"
             onClick={() => setIsZoomed(false)}

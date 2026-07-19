@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { cookies } from "next/headers";
 import { notFound } from "next/navigation";
 import { StarMapView } from "@/components/starmap/StarMapView";
+import { AuroraHeader } from "@/components/home/AuroraHeader";
 import { getStarMapBySlug } from "@/lib/starmaps";
 import { ownerCookieName, verifyOwnerToken } from "@/lib/starmapOwnerToken";
 
@@ -48,5 +49,14 @@ export default async function SharedStarMapPage({
   const ownerToken = cookies().get(ownerCookieName(params.slug))?.value;
   const isOwner = await verifyOwnerToken(params.slug, ownerToken);
 
-  return <StarMapView starMap={starMap} isOwner={isOwner} />;
+  return (
+    <>
+      <AuroraHeader
+        links={[{ href: "/", label: "Ana Sayfa" }]}
+        cta={{ href: "/urun/defter", label: "Deri Defter Sipariş Et" }}
+        showCart={false}
+      />
+      <StarMapView starMap={starMap} isOwner={isOwner} />
+    </>
+  );
 }

@@ -69,17 +69,17 @@ export function Timeline({ slug, createdAt, entries, palette, isOwner, isPreview
   const t = {
     eyebrow: isGravur ? "text-gravur-ink-soft" : "text-dim",
     body: isGravur ? "text-gravur-ink-soft" : "text-subtle",
-    accentText: isGravur ? "text-gravur-copper" : "text-amber",
-    accentBorder: isGravur ? "border-gravur-copper/40" : "border-amber/40",
-    accentBg: isGravur ? "bg-gravur-copper/10" : "bg-amber/10",
-    accentDot: isGravur ? "bg-gravur-copper" : "bg-amber",
-    accentButtonHover: isGravur ? "hover:bg-gravur-copper hover:text-gravur-paper" : "hover:bg-amber hover:text-ink",
+    accentText: isGravur ? "text-gravur-copper" : "text-[rgb(var(--accent-rgb))]",
+    accentBorder: isGravur ? "border-gravur-copper/40" : "border-[rgb(var(--accent-rgb)/0.4)]",
+    accentBg: isGravur ? "bg-gravur-copper/10" : "bg-[rgb(var(--accent-rgb)/0.1)]",
+    accentDot: isGravur ? "bg-gravur-copper" : "bg-[rgb(var(--accent-rgb))]",
+    accentButtonHover: isGravur ? "hover:bg-gravur-copper hover:text-gravur-paper" : "hover:bg-[rgb(var(--accent-rgb))] hover:text-ink",
     dashedCard: isGravur
       ? "border-gravur-copper/40 bg-gravur-copper/[0.02] hover:border-gravur-copper hover:bg-gravur-copper/[0.05]"
-      : "border-amber/30 bg-amber/[0.02] hover:border-amber hover:bg-amber/[0.05]",
-    dashedInner: isGravur ? "border-gravur-copper/20 text-gravur-copper/40 group-hover:text-gravur-copper/80" : "border-amber/20 text-amber/40 group-hover:text-amber/80",
-    accentTextSoft: isGravur ? "text-gravur-copper/90 group-hover:text-gravur-copper" : "text-amber/90 group-hover:text-amber",
-    pinDot: isGravur ? "bg-gravur-copper" : "bg-gradient-to-r from-amber-light to-amber-deep",
+      : "border-[rgb(var(--accent-rgb)/0.3)] bg-[rgb(var(--accent-rgb)/0.02)] hover:border-[rgb(var(--accent-rgb))] hover:bg-[rgb(var(--accent-rgb)/0.05)]",
+    dashedInner: isGravur ? "border-gravur-copper/20 text-gravur-copper/40 group-hover:text-gravur-copper/80" : "border-[rgb(var(--accent-rgb)/0.2)] text-[rgb(var(--accent-rgb)/0.4)] group-hover:text-[rgb(var(--accent-rgb)/0.8)]",
+    accentTextSoft: isGravur ? "text-gravur-copper/90 group-hover:text-gravur-copper" : "text-[rgb(var(--accent-rgb)/0.9)] group-hover:text-[rgb(var(--accent-rgb))]",
+    pinDot: isGravur ? "bg-gravur-copper" : "bg-gradient-to-r from-[rgb(var(--accent-rgb))] to-[rgb(var(--accent-rgb-2))]",
   };
 
   if (entries.length === 0 && !isOwner) return null;

@@ -29,7 +29,10 @@ export function getYoutubeId(url: string | null): string | null {
 
 export function MusicProvider({ src, children }: MusicProviderProps) {
   const audioRef = useRef<HTMLAudioElement | null>(null);
+  const ytContainerRef = useRef<HTMLDivElement | null>(null);
   const ytPlayerRef = useRef<any>(null);
+  const ytPlayerReadyRef = useRef(false);
+  const wantsPlayRef = useRef(false);
   const [playing, setPlaying] = useState(false);
 
   // Web Audio refs for visualization
@@ -69,12 +72,23 @@ export function MusicProvider({ src, children }: MusicProviderProps) {
   useEffect(() => {
     if (!isYoutube || !ytVideoId) return;
 
+    // Capture the wrapper node for this effect run so the cleanup below
+    // always references the exact node it mounted into, regardless of
+    // whether the ref itself has since changed.
+    const container = ytContainerRef.current;
+
+    // New video/track: any pending play request or readiness from a
+    // previous player instance is no longer valid.
+    ytPlayerReadyRef.current = false;
+
     // Load the Iframe Player API code asynchronously
-    if (!(window as any).YT) {
-      const tag = document.createElement("script");
-      tag.src = "https://www.youtube.com/iframe_api";
-      const firstScriptTag = document.getElementsByTagName("script")[0];
-      firstScriptTag.parentNode?.insertBefore(tag, firstScriptTag);
+    if (!(window as any).YT || !(window as any).YT.Player) {
+      if (!document.querySelector('script[src="https://www.youtube.com/iframe_api"]')) {
+        const tag = document.createElement("script");
+        tag.src = "https://www.youtube.com/iframe_api";
+        const firstScriptTag = document.getElementsByTagName("script")[0];
+        firstScriptTag.parentNode?.insertBefore(tag, firstScriptTag);
+      }
     }
 
     // Set up global callback for when API is ready
@@ -89,7 +103,25 @@ export function MusicProvider({ src, children }: MusicProviderProps) {
     }
 
     function initPlayer() {
-      ytPlayerRef.current = new (window as any).YT.Player("youtube-bg-player", {
+      // Guard against double-init (e.g. React Strict Mode double effect run).
+      if (ytPlayerRef.current) return;
+      if (!container) return;
+
+      // Create the mount target imperatively, entirely outside React's
+      // reconciliation. The YouTube IFrame API replaces this element with
+      // its own <iframe> behind React's back; if React itself rendered
+      // this node via JSX, React would later try to remove/update a node
+      // that YouTube already swapped out, throwing
+      // "NotFoundError: Failed to execute 'removeChild' on 'Node'".
+      // By only ever letting the wrapper div be React-managed, and
+      // creating/destroying the actual mount target by hand, React never
+      // has any expectation about that inner node's identity.
+      container.innerHTML = "";
+      const mountEl = document.createElement("div");
+      mountEl.id = "youtube-bg-player";
+      container.appendChild(mountEl);
+
+      ytPlayerRef.current = new (window as any).YT.Player(mountEl, {
         height: "0",
         width: "0",
         videoId: ytVideoId,
@@ -105,6 +137,19 @@ export function MusicProvider({ src, children }: MusicProviderProps) {
           rel: 0,
         },
         events: {
+          onReady: () => {
+            ytPlayerReadyRef.current = true;
+            // If the user already tapped "Aç" before the player finished
+            // initializing, honor that request now.
+            if (wantsPlayRef.current && ytPlayerRef.current && typeof ytPlayerRef.current.playVideo === "function") {
+              try {
+                ytPlayerRef.current.playVideo();
+                setPlaying(true);
+              } catch (e) {
+                console.error(e);
+              }
+            }
+          },
           onStateChange: (event: any) => {
             if (event.data === 1) { // YT.PlayerState.PLAYING
               setPlaying(true);
@@ -117,12 +162,21 @@ export function MusicProvider({ src, children }: MusicProviderProps) {
     }
 
     return () => {
+      ytPlayerReadyRef.current = false;
+      wantsPlayRef.current = false;
       if (ytPlayerRef.current && typeof ytPlayerRef.current.destroy === "function") {
         try {
           ytPlayerRef.current.destroy();
         } catch (e) {
           console.error("Error destroying YT Player:", e);
         }
+      }
+      ytPlayerRef.current = null;
+      // Imperative cleanup, independent of React's reconciliation: whatever
+      // YouTube left behind inside the wrapper (iframe or otherwise) is
+      // removed by hand so React never has to reconcile it.
+      if (container) {
+        container.innerHTML = "";
       }
     };
   }, [isYoutube, ytVideoId]);
@@ -145,7 +199,12 @@ export function MusicProvider({ src, children }: MusicProviderProps) {
       playing,
       play: () => {
         if (isYoutube) {
-          if (ytPlayerRef.current && typeof ytPlayerRef.current.playVideo === "function") {
+          wantsPlayRef.current = true;
+          if (
+            ytPlayerReadyRef.current &&
+            ytPlayerRef.current &&
+            typeof ytPlayerRef.current.playVideo === "function"
+          ) {
             try {
               ytPlayerRef.current.playVideo();
               setPlaying(true);
@@ -153,6 +212,8 @@ export function MusicProvider({ src, children }: MusicProviderProps) {
               console.error(e);
             }
           }
+          // If not ready yet, onReady will pick up wantsPlayRef and start
+          // playback as soon as the player becomes usable.
         } else {
           if (!audioRef.current) return;
           setupAudioContext();
@@ -165,7 +226,12 @@ export function MusicProvider({ src, children }: MusicProviderProps) {
       },
       toggle: () => {
         if (isYoutube) {
-          if (ytPlayerRef.current) {
+          if (playing) {
+            wantsPlayRef.current = false;
+          } else {
+            wantsPlayRef.current = true;
+          }
+          if (ytPlayerReadyRef.current && ytPlayerRef.current) {
             try {
               if (playing) {
                 ytPlayerRef.current.pauseVideo();
@@ -218,7 +284,7 @@ export function MusicProvider({ src, children }: MusicProviderProps) {
   return (
     <MusicContext.Provider value={value}>
       {src && !isYoutube && <audio ref={audioRef} src={src} loop preload="none" />}
-      {src && isYoutube && <div id="youtube-bg-player" className="hidden pointer-events-none" aria-hidden="true" />}
+      {src && isYoutube && <div ref={ytContainerRef} className="hidden pointer-events-none" aria-hidden="true" />}
       {children}
     </MusicContext.Provider>
   );

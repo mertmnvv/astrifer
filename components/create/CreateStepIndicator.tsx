@@ -14,7 +14,7 @@ export interface CreateStepIndicatorProps {
 
 /**
  * Wizard progress row for /create — numbered pills connected by a rule,
- * reusing the site's amber-accent mono-uppercase numbering language
+ * reusing the site's iris-accent mono-uppercase numbering language
  * (SectionLabel in CreateForm.tsx, "01".."05") instead of introducing a
  * new visual vocabulary. Only steps <= furthestStep are clickable, so
  * users can revisit but not skip ahead of what they've completed.
@@ -39,9 +39,9 @@ export function CreateStepIndicator({ steps, currentStep, furthestStep, onStepCl
                 aria-label={`${step.n}. adım: ${step.label}`}
                 className={`flex h-7 w-7 shrink-0 items-center justify-center rounded-full border font-mono text-[10px] transition-colors ${
                   isCurrent
-                    ? "border-amber bg-amber/10 text-amber"
+                    ? "border-iris-light bg-iris-light/10 text-iris-light"
                     : isDone
-                      ? "border-amber/50 text-amber/80 hover:border-amber"
+                      ? "border-iris-light/50 text-iris-light/80 hover:border-iris-light"
                       : "cursor-not-allowed border-text/15 text-dim"
                 }`}
               >
@@ -53,13 +53,13 @@ export function CreateStepIndicator({ steps, currentStep, furthestStep, onStepCl
                   step.n
                 )}
               </button>
-              {index < steps.length - 1 && <div className={`h-px flex-1 ${isDone ? "bg-amber/40" : "bg-text/10"}`} />}
+              {index < steps.length - 1 && <div className={`h-px flex-1 ${isDone ? "bg-iris-light/40" : "bg-text/10"}`} />}
             </li>
           );
         })}
       </ol>
       <p className="mt-2.5 font-mono text-[11px] uppercase tracking-[0.2em] text-dim">
-        <span className="text-amber">{String(currentStep).padStart(2, "0")}</span>
+        <span className="text-iris-light">{String(currentStep).padStart(2, "0")}</span>
         &nbsp;&nbsp;{activeLabel}
       </p>
     </nav>

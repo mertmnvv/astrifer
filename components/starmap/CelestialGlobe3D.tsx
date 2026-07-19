@@ -664,8 +664,8 @@ export function CelestialGlobe3D({ sky, palette, className = "" }: CelestialGlob
         Batı (W)
       </div>
 
-      <div className={`absolute top-8 md:top-6 left-1/2 -translate-x-1/2 ${isGravur ? "bg-[#E4DFCD]/90 border-[#241F19]/20 text-[#241F19]" : "bg-void/30 border-text/10 text-dim"} rounded-full px-3 py-1 font-mono text-[8.5px] uppercase tracking-widest select-none pointer-events-none flex items-center gap-1.5 opacity-80 backdrop-blur-sm`}>
-        <svg className={`h-3.5 w-3.5 ${isGravur ? "text-[#8A5A3B]" : "text-amber"}`} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.2}>
+      <div className={`absolute top-8 md:top-6 left-1/2 -translate-x-1/2 ${isGravur ? "bg-[#E4DFCD]/90 border-[#241F19]/20 text-[#241F19]" : "bg-nebula/50 border-[rgb(var(--accent-rgb)/0.15)] text-dim"} rounded-full px-3 py-1 font-mono text-[8.5px] uppercase tracking-widest select-none pointer-events-none flex items-center gap-1.5 opacity-80 backdrop-blur-sm`}>
+        <svg className={`h-3.5 w-3.5 ${isGravur ? "text-[#8A5A3B]" : "text-[rgb(var(--accent-rgb))]"}`} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.2}>
           <path strokeLinecap="round" strokeLinejoin="round" d="M7 11.5V14m0-2.5v-6a1.5 1.5 0 113 0m-3 6a1.5 1.5 0 00-3 0v2a7.5 7.5 0 0015 0v-5a1.5 1.5 0 00-3 0m-6-3V11m0-5.5v-1a1.5 1.5 0 013 0v1" />
         </svg>
         <span>Döndürmek için sürükleyin</span>
@@ -673,7 +673,7 @@ export function CelestialGlobe3D({ sky, palette, className = "" }: CelestialGlob
 
       {/* Selected Star Details Card */}
       {selectedStar && (
-        <div className={`absolute bottom-[max(2rem,env(safe-area-inset-bottom))] left-4 right-4 md:left-1/2 md:right-auto md:-translate-x-1/2 md:w-80 rounded-xl border p-4 shadow-xl backdrop-blur-sm z-30 flex flex-col gap-1.5 text-left animate-fadeIn ${isGravur ? "bg-[#E4DFCD]/95 border-[#241F19]/30 shadow-2xl" : "border-amber/20 bg-void/90"}`}>
+        <div className={`absolute bottom-[max(2rem,env(safe-area-inset-bottom))] left-4 right-4 md:left-1/2 md:right-auto md:-translate-x-1/2 md:w-80 rounded-xl border p-4 shadow-xl backdrop-blur-sm z-30 flex flex-col gap-1.5 text-left animate-fadeIn ${isGravur ? "bg-[#E4DFCD]/95 border-[#241F19]/30 shadow-2xl" : "border-[rgb(var(--accent-rgb)/0.2)] bg-nebula/90"}`}>
           <button
             type="button"
             onClick={() => setSelectedStar(null)}
@@ -684,7 +684,7 @@ export function CelestialGlobe3D({ sky, palette, className = "" }: CelestialGlob
               <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
             </svg>
           </button>
-          <p className={`font-mono text-[8.5px] uppercase tracking-[0.2em] ${isGravur ? "text-[#8A5A3B]" : "text-amber"}`}>
+          <p className={`font-mono text-[8.5px] uppercase tracking-[0.2em] ${isGravur ? "text-[#8A5A3B]" : "text-[rgb(var(--accent-rgb))]"}`}>
             {selectedStar.type === "body" ? "🪐 Gök Cismi" : "⭐ Yıldız Raporu"}
           </p>
           <h4 className={`font-display text-base italic font-medium ${isGravur ? "text-[#241F19] font-gravur-serif" : "text-bright"}`}>

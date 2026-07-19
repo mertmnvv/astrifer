@@ -59,7 +59,7 @@ export function AddEntryForm({ slug, onDone, initialNote }: AddEntryFormProps) {
     <form
       id="add-entry-form"
       onSubmit={handleSubmit}
-      className="flex flex-col gap-3 rounded-2xl border border-amber/20 bg-void/60 p-4"
+      className="flex flex-col gap-3 rounded-2xl border border-[rgb(var(--accent-rgb)/0.2)] bg-void/60 p-4"
     >
       <div>
         <label htmlFor="entry-date" className="mb-1 block font-mono text-[9px] uppercase tracking-widest text-dim">
@@ -100,7 +100,7 @@ export function AddEntryForm({ slug, onDone, initialNote }: AddEntryFormProps) {
       <button
         type="submit"
         disabled={!isValid || isSubmitting}
-        className="rounded-full bg-gradient-to-br from-amber-light to-amber-deep px-4 py-2 font-mono text-[10px] uppercase tracking-widest text-ink transition-opacity hover:opacity-90 disabled:opacity-40"
+        className="rounded-full bg-gradient-to-br from-[rgb(var(--accent-rgb))] to-[rgb(var(--accent-rgb-2))] px-4 py-2 font-mono text-[10px] uppercase tracking-widest text-ink transition-opacity hover:opacity-90 disabled:opacity-40"
       >
         {isSubmitting ? "Ekleniyor…" : "Anı Ekle"}
       </button>

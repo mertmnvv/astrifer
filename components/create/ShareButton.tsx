@@ -46,7 +46,7 @@ export function ShareButton({ slug, className }: ShareButtonProps) {
     <button
       type="button"
       onClick={handleShare}
-      className={`inline-flex items-center gap-2 rounded-full bg-gradient-to-br from-amber-light to-amber-deep px-6 py-3 font-mono text-xs uppercase tracking-widest text-ink shadow-[0_6px_24px_-6px_rgba(230,163,92,0.5)] transition-opacity hover:opacity-90 ${className ?? ""}`}
+      className={`inline-flex items-center gap-2 rounded-full bg-gradient-to-br from-iris to-flare px-6 py-3 font-mono text-xs uppercase tracking-widest text-white shadow-[0_6px_24px_-6px_rgba(124,58,237,0.5)] transition-opacity hover:opacity-90 ${className ?? ""}`}
     >
       {done ? (
         <>

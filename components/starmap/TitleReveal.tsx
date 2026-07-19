@@ -54,7 +54,9 @@ export function TitleReveal({ title, dateLabel, locationName, palette }: TitleRe
         <motion.h1
           variants={item}
           className={`mt-5 text-4xl font-light italic leading-[1.05] sm:text-6xl lg:text-7xl ${
-            isGravur ? "font-gravur-serif text-gravur-ink" : "font-display text-bright"
+            isGravur
+              ? "font-gravur-serif text-gravur-ink"
+              : "font-display bg-gradient-to-r from-[rgb(var(--accent-rgb))] via-bright to-[rgb(var(--accent-rgb-2))] bg-clip-text text-transparent"
           }`}
         >
           {title}
@@ -63,12 +65,12 @@ export function TitleReveal({ title, dateLabel, locationName, palette }: TitleRe
           <LedgerRule
             className="mx-auto mt-7 max-w-[8rem]"
             ruleClassName={isGravur ? "border-gravur-ink/15" : "border-text/10"}
-            accentClassName={isGravur ? "text-gravur-copper" : "text-amber"}
+            accentClassName={isGravur ? "text-gravur-copper" : "text-[rgb(var(--accent-rgb))]"}
           />
         </motion.div>
         <motion.p
           variants={item}
-          className={`mt-6 font-mono text-[10.5px] font-medium uppercase tracking-[0.25em] ${isGravur ? "text-gravur-copper" : "text-amber"}`}
+          className={`mt-6 font-mono text-[10.5px] font-medium uppercase tracking-[0.25em] ${isGravur ? "text-gravur-copper" : "text-[rgb(var(--accent-rgb))]"}`}
         >
           {dateLabel}
         </motion.p>

@@ -4,8 +4,9 @@ import { FALLBACK_TEMPLATES, type TemplateOption } from "@/lib/templates";
 import { isFirebaseConfigured } from "@/lib/firebase/isConfigured";
 import { getPricingConfig } from "@/lib/pricingConfig";
 import type { TemplateDoc } from "@/types/firestore";
-import { SiteHeader } from "@/components/layout/SiteHeader";
-import { SiteFooter } from "@/components/layout/SiteFooter";
+import { AuroraHeader } from "@/components/home/AuroraHeader";
+import { AuroraFooter } from "@/components/home/AuroraFooter";
+import { AuroraField } from "@/components/home/AuroraField";
 import { RevealOnScroll } from "@/components/ui/RevealOnScroll";
 
 export const metadata: Metadata = {
@@ -50,11 +51,12 @@ export default async function CreatePage() {
 
   return (
     <>
-      <SiteHeader />
-      <main className="min-h-screen px-4 pb-16 pt-28 sm:px-8 sm:pb-24 sm:pt-36">
+      <AuroraHeader links={[{ href: "/", label: "Ana Sayfa" }]} cta={null} />
+      <main className="relative min-h-screen px-4 pb-16 pt-28 sm:px-8 sm:pb-24 sm:pt-36">
+        <AuroraField />
         <div className="mx-auto max-w-6xl">
           <RevealOnScroll className="mb-10 flex flex-col items-center text-center sm:mb-14">
-            <p className="font-mono text-[11px] uppercase tracking-[0.34em] text-amber">Zaman Kapsülü Oluştur</p>
+            <p className="font-mono text-[11px] uppercase tracking-[0.34em] text-iris-light">Zaman Kapsülü Oluştur</p>
             <h1 className="mt-3.5 font-display text-3xl italic leading-tight text-bright sm:text-5xl">
               O anı seçin, gökyüzünü çizelim.
             </h1>
@@ -64,7 +66,7 @@ export default async function CreatePage() {
           </RevealOnScroll>
         </div>
       </main>
-      <SiteFooter />
+      <AuroraFooter />
     </>
   );
 }

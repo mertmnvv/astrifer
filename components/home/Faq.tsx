@@ -3,31 +3,8 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { RevealOnScroll } from "@/components/ui/RevealOnScroll";
-import { SectionHeading } from "@/components/atlas/SectionHeading";
-
-interface FaqItemData {
-  question: string;
-  answer: string;
-}
-
-const FAQ_ITEMS: FaqItemData[] = [
-  {
-    question: "Yıldız haritaları ne kadar doğru?",
-    answer: "Astronomik olarak tam doğru. Girdiğiniz tarih, saat ve konuma göre o anın gerçek yıldız, gezegen ve Ay konumları hesaplanır — tahmini ya da dekoratif bir çizim değildir.",
-  },
-  {
-    question: "Dijital ve fiziksel ürün arasındaki fark nedir?",
-    answer: "Dijital Sayfa, size özel kalıcı bir web adresi ve paylaşılabilir bir zaman kapsülü sayfasıdır. Deri Defter ise bu dijital sayfanın fiziksel bir uzantısıdır — dijital sayfanıza götüren bir QR kod içerir, yani Deri Defter'i alanlar dijital deneyimi de otomatik olarak elde eder.",
-  },
-  {
-    question: "Kargo süresi nedir?",
-    answer: "Deri Defter siparişleri 5-7 iş günü içinde kargoya verilir. Kargo ücreti fiyata dahildir.",
-  },
-  {
-    question: "Fotoğraf ve ses kaydı eklemek zorunlu mu?",
-    answer: "Hayır, tamamen opsiyoneldir. Yalnızca tarih, saat ve konum bilgisiyle de eksiksiz bir zaman kapsülü oluşturabilirsiniz; fotoğraf ve sesli mesaj isteğe bağlı bir zenginleştirmedir.",
-  },
-];
+import { HomeSectionHeading } from "@/components/home/HomeSectionHeading";
+import { FAQ_ITEMS } from "@/components/home/faqData";
 
 export function Faq() {
   const [openIndex, setOpenIndex] = useState<number | null>(null);
@@ -37,13 +14,13 @@ export function Faq() {
   };
 
   return (
-    <section className="px-4 py-28 sm:px-8 select-none relative overflow-hidden bg-void">
+    <section id="sss" className="scroll-mt-20 px-4 py-28 sm:px-8 select-none relative overflow-hidden bg-nebula">
       {/* Ambient background light */}
-      <div className="absolute bottom-0 right-10 w-96 h-96 rounded-full bg-amber/[0.01] blur-3xl pointer-events-none -z-10" />
+      <div className="absolute bottom-0 right-10 w-96 h-96 rounded-full bg-flare/[0.03] blur-3xl pointer-events-none -z-10" />
 
       <div className="mx-auto max-w-2xl">
         <RevealOnScroll>
-          <SectionHeading eyebrow="Destek" title="Sıkça Sorulan Sorular" />
+          <HomeSectionHeading eyebrow="Destek" title="Sıkça Sorulan Sorular" />
         </RevealOnScroll>
 
         <div className="mt-14 space-y-4">
@@ -54,22 +31,22 @@ export function Faq() {
                 <div 
                   className={`overflow-hidden rounded-2xl border transition-all duration-500 backdrop-blur-md ${
                     isOpen
-                      ? "border-amber/40 bg-void/50 shadow-[0_0_20px_rgba(230,163,92,0.06)]"
-                      : "border-text/10 bg-void/25 hover:border-text/20"
+                      ? "border-iris/40 bg-nebula/50 shadow-[0_0_20px_rgba(167,139,250,0.08)]"
+                      : "border-text/10 bg-nebula/25 hover:border-text/20"
                   }`}
                 >
                   <button
                     onClick={() => toggleItem(index)}
                     aria-expanded={isOpen}
-                    className="flex w-full items-center gap-4 px-6 py-5 text-left transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-amber group"
+                    className="flex w-full items-center gap-4 px-6 py-5 text-left transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-iris-light group"
                   >
-                    <span className="font-mono text-xs font-bold tracking-widest text-amber">
+                    <span className="font-mono text-xs font-bold tracking-widest text-iris-light">
                       {`Q0${index + 1}`}
                     </span>
-                    <span className="flex-1 font-display text-[16px] sm:text-lg italic text-bright group-hover:text-amber transition-colors duration-300">
+                    <span className="flex-1 font-display text-[16px] sm:text-lg italic text-bright group-hover:text-flare-light transition-colors duration-300">
                       {item.question}
                     </span>
-                    <span className="ml-4 shrink-0 text-amber/60 group-hover:text-amber transition-colors">
+                    <span className="ml-4 shrink-0 text-iris-light/60 group-hover:text-iris-light transition-colors">
                       <motion.svg
                         animate={{ rotate: isOpen ? 180 : 0 }}
                         transition={{ duration: 0.25, ease: "easeInOut" }}

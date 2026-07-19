@@ -2,9 +2,10 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { CrossSell } from "@/components/CrossSell";
 import { JournalShowcase } from "@/components/journal/JournalShowcase";
-import { SiteHeader } from "@/components/layout/SiteHeader";
-import { SiteFooter } from "@/components/layout/SiteFooter";
-import { SectionHeading } from "@/components/atlas/SectionHeading";
+import { AuroraHeader } from "@/components/home/AuroraHeader";
+import { AuroraFooter } from "@/components/home/AuroraFooter";
+import { AuroraField } from "@/components/home/AuroraField";
+import { HomeSectionHeading } from "@/components/home/HomeSectionHeading";
 import { AtlasPanel } from "@/components/atlas/AtlasPanel";
 import { RevealOnScroll } from "@/components/ui/RevealOnScroll";
 import { LazyMount } from "@/components/ui/LazyMount";
@@ -31,7 +32,7 @@ export const metadata: Metadata = {
 
 
 const CTA_CLASS =
-  "inline-block rounded-full bg-gradient-to-br from-amber-light to-amber-deep px-7 py-3.5 text-center font-mono text-xs uppercase tracking-widest text-ink shadow-[0_12px_40px_-14px_rgba(230,163,92,0.6)] transition-opacity hover:opacity-90 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-amber";
+  "inline-block rounded-full bg-gradient-to-br from-iris to-flare px-7 py-3.5 text-center font-mono text-xs uppercase tracking-widest text-white shadow-[0_12px_40px_-14px_rgba(124,58,237,0.6)] transition-opacity hover:opacity-90 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-iris-light";
 
 const SAMPLE_LETTER_TEXT =
   "Bana evet dediğin an, gökyüzü buydu. Bu mektubu bugün yazıyorum ki yıllar sonra bu sayfayı açtığımızda o geceyi unutmayalım — seni o an ne kadar sevdiğimi hatırlaman için. İyi ki varsın.";
@@ -88,7 +89,7 @@ function CheckListItem({ children }: { children: React.ReactNode }) {
         fill="none"
         stroke="currentColor"
         strokeWidth="2.5"
-        className="mt-0.5 h-3.5 w-3.5 shrink-0 text-amber"
+        className="mt-0.5 h-3.5 w-3.5 shrink-0 text-iris-light"
       >
         <path d="M20 6L9 17l-5-5" strokeLinecap="round" strokeLinejoin="round" />
       </svg>
@@ -116,14 +117,15 @@ export default async function JournalProductPage() {
 
   return (
     <>
-      <SiteHeader />
-      <main className="min-h-screen px-4 pb-16 pt-28 sm:px-8 sm:pb-24 sm:pt-36">
+      <AuroraHeader />
+      <main className="relative min-h-screen px-4 pb-16 pt-28 sm:px-8 sm:pb-24 sm:pt-36">
+        <AuroraField />
         <div className="mx-auto max-w-5xl">
           <JournalThemeProvider theme={getJournalTheme("gece-laciverti")}>
           <header className="mb-8 sm:mb-12">
             <div className="lg:grid lg:grid-cols-[1.05fr_0.95fr] lg:items-center lg:gap-12">
               <div className="flex flex-col items-center text-center lg:items-start lg:text-left">
-                <p className="font-mono text-[11px] uppercase tracking-[0.34em] text-amber">Deri Defter</p>
+                <p className="font-mono text-[11px] uppercase tracking-[0.34em] text-iris-light">Deri Defter</p>
                 <h1 className="mt-3.5 font-display text-3xl italic text-bright sm:text-5xl">
                   Kapağında adın, içinde o an.
                 </h1>
@@ -135,7 +137,7 @@ export default async function JournalProductPage() {
                   {journalOriginalPrice > journalPrice ? (
                     <span className="flex items-center gap-1.5 inline-flex flex-wrap">
                       <span className="line-through text-dim">{formatTRY(journalOriginalPrice)}</span>
-                      <span className="text-amber font-semibold">{formatTRY(journalPrice)}</span>
+                      <span className="text-iris-light font-semibold">{formatTRY(journalPrice)}</span>
                       <span className="rounded bg-green-500/10 px-2 py-0.5 text-[10px] font-bold text-green-400">
                         %{Math.round(((journalOriginalPrice - journalPrice) / journalOriginalPrice) * 100)} İNDİRİM
                       </span>
@@ -150,7 +152,7 @@ export default async function JournalProductPage() {
                   </Link>
                   <a
                     href="#icindekiler"
-                    className="font-mono text-[11px] uppercase tracking-widest text-dim transition-colors hover:text-amber"
+                    className="font-mono text-[11px] uppercase tracking-widest text-dim transition-colors hover:text-iris-light"
                   >
                     26 sayfayı keşfedin ↓
                   </a>
@@ -170,7 +172,7 @@ export default async function JournalProductPage() {
 
           <div id="icindekiler" className="mb-10">
             <RevealOnScroll>
-              <SectionHeading eyebrow="Keşfedin" title="Defterin sayfalarını çevirerek inceleyin." />
+              <HomeSectionHeading eyebrow="Keşfedin" title="Defterin sayfalarını çevirerek inceleyin." />
             </RevealOnScroll>
             <RevealOnScroll delayMs={100}>
               <JournalShowcase
@@ -185,7 +187,7 @@ export default async function JournalProductPage() {
 
           <div className="mt-16 border-t border-text/10 pt-10">
             <RevealOnScroll>
-              <SectionHeading eyebrow="Gelecek Mektubu" title="Bugün yazılan, yıllarca beklenen." />
+              <HomeSectionHeading eyebrow="Gelecek Mektubu" title="Bugün yazılan, yıllarca beklenen." />
             </RevealOnScroll>
             <RevealOnScroll delayMs={100}>
               <AtlasPanel padding="lg" className="mx-auto mt-10 max-w-3xl">
@@ -215,7 +217,7 @@ export default async function JournalProductPage() {
 
           <div className="mt-16 border-t border-text/10 pt-10">
             <RevealOnScroll>
-              <SectionHeading eyebrow="Dijital Bağlantı" title="Kapaktan ekrana, tek dokunuş." />
+              <HomeSectionHeading eyebrow="Dijital Bağlantı" title="Kapaktan ekrana, tek dokunuş." />
             </RevealOnScroll>
             <RevealOnScroll delayMs={100}>
               <AtlasPanel padding="lg" className="mx-auto mt-10 max-w-3xl">
@@ -237,7 +239,7 @@ export default async function JournalProductPage() {
 
           <div className="mt-16 border-t border-text/10 pt-10">
             <RevealOnScroll>
-              <SectionHeading eyebrow="Malzeme & İşçilik" title="Her ayrıntı, elle düşünüldü." />
+              <HomeSectionHeading eyebrow="Malzeme & İşçilik" title="Her ayrıntı, elle düşünüldü." />
             </RevealOnScroll>
             <RevealOnScroll delayMs={100}>
               <AtlasPanel padding="lg" className="mx-auto mt-10 max-w-3xl">
@@ -256,13 +258,13 @@ export default async function JournalProductPage() {
 
           <div className="mt-16 border-t border-text/10 pt-10">
             <RevealOnScroll>
-              <SectionHeading eyebrow="Nasıl Çalışır" title="Üç adımda, elde tutulur bir an." />
+              <HomeSectionHeading eyebrow="Nasıl Çalışır" title="Üç adımda, elde tutulur bir an." />
             </RevealOnScroll>
             <div className="mx-auto mt-10 grid max-w-3xl gap-4 sm:grid-cols-3">
               {PROCESS_STEPS.map((step, index) => (
                 <RevealOnScroll key={step.n} delayMs={index * 100}>
                   <AtlasPanel padding="lg" className="h-full">
-                    <p className="font-mono text-[11px] text-amber">{step.n}</p>
+                    <p className="font-mono text-[11px] text-iris-light">{step.n}</p>
                     <p className="mt-2 font-display text-lg italic text-bright">{step.title}</p>
                     <p className="mt-1.5 text-xs leading-relaxed text-subtle">{step.body}</p>
                   </AtlasPanel>
@@ -273,7 +275,7 @@ export default async function JournalProductPage() {
 
           <div className="mt-16 border-t border-text/10 pt-10">
             <RevealOnScroll>
-              <SectionHeading eyebrow="Destek" title="Sıkça Sorulan Sorular" />
+              <HomeSectionHeading eyebrow="Destek" title="Sıkça Sorulan Sorular" />
             </RevealOnScroll>
             <div className="mx-auto mt-10 flex max-w-2xl flex-col gap-4">
               {FAQ.map((item, index) => (
@@ -297,7 +299,7 @@ export default async function JournalProductPage() {
           <CrossSell exclude={["journal"]} />
         </div>
       </main>
-      <SiteFooter />
+      <AuroraFooter />
     </>
   );
 }

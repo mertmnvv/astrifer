@@ -42,10 +42,10 @@ export function FirstMomentSection({ photos, palette, isPreviewMode = false, edi
     body: isGravur ? "text-gravur-ink-soft" : "text-subtle",
     dashedCard: isGravur
       ? "border-gravur-copper/40 bg-gravur-copper/[0.02] hover:bg-gravur-copper/[0.04]"
-      : "border-amber/30 bg-amber/[0.02] hover:bg-amber/[0.04]",
-    dashedIcon: isGravur ? "text-gravur-copper/50 group-hover:text-gravur-copper/70" : "text-amber/40 group-hover:text-amber/60",
-    accentText: isGravur ? "text-gravur-copper" : "text-amber",
-    accentTextSoft: isGravur ? "text-gravur-copper/70" : "text-amber/70",
+      : "border-[rgb(var(--accent-rgb)/0.3)] bg-[rgb(var(--accent-rgb)/0.02)] hover:bg-[rgb(var(--accent-rgb)/0.04)]",
+    dashedIcon: isGravur ? "text-gravur-copper/50 group-hover:text-gravur-copper/70" : "text-[rgb(var(--accent-rgb)/0.4)] group-hover:text-[rgb(var(--accent-rgb)/0.6)]",
+    accentText: isGravur ? "text-gravur-copper" : "text-[rgb(var(--accent-rgb))]",
+    accentTextSoft: isGravur ? "text-gravur-copper/70" : "text-[rgb(var(--accent-rgb)/0.7)]",
   };
 
   if (photos.length === 0) {
@@ -122,7 +122,7 @@ export function FirstMomentSection({ photos, palette, isPreviewMode = false, edi
                 <span
                   aria-hidden
                   className={`absolute -top-1.5 left-1/2 h-2 w-2 -translate-x-1/2 rounded-full shadow opacity-60 ${
-                    isGravur ? "bg-gravur-copper" : "bg-gradient-to-r from-amber-light to-amber-deep"
+                    isGravur ? "bg-gravur-copper" : "bg-gradient-to-r from-[rgb(var(--accent-rgb))] to-[rgb(var(--accent-rgb-2))]"
                   }`}
                 />
                 <svg className={`h-6 w-6 mb-2 ${t.dashedIcon}`} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">

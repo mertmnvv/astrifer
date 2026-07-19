@@ -40,9 +40,14 @@ kullanan process'i taskkill ile sonlandır).
 - **Kozmik Senkronizasyon & Gün Döngüsü:** Gün dilimi tespitiyle 4 farklı kozmik gradyan geçişi 
   (Sabah, Gündüz, Akşam, Gece) ve o günkü Ay evresi ile meteor yağmurlarını hesaplayan 
   `lib/astronomy/cosmicEvents.ts` entegre edilmiştir.
-- **Ödeme: iyzico — henüz entegre değil.** `/checkout` bir stub;
-  ödeme akışı ayrı bir işte bağlanacak. `.env`'de `IYZICO_*`
-  değişkenleri var ama kod tarafında kullanılmıyor.
+- **Ödeme: PayTR — canlı.** `/checkout` (`app/checkout/page.tsx`)
+  sepeti PayTR'ın güvenli iframe akışına yönlendirir, sipariş
+  Firestore'a yazılır. (Daha eski notlarda geçen iyzico entegrasyonu
+  terk edildi, PayTR kullanılıyor.)
+- **Analitik: Google Analytics 4 (opsiyonel, env-gated).**
+  `components/analytics/GoogleAnalytics.tsx` yalnızca
+  `NEXT_PUBLIC_GA_MEASUREMENT_ID` `.env`'de tanımlıysa `gtag.js`
+  yükler; tanımlı değilse hiçbir şey render etmez.
 - **300 DPI baskı render:** Puppeteer + `@sparticuz/chromium`, ayrı bir
   worker servisi değil — mevcut Next.js server action'ları içinde
   çalışıyor (`lib/journalPrintRender.ts`, token korumalı

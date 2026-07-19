@@ -54,25 +54,27 @@ const FEATURES = [
   },
 ];
 
+const ICON_ACCENTS = ["text-iris-light", "text-flare-light", "text-glow-light", "text-iris-light", "text-flare-light"];
+
 export function FeatureShowcase() {
   return (
-    <section className="relative px-4 py-16 sm:px-8 select-none bg-void overflow-hidden">
-      <div className="absolute top-0 left-1/2 -translate-x-1/2 h-px w-[70%] bg-gradient-to-r from-transparent via-amber/20 to-transparent" />
+    <section className="relative px-4 py-16 sm:px-8 select-none bg-nebula overflow-hidden">
+      <div className="absolute top-0 left-1/2 -translate-x-1/2 h-px w-[70%] bg-gradient-to-r from-transparent via-iris/30 to-transparent" />
 
       <div className="mx-auto max-w-5xl">
         <RevealOnScroll>
-          <div className="mb-8 flex items-center justify-center gap-3 text-amber/70" aria-hidden>
-            <span className="h-px w-8 bg-amber/30" />
-            <span className="font-mono text-[9px] font-bold uppercase tracking-[0.3em]">Sayfanızda neler var</span>
-            <span className="h-px w-8 bg-amber/30" />
+          <div className="mb-8 flex items-center justify-center gap-3 text-iris-light/80" aria-hidden>
+            <span className="h-px w-8 bg-iris/30" />
+            <span className="font-mono text-[9px] font-bold uppercase tracking-[0.3em]">Sayfanızda Sizi Bekleyenler</span>
+            <span className="h-px w-8 bg-flare/30" />
           </div>
         </RevealOnScroll>
 
         <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-5 sm:gap-4">
           {FEATURES.map((feature, index) => (
             <RevealOnScroll key={feature.title} delayMs={index * 90}>
-              <div className="group relative flex h-full flex-col items-center gap-2.5 rounded-2xl border border-amber/10 bg-void/40 px-3 py-5 text-center backdrop-blur-md transition-all duration-500 hover:border-amber/30 hover:bg-amber/[0.04]">
-                <div className="flex h-9 w-9 items-center justify-center rounded-full border border-amber/20 text-amber/80 transition-colors group-hover:text-amber group-hover:border-amber/40">
+              <div className="group relative flex h-full flex-col items-center gap-2.5 rounded-2xl border border-iris/10 bg-panel/40 px-3 py-5 text-center backdrop-blur-md transition-all duration-500 hover:border-iris/30 hover:bg-iris/[0.04]">
+                <div className={`flex h-9 w-9 items-center justify-center rounded-full border border-iris/20 ${ICON_ACCENTS[index % ICON_ACCENTS.length]} opacity-80 transition-colors group-hover:opacity-100 group-hover:border-iris/40`}>
                   {feature.icon}
                 </div>
                 <h3 className="font-display text-[13px] italic text-bright leading-snug">

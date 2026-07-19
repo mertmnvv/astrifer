@@ -27,6 +27,17 @@ const config: Config = {
         leather: "#2b1e15",
         "leather-dk": "#150d07",
         "leather-lt": "#5a3c22",
+        // Aurora / nebula theme (homepage-only redesign)
+        nebula: "#07050f",
+        "nebula-soft": "#0d0a1a",
+        "nebula-deep": "#030209",
+        iris: "#a78bfa",
+        "iris-light": "#c9b8ff",
+        "iris-deep": "#7c5cf0",
+        flare: "#f472b6",
+        "flare-light": "#fbaed4",
+        glow: "#60a5fa",
+        "glow-light": "#93c5fd",
         // Gravur theme
         "gravur-paper": "#E4DFCD",
         "gravur-paper-dim": "#DAD3BC",
@@ -72,6 +83,15 @@ const config: Config = {
           "0%, 100%": { opacity: "0.6" },
           "50%": { opacity: "1" },
         },
+        "aurora-drift": {
+          "0%, 100%": { transform: "translate(0, 0) scale(1)" },
+          "33%": { transform: "translate(4%, -6%) scale(1.08)" },
+          "66%": { transform: "translate(-3%, 4%) scale(0.96)" },
+        },
+        "aurora-drift-slow": {
+          "0%, 100%": { transform: "translate(0, 0) scale(1)" },
+          "50%": { transform: "translate(-5%, 5%) scale(1.05)" },
+        },
       },
       animation: {
         twinkle: "twinkle 4s ease-in-out infinite",
@@ -82,6 +102,8 @@ const config: Config = {
         "logo-spin-slow": "spin 16s linear infinite",
         "auto-scroll": "auto-scroll 18s ease-in-out infinite",
         "glow-pulse": "glow-pulse 6s ease-in-out infinite",
+        "aurora-drift": "aurora-drift 22s ease-in-out infinite",
+        "aurora-drift-slow": "aurora-drift-slow 30s ease-in-out infinite",
       },
     },
   },

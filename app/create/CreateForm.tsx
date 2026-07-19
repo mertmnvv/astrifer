@@ -58,7 +58,7 @@ const QUICK_CITIES = QUICK_CITY_NAMES.map((name) => BUILTIN_PLACES.find((place) 
 const LETTER_MAX_LENGTH = 2000;
 
 const FIELD_CLASS =
-  "w-full rounded-[10px] border border-text/[0.14] bg-text/[0.04] px-3 py-2.5 text-sm text-text placeholder:text-subtle focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-amber";
+  "w-full rounded-[10px] border border-text/[0.14] bg-text/[0.04] px-3 py-2.5 text-sm text-text placeholder:text-subtle focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-iris-light";
 const FIELD_LABEL_CLASS = "mb-1.5 block font-mono text-[9.5px] uppercase tracking-[0.14em] text-dim";
 
 function pad(value: number): string {
@@ -93,7 +93,7 @@ function isValidPlace(value: unknown): value is PlaceResult {
 function SectionLabel({ n, children }: { n: string; children: ReactNode }) {
   return (
     <p className="mb-3.5 font-mono text-[11px] uppercase tracking-[0.2em] text-dim">
-      <span className="text-amber">{n}</span>
+      <span className="text-iris-light">{n}</span>
       &nbsp;&nbsp;{children}
     </p>
   );
@@ -117,7 +117,7 @@ function AddOnCheckbox({ checked }: { checked: boolean }) {
     <span
       aria-hidden
       className={`flex h-5 w-5 shrink-0 items-center justify-center rounded-md border transition-colors ${
-        checked ? "border-amber bg-amber text-ink" : "border-text/25 text-transparent"
+        checked ? "border-iris bg-iris text-white" : "border-text/25 text-transparent"
       }`}
     >
       <svg viewBox="0 0 16 16" className="h-3 w-3" fill="none" stroke="currentColor" strokeWidth={2.5}>
@@ -196,6 +196,7 @@ export function CreateForm({ templates, pricing }: CreateFormProps) {
           keywords: aiKeywords,
           date,
           location: place?.name,
+          context: "letter",
         }),
       });
       const data = await res.json();
@@ -782,7 +783,7 @@ export function CreateForm({ templates, pricing }: CreateFormProps) {
                 key={city.name}
                 type="button"
                 onClick={() => setPlace(city)}
-                className="rounded-full border border-text/[0.14] px-3 py-1 text-xs text-muted transition-colors hover:border-amber/50 hover:text-amber"
+                className="rounded-full border border-text/[0.14] px-3 py-1 text-xs text-muted transition-colors hover:border-iris/50 hover:text-iris-light"
               >
                 {city.name}
               </button>
@@ -826,7 +827,7 @@ export function CreateForm({ templates, pricing }: CreateFormProps) {
                 onClick={() => setMediaOption("voice")}
                 className={`rounded-full px-2.5 py-0.5 font-mono text-[9px] uppercase tracking-wider transition-colors ${
                   mediaOption === "voice"
-                    ? "bg-amber text-ink font-bold"
+                    ? "bg-iris text-white font-bold"
                     : "text-dim hover:text-bright"
                 }`}
               >
@@ -837,7 +838,7 @@ export function CreateForm({ templates, pricing }: CreateFormProps) {
                 onClick={() => setMediaOption("video")}
                 className={`rounded-full px-2.5 py-0.5 font-mono text-[9px] uppercase tracking-wider transition-colors ${
                   mediaOption === "video"
-                    ? "bg-amber text-ink font-bold"
+                    ? "bg-iris text-white font-bold"
                     : "text-dim hover:text-bright"
                 }`}
               >
@@ -867,9 +868,9 @@ export function CreateForm({ templates, pricing }: CreateFormProps) {
                 <p className="mt-1 text-xs text-red-500 font-mono">{musicError}</p>
               )}
               {musicUrl && (
-                <div className="mt-3 flex flex-col gap-2 rounded-xl border border-amber/20 bg-amber/[0.04] p-3">
+                <div className="mt-3 flex flex-col gap-2 rounded-xl border border-iris/20 bg-iris/[0.04] p-3">
                   <div className="flex items-center justify-between gap-3">
-                    <span className="font-mono text-[9px] uppercase tracking-wider text-amber font-bold">
+                    <span className="font-mono text-[9px] uppercase tracking-wider text-iris-light font-bold">
                       YouTube Müziği Aktif
                     </span>
                     <button
@@ -914,21 +915,9 @@ export function CreateForm({ templates, pricing }: CreateFormProps) {
           </div>
 
           <div className="mt-3">
-            <div className="flex items-center justify-between">
-              <label htmlFor="message" className={FIELD_LABEL_CLASS}>
-                Kişisel Mesaj
-              </label>
-              <button
-                type="button"
-                onClick={() => setShowAiModal(true)}
-                className="font-mono text-[9px] uppercase tracking-wider text-amber hover:underline flex items-center gap-1 focus:outline-none"
-              >
-                <svg className="h-3 w-3 text-amber" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.2}>
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M9.813 15.904L9 21l8.904-4.467L21 21l-4.467-8.904t-8.904 4.467z" />
-                </svg>
-                <span>Yapay Zeka ile Yaz</span>
-              </button>
-            </div>
+            <label htmlFor="message" className={FIELD_LABEL_CLASS}>
+              Kişisel Mesaj
+            </label>
             <textarea
               id="message"
               rows={3}
@@ -947,8 +936,8 @@ export function CreateForm({ templates, pricing }: CreateFormProps) {
                     aria-pressed={message === example}
                     className={`max-w-full truncate rounded-full border px-3 py-1 text-left text-[11px] transition-colors ${
                       message === example
-                        ? "border-amber/60 bg-amber/10 text-amber"
-                        : "border-text/[0.14] text-muted hover:border-amber/40 hover:text-amber"
+                        ? "border-iris/60 bg-iris/10 text-iris-light"
+                        : "border-text/[0.14] text-muted hover:border-iris/40 hover:text-iris-light"
                     }`}
                     title={example}
                   >
@@ -975,8 +964,8 @@ export function CreateForm({ templates, pricing }: CreateFormProps) {
           </p>
 
           <label
-            className={`flex w-full cursor-pointer flex-col gap-3 rounded-2xl border p-4 transition-colors focus-within:outline focus-within:outline-2 focus-within:outline-offset-2 focus-within:outline-amber sm:max-w-xs ${
-              journalEnabled ? "border-amber/50 bg-amber/[0.06]" : "border-text/10 bg-text/[0.02] hover:border-text/20"
+            className={`flex w-full cursor-pointer flex-col gap-3 rounded-2xl border p-4 transition-colors focus-within:outline focus-within:outline-2 focus-within:outline-offset-2 focus-within:outline-iris-light sm:max-w-xs ${
+              journalEnabled ? "border-iris/50 bg-iris/[0.06]" : "border-text/10 bg-text/[0.02] hover:border-text/20"
             }`}
           >
             <input
@@ -999,7 +988,7 @@ export function CreateForm({ templates, pricing }: CreateFormProps) {
             </div>
             <div className="flex items-center justify-between gap-2">
               <span className="text-[11px] text-dim">Suni deri · 26 sayfa</span>
-              <span className="font-mono text-xs text-amber flex items-center gap-1.5">
+              <span className="font-mono text-xs text-iris-light flex items-center gap-1.5">
                 {pricing.journalOriginalPrice > pricing.journalPrice ? (
                   <>
                     <span className="line-through text-dim">{formatTRY(pricing.journalOriginalPrice)}</span>
@@ -1036,9 +1025,21 @@ export function CreateForm({ templates, pricing }: CreateFormProps) {
                 </div>
 
                 <div>
-                  <label htmlFor="letter-text" className={FIELD_LABEL_CLASS}>
-                    Gelecek Mektubu
-                  </label>
+                  <div className="flex items-center justify-between">
+                    <label htmlFor="letter-text" className={FIELD_LABEL_CLASS}>
+                      Gelecek Mektubu
+                    </label>
+                    <button
+                      type="button"
+                      onClick={() => setShowAiModal(true)}
+                      className="font-mono text-[9px] uppercase tracking-wider text-iris-light hover:underline flex items-center gap-1 focus:outline-none"
+                    >
+                      <svg className="h-3 w-3 text-iris-light" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.2}>
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M9.813 15.904L9 21l8.904-4.467L21 21l-4.467-8.904t-8.904 4.467z" />
+                      </svg>
+                      <span>Yapay Zeka ile Yaz</span>
+                    </button>
+                  </div>
                   <textarea
                     id="letter-text"
                     rows={4}
@@ -1071,7 +1072,7 @@ export function CreateForm({ templates, pricing }: CreateFormProps) {
                   <button
                     type="button"
                     onClick={() => setShowBookModal(true)}
-                    className="rounded-full border border-amber/40 bg-amber/5 px-6 py-3 font-mono text-xs uppercase tracking-widest text-amber transition-colors hover:bg-amber hover:text-ink shadow-lg"
+                    className="rounded-full border border-iris/40 bg-iris/5 px-6 py-3 font-mono text-xs uppercase tracking-widest text-iris-light transition-colors hover:bg-iris hover:text-white shadow-lg"
                   >
                     📖 Defteri İncele
                   </button>
@@ -1091,7 +1092,7 @@ export function CreateForm({ templates, pricing }: CreateFormProps) {
             <button
               type="button"
               onClick={handleBack}
-              className="rounded-full border border-text/15 px-5 py-2.5 font-mono text-xs uppercase tracking-widest text-subtle transition-colors hover:border-amber/40 hover:text-amber"
+              className="rounded-full border border-text/15 px-5 py-2.5 font-mono text-xs uppercase tracking-widest text-subtle transition-colors hover:border-iris/40 hover:text-iris-light"
             >
               Geri
             </button>
@@ -1100,7 +1101,7 @@ export function CreateForm({ templates, pricing }: CreateFormProps) {
             <button
               type="button"
               onClick={handleNext}
-              className="ml-auto rounded-full bg-gradient-to-br from-amber-light to-amber-deep px-6 py-2.5 font-mono text-xs uppercase tracking-widest text-ink shadow-[0_12px_40px_-14px_rgba(230,163,92,0.6)] transition-opacity hover:opacity-90"
+              className="ml-auto rounded-full bg-gradient-to-br from-iris to-flare px-6 py-2.5 font-mono text-xs uppercase tracking-widest text-white shadow-[0_12px_40px_-14px_rgba(124,58,237,0.6)] transition-opacity hover:opacity-90"
             >
               İleri
             </button>
@@ -1131,20 +1132,20 @@ export function CreateForm({ templates, pricing }: CreateFormProps) {
 
       {/* ORDER PLAQUE — decorative gravur-style summary & CTA */}
       <div className="order-2 lg:order-4 lg:sticky lg:top-28 lg:self-start mx-auto w-full max-w-sm lg:mx-0">
-        <div className="relative rounded-[26px] border border-amber/25 bg-gradient-to-b from-text/[0.04] via-transparent to-transparent p-7 shadow-[0_30px_70px_-30px_rgba(0,0,0,0.7)]">
+        <div className="relative rounded-[26px] border border-iris/25 bg-gradient-to-b from-text/[0.04] via-transparent to-transparent p-7 shadow-[0_30px_70px_-30px_rgba(0,0,0,0.7)]">
           {/* Corner flourishes */}
-          <span aria-hidden className="pointer-events-none absolute left-4 top-4 h-4 w-4 border-l border-t border-amber/40" />
-          <span aria-hidden className="pointer-events-none absolute right-4 top-4 h-4 w-4 border-r border-t border-amber/40" />
-          <span aria-hidden className="pointer-events-none absolute bottom-4 left-4 h-4 w-4 border-b border-l border-amber/40" />
-          <span aria-hidden className="pointer-events-none absolute bottom-4 right-4 h-4 w-4 border-b border-r border-amber/40" />
+          <span aria-hidden className="pointer-events-none absolute left-4 top-4 h-4 w-4 border-l border-t border-iris/40" />
+          <span aria-hidden className="pointer-events-none absolute right-4 top-4 h-4 w-4 border-r border-t border-iris/40" />
+          <span aria-hidden className="pointer-events-none absolute bottom-4 left-4 h-4 w-4 border-b border-l border-iris/40" />
+          <span aria-hidden className="pointer-events-none absolute bottom-4 right-4 h-4 w-4 border-b border-r border-iris/40" />
 
           {/* Plaque header */}
           <div className="flex flex-col items-center gap-2 pb-5 text-center">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.2" className="h-5 w-5 text-amber">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.2" className="h-5 w-5 text-iris-light">
               <path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z" />
             </svg>
             <h3 className="font-display italic text-lg text-bright">Sipariş Özeti</h3>
-            <span className="h-px w-16 bg-gradient-to-r from-transparent via-amber/50 to-transparent" />
+            <span className="h-px w-16 bg-gradient-to-r from-transparent via-iris/50 to-transparent" />
           </div>
 
           {/* Line items */}
@@ -1181,13 +1182,13 @@ export function CreateForm({ templates, pricing }: CreateFormProps) {
 
             <div className="flex items-center gap-2 pt-1">
               <span className="h-px flex-1 bg-text/10" />
-              <span className="text-[9px] text-amber/60">✦</span>
+              <span className="text-[9px] text-iris-light/60">✦</span>
               <span className="h-px flex-1 bg-text/10" />
             </div>
 
             <div className="flex items-baseline justify-between">
               <span className="font-mono text-xs uppercase tracking-widest text-bright">Toplam</span>
-              <span className="font-mono text-xl text-amber">{formatTRY(totalPrice)}</span>
+              <span className="font-mono text-xl text-iris-light">{formatTRY(totalPrice)}</span>
             </div>
           </div>
 
@@ -1197,7 +1198,7 @@ export function CreateForm({ templates, pricing }: CreateFormProps) {
                 href={previewHref}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="w-full block rounded-full border border-amber/40 px-6 py-3 text-center font-mono text-xs uppercase tracking-widest text-amber transition-colors hover:bg-amber/10 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-amber"
+                className="w-full block rounded-full border border-iris/40 px-6 py-3 text-center font-mono text-xs uppercase tracking-widest text-iris-light transition-colors hover:bg-iris/10 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-iris-light"
               >
                 Dijital Sayfayı Önizle
               </a>
@@ -1215,7 +1216,7 @@ export function CreateForm({ templates, pricing }: CreateFormProps) {
             <button
               type="submit"
               disabled={uploadsPending || isSubmitting || currentStep !== STEPS.length}
-              className="w-full rounded-full bg-gradient-to-br from-amber-light to-amber-deep px-6 py-3.5 font-mono text-xs uppercase tracking-widest text-ink shadow-[0_12px_40px_-14px_rgba(230,163,92,0.6)] transition-opacity hover:opacity-90 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-amber disabled:opacity-40"
+              className="w-full rounded-full bg-gradient-to-br from-iris to-flare px-6 py-3.5 font-mono text-xs uppercase tracking-widest text-white shadow-[0_12px_40px_-14px_rgba(124,58,237,0.6)] transition-opacity hover:opacity-90 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-iris-light disabled:opacity-40"
             >
               {isSubmitting ? "Oluşturuluyor…" : uploadsPending ? "Yükleniyor…" : "Sepete Ekle"}
             </button>
@@ -1295,8 +1296,8 @@ export function CreateForm({ templates, pricing }: CreateFormProps) {
                 </svg>
               </button>
 
-              <p className="font-mono text-[9px] uppercase tracking-[0.25em] text-amber mb-1 flex items-center gap-1.5">
-                <svg className="h-3 w-3 text-amber" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.2}>
+              <p className="font-mono text-[9px] uppercase tracking-[0.25em] text-iris-light mb-1 flex items-center gap-1.5">
+                <svg className="h-3 w-3 text-iris-light" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.2}>
                   <path strokeLinecap="round" strokeLinejoin="round" d="M9.813 15.904L9 21l8.904-4.467L21 21l-4.467-8.904t-8.904 4.467z" />
                 </svg>
                 <span>Yapay Zeka Hikaye Asistanı</span>
@@ -1346,8 +1347,8 @@ export function CreateForm({ templates, pricing }: CreateFormProps) {
                 )}
 
                 {aiResult && (
-                  <div className="rounded-xl border border-amber/20 bg-amber/[0.03] p-4 flex flex-col gap-2">
-                    <p className="font-mono text-[9px] uppercase tracking-wider text-amber">Taslak Mektup</p>
+                  <div className="rounded-xl border border-iris/20 bg-iris/[0.03] p-4 flex flex-col gap-2">
+                    <p className="font-mono text-[9px] uppercase tracking-wider text-iris-light">Taslak Mektup</p>
                     <p className="font-display text-sm italic text-bright leading-relaxed">
                       &ldquo;{aiResult}&rdquo;
                     </p>
@@ -1361,19 +1362,19 @@ export function CreateForm({ templates, pricing }: CreateFormProps) {
                         type="button"
                         onClick={handleGenerateAiMessage}
                         disabled={isGeneratingAi}
-                        className="flex-1 rounded-full border border-text/20 bg-text/[0.02] py-2.5 font-mono text-[10px] uppercase tracking-widest text-subtle transition-colors hover:border-amber hover:text-amber disabled:opacity-40"
+                        className="flex-1 rounded-full border border-text/20 bg-text/[0.02] py-2.5 font-mono text-[10px] uppercase tracking-widest text-subtle transition-colors hover:border-iris hover:text-iris-light disabled:opacity-40"
                       >
                         {isGeneratingAi ? "Yazılıyor..." : "Yeniden Yaz"}
                       </button>
                       <button
                         type="button"
                         onClick={() => {
-                          setMessage(aiResult);
+                          setJournalLetterText(aiResult);
                           setShowAiModal(false);
                           setAiResult("");
                           setAiError(null);
                         }}
-                        className="flex-1 rounded-full bg-amber py-2.5 font-mono text-[10px] uppercase tracking-widest text-ink font-semibold transition-colors hover:bg-amber-light active:scale-95"
+                        className="flex-1 rounded-full bg-iris py-2.5 font-mono text-[10px] uppercase tracking-widest text-white font-semibold transition-colors hover:bg-iris-light active:scale-95"
                       >
                         Mektubu Kullan
                       </button>
@@ -1383,7 +1384,7 @@ export function CreateForm({ templates, pricing }: CreateFormProps) {
                       type="button"
                       onClick={handleGenerateAiMessage}
                       disabled={isGeneratingAi || !aiKeywords.trim()}
-                      className="w-full rounded-full bg-amber py-2.5 font-mono text-[10px] uppercase tracking-widest text-ink font-semibold transition-colors hover:bg-amber-light disabled:opacity-40 active:scale-95 flex items-center justify-center gap-2"
+                      className="w-full rounded-full bg-iris py-2.5 font-mono text-[10px] uppercase tracking-widest text-white font-semibold transition-colors hover:bg-iris-light disabled:opacity-40 active:scale-95 flex items-center justify-center gap-2"
                     >
                       {isGeneratingAi ? (
                         <>

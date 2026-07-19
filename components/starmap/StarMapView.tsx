@@ -8,6 +8,7 @@ import { buildSkyLabels } from "@/components/astrolab/drawStarChart";
 import { getSkyPalette, getTimedPalette } from "@/components/astrolab/palettes";
 import { AtlasPanel } from "@/components/atlas/AtlasPanel";
 import { LedgerRule } from "@/components/atlas/LedgerRule";
+import { AuroraField } from "@/components/home/AuroraField";
 import { PageGate } from "@/components/journal/PageGate";
 import { VoiceNote } from "@/components/journal/VoiceNote";
 import { MusicToggle } from "@/components/ui/MusicToggle";
@@ -23,6 +24,20 @@ import { TitleReveal } from "./TitleReveal";
 import { Timeline } from "./Timeline";
 
 const SCENE_GAP = "mt-14 sm:mt-24";
+
+/**
+ * "#rrggbb" → "r g b" (space-separated so it drops straight into
+ * `rgb(var(--accent-rgb) / <alpha>)`, the modern space+slash syntax that
+ * stays valid whether or not an alpha is appended).
+ */
+function hexToRgbTriplet(hex: string): string {
+  const h = hex.replace("#", "");
+  const full = h.length === 3 ? h.split("").map((c) => c + c).join("") : h;
+  const r = parseInt(full.slice(0, 2), 16);
+  const g = parseInt(full.slice(2, 4), 16);
+  const b = parseInt(full.slice(4, 6), 16);
+  return `${r} ${g} ${b}`;
+}
 
 function formatEventDate(date: Date, timezone: string): string {
   return new Intl.DateTimeFormat("tr-TR", {
@@ -94,30 +109,52 @@ export function StarMapView({
   const skyLog = buildSkyNarrative(sky);
   const palette = getTimedPalette(getSkyPalette(starMap.palette));
   const isGravur = palette.id === "gravur-atlas";
+
+  // Dynamic accent system — for every live-sky palette the UI accent (glow,
+  // borders, gradients, hover states) tracks the palette the visitor picked,
+  // and the *timed* palette at that, so it shifts with the time-of-day sky.
+  // Gravür keeps its fixed antique-copper identity and gets no Aurora glow.
+  //   --accent-rgb   : primary accent, from the star-glow halo colour
+  //   --accent-rgb-2 : second gradient stop, from the palette's own sun tone
+  // Both are space-separated triplets so `rgb(var(--accent-rgb) / a)` — the
+  // arbitrary Tailwind classes below — stays valid CSS with or without alpha.
+  const accentRgb = (isGravur ? "138,90,59" : palette.starGlowRgb).replace(/,/g, " ");
+  const accentRgb2 = hexToRgbTriplet(isGravur ? "#8A5A3B" : palette.sun);
+  const accentStyle = {
+    "--accent-rgb": accentRgb,
+    "--accent-rgb-2": accentRgb2,
+  } as React.CSSProperties;
+  // Palette-derived gradient for the `font-display italic` headings — echoes
+  // HomeSectionHeading's iris→text→flare sweep but tinted to this sky.
+  const accentGradientText = isGravur
+    ? "text-gravur-ink"
+    : "bg-gradient-to-r from-[rgb(var(--accent-rgb))] via-text to-[rgb(var(--accent-rgb-2))] bg-clip-text text-transparent";
+
   // Shared per-theme style tokens — computed once instead of scattering
   // `isGravur ? x : y` across every element below.
   const t = {
-    accentText: isGravur ? "text-gravur-copper" : "text-amber",
-    accentBg: isGravur ? "bg-gravur-copper" : "bg-amber",
-    accentBorder: isGravur ? "border-gravur-copper/40" : "border-amber/40",
-    accentBorderSoft: isGravur ? "border-gravur-copper/20" : "border-amber/20",
-    bannerBg: isGravur ? "bg-gravur-paper/95 text-gravur-ink" : "bg-void/90 text-text",
+    accentText: isGravur ? "text-gravur-copper" : "text-[rgb(var(--accent-rgb))]",
+    accentBg: isGravur ? "bg-gravur-copper" : "bg-[rgb(var(--accent-rgb))]",
+    accentBorder: isGravur ? "border-gravur-copper/40" : "border-[rgb(var(--accent-rgb)/0.4)]",
+    accentBorderSoft: isGravur ? "border-gravur-copper/20" : "border-[rgb(var(--accent-rgb)/0.2)]",
+    accentRule: isGravur ? "bg-gravur-copper/35" : "bg-[rgb(var(--accent-rgb)/0.35)]",
+    bannerBg: isGravur ? "bg-gravur-paper/95 text-gravur-ink" : "bg-nebula/90 text-text",
     bodyText: isGravur ? "text-gravur-ink-soft" : "text-subtle",
-    panelBorder: isGravur ? "border-gravur-ink/10 bg-gravur-ink/[0.015]" : "border-amber/15 bg-amber/[0.02]",
-    cardBorder: isGravur ? "border-gravur-ink/10 bg-gravur-paper/40" : "border-text/5 bg-text/[0.015]",
-    keyLegendBorder: isGravur ? "border-gravur-ink/15 bg-gravur-ink/[0.025]" : "",
-    lockOverlay: isGravur ? "border-gravur-copper/20 bg-gravur-paper-dim/80 text-gravur-ink" : "border-amber/20 bg-void/80 text-amber",
+    panelBorder: isGravur ? "border-gravur-ink/10 bg-gravur-ink/[0.015]" : "border-[rgb(var(--accent-rgb)/0.15)] bg-panel/40 backdrop-blur-md",
+    cardBorder: isGravur ? "border-gravur-ink/10 bg-gravur-paper/40" : "border-[rgb(var(--accent-rgb)/0.1)] bg-panel/30",
+    keyLegendBorder: isGravur ? "border-gravur-ink/15 bg-gravur-ink/[0.025]" : "border-[rgb(var(--accent-rgb)/0.15)] bg-panel/40 backdrop-blur-md",
+    lockOverlay: isGravur ? "border-gravur-copper/20 bg-gravur-paper-dim/80 text-gravur-ink" : "border-[rgb(var(--accent-rgb)/0.2)] bg-nebula/80 text-[rgb(var(--accent-rgb))]",
     dashedCard: isGravur
       ? "border-gravur-copper/40 bg-gravur-copper/[0.02] hover:bg-gravur-copper/[0.04]"
-      : "border-amber/30 bg-amber/[0.02] hover:bg-amber/[0.04]",
+      : "border-[rgb(var(--accent-rgb)/0.3)] bg-[rgb(var(--accent-rgb)/0.02)] hover:bg-[rgb(var(--accent-rgb)/0.05)]",
     dashedIcon: isGravur
       ? "border-gravur-copper/40 bg-gravur-copper/5 text-gravur-copper group-hover:bg-gravur-copper group-hover:text-gravur-paper"
-      : "border-amber/30 bg-amber/5 text-amber group-hover:bg-amber group-hover:text-ink",
+      : "border-[rgb(var(--accent-rgb)/0.3)] bg-[rgb(var(--accent-rgb)/0.05)] text-[rgb(var(--accent-rgb))] group-hover:bg-[rgb(var(--accent-rgb))] group-hover:text-ink",
     ctaHeading: isGravur ? "text-gravur-ink" : "text-text",
     videoCard: isGravur ? "border-gravur-ink/10 bg-gravur-ink/[0.02]" : "border-text/10 bg-text/[0.035]",
     ctaButton: isGravur
       ? "bg-gravur-copper text-gravur-paper shadow-[0_10px_40px_-12px_rgba(138,90,59,0.5)] hover:opacity-90"
-      : "bg-gradient-to-br from-amber-light to-amber-deep text-ink shadow-[0_10px_40px_-12px_rgba(230,163,92,0.6)] hover:opacity-90",
+      : "bg-gradient-to-br from-[rgb(var(--accent-rgb))] to-[rgb(var(--accent-rgb-2))] text-ink shadow-[0_10px_40px_-12px_rgb(var(--accent-rgb)/0.55)] hover:opacity-90",
   };
   const hasStarKey = buildSkyLabels(sky).length > 0;
   const editHref = `/create?${buildEditParams(starMap, step, furthestStep).toString()}`;
@@ -136,13 +173,17 @@ export function StarMapView({
         </>
       ) : (
         <>
-          {/* Gökyüzü animasyonu — tüm sayfayı kaplayan sabit arka plan, atmosfer için soluk/bulanık; net "harita" aşağıdaki madalyonda */}
-          <div aria-hidden className="fixed inset-0 -z-10 opacity-75 blur-[1.5px]">
-            <StarChart sky={sky} label={previewLabel} className="h-full w-full" palette={palette} showLabels={false} />
+          {/* Nebula tabanı — Aurora temasının koyu zemin rengi, gökyüzü haritasının arkasında */}
+          <div aria-hidden className="fixed inset-0 -z-20 bg-nebula" />
+          {/* Gökyüzü animasyonu — tüm sayfayı kaplayan sabit arka plan; belirginlik
+              için blur/opaklık hafifletildi, drift+twinkle animasyonu intensity
+              ile hızlandırıldı — net "harita" aşağıdaki küredeki sahnede */}
+          <div aria-hidden className="fixed inset-0 -z-10 opacity-90 blur-[0.5px]">
+            <StarChart sky={sky} label={previewLabel} className="h-full w-full" palette={palette} showLabels={false} intensity={2.2} />
           </div>
           <div
             aria-hidden
-            className="pointer-events-none fixed inset-0 -z-10 bg-[radial-gradient(circle_at_50%_40%,rgba(11,8,16,0.25)_0%,rgba(11,8,16,0.6)_66%,#0b0810_100%)]"
+            className="pointer-events-none fixed inset-0 -z-10 bg-[radial-gradient(circle_at_50%_40%,rgba(7,5,15,0.12)_0%,rgba(7,5,15,0.45)_66%,#07050f_100%)]"
           />
         </>
       )}
@@ -154,14 +195,14 @@ export function StarMapView({
       {isPreview && !isInlinePreview && (
         <>
           <div className={`watermark-overlay ${isGravur ? "watermark-gravur" : ""}`} />
-          <div className={`fixed inset-x-0 top-0 z-50 border-b px-4 py-3 backdrop-blur-md ${t.accentBorderSoft} ${t.bannerBg}`}>
+          <div style={accentStyle} className={`fixed inset-x-0 top-0 z-50 border-b px-4 py-3 backdrop-blur-md ${t.accentBorderSoft} ${t.bannerBg}`}>
             <div className="mx-auto flex max-w-5xl flex-wrap items-center justify-between gap-3 text-center sm:text-left">
               <div className="flex items-center gap-2.5">
                 <span aria-hidden className={`h-1.5 w-1.5 shrink-0 animate-pulse rounded-full motion-reduce:animate-none ${t.accentBg}`} />
                 <p className={`font-mono text-[10px] uppercase tracking-wider font-semibold ${t.accentText}`}>
                   Tasarım Önizleme Modu
                 </p>
-                <span aria-hidden className={`hidden h-3 w-px sm:inline ${isGravur ? "bg-gravur-copper/30" : "bg-amber/30"}`} />
+                <span aria-hidden className={`hidden h-3 w-px sm:inline ${isGravur ? "bg-gravur-copper/30" : "bg-[rgb(var(--accent-rgb)/0.3)]"}`} />
                 <p className={`hidden text-xs sm:inline ${t.bodyText}`}>
                   Sayfanızı kaydetmek için yan sekmedeki tasarım ekranına dönebilirsiniz.
                 </p>
@@ -172,7 +213,7 @@ export function StarMapView({
                   className={`rounded-full border px-3.5 py-1.5 font-mono text-[9.5px] uppercase tracking-widest transition-colors ${t.accentBorder} ${
                     isGravur
                       ? "text-gravur-copper hover:bg-gravur-copper hover:text-gravur-paper"
-                      : "text-amber hover:bg-amber hover:text-ink"
+                      : "text-[rgb(var(--accent-rgb))] hover:bg-[rgb(var(--accent-rgb))] hover:text-ink"
                   }`}
                 >
                   Düzenle
@@ -189,7 +230,7 @@ export function StarMapView({
                   className={`rounded-full px-3.5 py-1.5 font-mono text-[9.5px] uppercase tracking-widest transition-colors ${
                     isGravur
                       ? "bg-gravur-copper/10 text-gravur-ink-soft hover:bg-gravur-copper/20 hover:text-gravur-ink"
-                      : "bg-amber/[0.08] text-muted hover:bg-amber/15 hover:text-bright"
+                      : "bg-[rgb(var(--accent-rgb)/0.08)] text-muted hover:bg-[rgb(var(--accent-rgb)/0.15)] hover:text-bright"
                   }`}
                 >
                   Kapat
@@ -200,9 +241,22 @@ export function StarMapView({
         </>
       )}
 
-      <main className={`relative flex flex-col items-center px-4 py-12 sm:px-8 sm:py-16 ${
+      <main style={accentStyle} className={`relative flex flex-col items-center px-4 py-12 sm:px-8 sm:py-16 ${
         isPreview && !isInlinePreview ? "pt-24 sm:pt-28" : ""
       }`}>
+        {/* Aurora'nın anasayfada kullandığı sürüklenen leke katmanı — sayfa
+            boyunca tekrarlanan bölümlerin arkasında, gravürde kapalı. */}
+        {!isGravur && <AuroraField className="!absolute !inset-0 !-z-20 h-full" />}
+
+        {/* Aurora ambient — anasayfayla aynı sürüklenen nebula lekeleri, palet
+            rengine göre boyanmış; gravürde kapalı (antik-kağıt kimliği korunur). */}
+        {!isGravur && (
+          <div aria-hidden className="pointer-events-none absolute inset-x-0 top-0 -z-10 h-[100svh] overflow-hidden">
+            <div className="absolute left-1/2 top-[38%] h-[520px] w-[520px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-[radial-gradient(closest-side,rgb(var(--accent-rgb)/0.28),transparent)] blur-[110px] animate-aurora-drift" />
+            <div className="absolute left-[18%] top-[62%] h-[360px] w-[360px] rounded-full bg-[radial-gradient(closest-side,rgb(var(--accent-rgb-2)/0.18),transparent)] blur-[120px] animate-aurora-drift-slow" />
+          </div>
+        )}
+
         {/* Sahne 1 — İsim ve an, gökyüzü henüz atmosferik arka planda */}
         <TitleReveal title={starMap.title} dateLabel={dateLabel} locationName={starMap.locationName} palette={palette} />
 
@@ -234,7 +288,7 @@ export function StarMapView({
                     </svg>
                     <span>Kozmik Gökyüzü Olayları</span>
                   </p>
-                  <div className={`w-[80px] h-[1px] ${isGravur ? "bg-gravur-copper/35" : "bg-amber/35"} mt-1.5`} />
+                  <div className={`w-[80px] h-[1px] ${t.accentRule} mt-1.5`} />
                 </div>
                 <div className="grid gap-4 sm:grid-cols-2 text-left">
                   <div className={`p-3.5 rounded-xl border ${t.cardBorder}`}>
@@ -280,7 +334,7 @@ export function StarMapView({
               {isPreview && (
                 <div className={`absolute inset-0 z-20 flex flex-col items-center justify-center rounded-2xl border px-6 text-center backdrop-blur-[2px] ${t.lockOverlay}`}>
                   <svg
-                    className={`mb-3 h-7 w-7 ${isGravur ? "text-gravur-copper/80" : "text-amber/80"}`}
+                    className={`mb-3 h-7 w-7 ${isGravur ? "text-gravur-copper/80" : "text-[rgb(var(--accent-rgb)/0.8)]"}`}
                     viewBox="0 0 24 24"
                     fill="none"
                     stroke="currentColor"
@@ -329,8 +383,8 @@ export function StarMapView({
               <div className={`w-full max-w-md flex flex-col gap-3 rounded-2xl border p-5 backdrop-blur-md ${t.videoCard}`}>
                 <video src={starMap.videoUrl} controls className="w-full rounded-xl bg-black shadow-lg" />
                 <div className="flex items-center gap-2">
-                  <span aria-hidden className={`h-1.5 w-1.5 rounded-full ${isGravur ? "bg-gravur-copper animate-pulse" : "bg-amber animate-pulse"}`} />
-                  <span className={`font-mono text-[9px] uppercase tracking-wider font-semibold ${isGravur ? "text-gravur-copper" : "text-amber"}`}>
+                  <span aria-hidden className={`h-1.5 w-1.5 rounded-full animate-pulse ${isGravur ? "bg-gravur-copper" : "bg-[rgb(var(--accent-rgb))]"}`} />
+                  <span className={`font-mono text-[9px] uppercase tracking-wider font-semibold ${t.accentText}`}>
                     Görüntülü Zaman Kapsülü Mesajı
                   </span>
                 </div>
@@ -380,20 +434,20 @@ export function StarMapView({
           />
           {isPreview ? (
             <>
-              <p className={`font-display text-xl italic sm:text-2xl ${t.ctaHeading}`}>Beğendin mi?</p>
+              <p className={`font-display text-xl italic sm:text-2xl ${accentGradientText}`}>Beğendin mi?</p>
               <p className={`text-sm leading-relaxed ${t.bodyText}`}>
                 Devam edip bu anı sepete ekleyebilir, dilediğin zaman düzenlemeye dönebilirsin.
               </p>
               <Link
                 href={editHref}
-                className={`rounded-full px-7 py-3.5 font-mono text-xs uppercase tracking-widest transition-opacity focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-amber ${t.ctaButton}`}
+                className={`rounded-full px-7 py-3.5 font-mono text-xs uppercase tracking-widest transition-opacity focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[rgb(var(--accent-rgb))] ${t.ctaButton}`}
               >
                 Düzenlemeye Dön
               </Link>
             </>
           ) : isOwner ? (
             <>
-              <p className={`font-display text-xl italic sm:text-2xl ${t.ctaHeading}`}>
+              <p className={`font-display text-xl italic sm:text-2xl ${accentGradientText}`}>
                 Anını fiziksel bir ürüne dönüştür.
               </p>
               <p className={`text-sm leading-relaxed ${t.bodyText}`}>
@@ -402,13 +456,13 @@ export function StarMapView({
             </>
           ) : (
             <>
-              <p className={`font-display text-xl italic sm:text-2xl ${t.ctaHeading}`}>Bu an burada, sonsuza dek.</p>
+              <p className={`font-display text-xl italic sm:text-2xl ${accentGradientText}`}>Bu an burada, sonsuza dek.</p>
               <p className={`text-sm leading-relaxed ${t.bodyText}`}>
                 Sen de sevdiğin bir anın gerçek gökyüzünü sonsuza dek sakla.
               </p>
               <Link
                 href="/create"
-                className={`rounded-full px-7 py-3.5 font-mono text-xs uppercase tracking-widest transition-opacity focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-amber ${t.ctaButton}`}
+                className={`rounded-full px-7 py-3.5 font-mono text-xs uppercase tracking-widest transition-opacity focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[rgb(var(--accent-rgb))] ${t.ctaButton}`}
               >
                 Kendi Haritanı Oluştur
               </Link>

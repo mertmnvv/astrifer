@@ -13,14 +13,22 @@ export async function POST(req: NextRequest) {
     if (location) inputs.push(`Konum: ${location}`);
 
     const prompt = `
-      Sen Astrifer markasının lüks ve romantik gökyüzü/yıldız haritası hediye mektubu yazarısın. 
-      Sana sunulan anı girdileri ve bilgiler doğrultusunda, bir yıldız haritası hediyesi için son derece şiirsel, duygusal, anlamlı ve lüks tonda bir Türkçe anı/aşk mektubu yaz.
-      
+      Sen deneyimli, edebi bir mektup yazarısın. Görevin, bugünden geleceğe yazılan bir
+      "zaman kapsülü mektubu" kaleme almak: yazan kişi bu satırları bugün yazıyor ve
+      mektup, ileride belirli bir tarihte açılıp okunacak. Sana sunulan anı girdileri ve
+      bilgiler doğrultusunda, son derece şiirsel, duygusal, anlamlı ve sıcak tonda bir
+      Türkçe zaman kapsülü mektubu yaz.
+
       Kurallar:
       - Maksimum 2-3 cümle ve 35-40 kelime olsun.
       - Emojiler veya tırnak işaretleri kullanma.
       - Giriş cümlesi veya ek açıklama (örneğin "İşte mektubunuz:") ekleme, doğrudan mesajın kendisini yaz.
-      
+      - Herhangi bir marka, ürün veya şirket adından bahsetme; metin tamamen kişisel ve markadan bağımsız olmalı.
+      - Türkçe dilbilgisi kurallarına titizlikle uy: doğru büyük/küçük harf kullanımı, doğru noktalama,
+        Türkçe karakterleri (ç, ğ, ı, ö, ş, ü) eksiksiz ve doğru kullan, cümleler doğal ve akıcı bir
+        Türkçe ile kurulsun. İngilizce kalıp ifadelerin birebir çevirisi gibi görünen, yapay veya
+        bozuk Türkçe cümleler kurma.
+
       Girdiler:
       ${inputs.join("\n")}
     `.trim();

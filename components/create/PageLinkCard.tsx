@@ -53,7 +53,7 @@ export function PageLinkCard({ host, slug, className }: PageLinkCardProps) {
   }
 
   return (
-    <div className={`rounded-xl border border-amber/25 bg-amber/[0.05] px-4 py-3 ${className ?? ""}`}>
+    <div className={`rounded-xl border border-iris-light/25 bg-iris-light/[0.05] px-4 py-3 ${className ?? ""}`}>
       <div className="flex items-center justify-between gap-2">
         <span className="font-mono text-[9.5px] uppercase tracking-[0.14em] text-dim">
           Kalıcı Adresin
@@ -63,7 +63,7 @@ export function PageLinkCard({ host, slug, className }: PageLinkCardProps) {
           type="button"
           onClick={handleCopy}
           aria-label="Linki kopyala"
-          className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full border border-amber/30 text-amber transition-colors hover:bg-amber/10"
+          className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full border border-iris-light/30 text-iris-light transition-colors hover:bg-iris-light/10"
         >
           {copied ? (
             <svg viewBox="0 0 16 16" className="h-3.5 w-3.5" fill="none" stroke="currentColor" strokeWidth={2.2}>
@@ -78,7 +78,7 @@ export function PageLinkCard({ host, slug, className }: PageLinkCardProps) {
         </button>
       </div>
       <p className="mt-1.5 break-all font-mono text-[11px] leading-relaxed text-muted">
-        {host}/s/<span className="font-semibold text-amber">{slug}</span>
+        {host}/s/<span className="font-semibold text-iris-light">{slug}</span>
       </p>
 
       {/* Action buttons row */}
@@ -88,7 +88,7 @@ export function PageLinkCard({ host, slug, className }: PageLinkCardProps) {
           href={`/s/${slug}`}
           target="_blank"
           rel="noreferrer"
-          className="flex flex-1 items-center justify-center gap-1.5 rounded-full border border-amber/30 px-3 py-2 font-mono text-[10px] uppercase tracking-widest text-amber transition-colors hover:bg-amber/10"
+          className="flex flex-1 items-center justify-center gap-1.5 rounded-full border border-iris-light/30 px-3 py-2 font-mono text-[10px] uppercase tracking-widest text-iris-light transition-colors hover:bg-iris-light/10"
         >
           <svg viewBox="0 0 20 20" className="h-3.5 w-3.5" fill="currentColor">
             <path d="M10 12.5a2.5 2.5 0 100-5 2.5 2.5 0 000 5z" />
@@ -101,7 +101,7 @@ export function PageLinkCard({ host, slug, className }: PageLinkCardProps) {
         <button
           type="button"
           onClick={handleShare}
-          className="flex flex-1 items-center justify-center gap-1.5 rounded-full bg-gradient-to-br from-amber-light to-amber-deep px-3 py-2 font-mono text-[10px] uppercase tracking-widest text-ink transition-opacity hover:opacity-90"
+          className="flex flex-1 items-center justify-center gap-1.5 rounded-full bg-gradient-to-br from-iris to-flare px-3 py-2 font-mono text-[10px] uppercase tracking-widest text-white transition-opacity hover:opacity-90"
         >
           {shared ? (
             <>
