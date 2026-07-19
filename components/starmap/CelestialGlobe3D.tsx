@@ -92,14 +92,18 @@ export function CelestialGlobe3D({ sky, palette, className = "" }: CelestialGlob
   const rotationVelocity = useRef({ x: 0.002, y: 0 }); // Autospin start
   const globeGroupRef = useRef<THREE.Group | null>(null);
 
-  // Soft cream/parchment colors for Gravür, cosmic darks for night palettes
+  // Soft cream/parchment colors for Gravür, otherwise derived from the
+  // selected sky palette so the globe matches the chosen theme.
   const isGravur = palette.id === "gravur-atlas";
+  const glowHex = new THREE.Color(
+    ...(palette.starGlowRgb.split(",").map((n) => Number(n) / 255) as [number, number, number]),
+  ).getHex();
   const colors = {
-    bg: isGravur ? 0xe4dfcd : 0x07050a,
-    star: isGravur ? 0x8a5a3b : 0xffffff,
-    constellation: isGravur ? 0x5c7a6b : 0x7e5bef,
-    horizon: isGravur ? 0x241f19 : 0xe6a35c,
-    text: isGravur ? "#241F19" : "#e6a35c",
+    bg: isGravur ? 0xe4dfcd : new THREE.Color(palette.skyEdge).getHex(),
+    star: isGravur ? 0x8a5a3b : new THREE.Color(palette.star).getHex(),
+    constellation: isGravur ? 0x5c7a6b : glowHex,
+    horizon: isGravur ? 0x241f19 : new THREE.Color(palette.sun).getHex(),
+    text: isGravur ? "#241F19" : palette.sun,
   };
 
   // Listen to selectedStar to manage target vectors and interaction timeouts
@@ -130,8 +134,10 @@ export function CelestialGlobe3D({ sky, palette, className = "" }: CelestialGlob
     scene.background = new THREE.Color(colors.bg);
     sceneRef.current = scene;
 
-    // 2. Camera setup
-    const camera = new THREE.PerspectiveCamera(60, width / height, 0.001, 100);
+    // 2. Camera setup — starts wide (95°) and the animation loop's existing
+    // "zoom out to 60" lerp below pulls it in on mount, reading as a
+    // cinematic dolly-in instead of a static pop-in.
+    const camera = new THREE.PerspectiveCamera(95, width / height, 0.001, 100);
     camera.position.set(0, 4, 8);
     camera.lookAt(0, 0, 0);
     cameraRef.current = camera;
