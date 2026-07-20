@@ -168,9 +168,6 @@ export default async function JournalProductPage() {
                   <Link href="/create" className={CTA_CLASS}>
                     Sipariş Vermeye Başlayın →
                   </Link>
-                  <p className="font-mono text-[10px] uppercase tracking-widest text-dim">
-                    /create&apos;te 05. adımda tek tıkla sepete eklenir
-                  </p>
                   <a
                     href="#icindekiler"
                     className="font-mono text-[11px] uppercase tracking-widest text-dim transition-colors hover:text-iris-light"
