@@ -11,7 +11,7 @@ import { RevealOnScroll } from "@/components/ui/RevealOnScroll";
 import { LazyMount } from "@/components/ui/LazyMount";
 import { BackCoverPage } from "@/components/journal/night/BackCoverPage";
 import { LetterInsertPage } from "@/components/journal/night/LetterInsertPage";
-import { NightCoverPage } from "@/components/journal/night/NightCoverPage";
+import { JournalTiltCover } from "@/components/journal/JournalTiltCover";
 import { QrPage } from "@/components/journal/night/QrPage";
 import { getJournalTheme } from "@/components/journal/night/journalTheme";
 import { JournalThemeProvider } from "@/components/journal/JournalThemeContext";
@@ -38,6 +38,24 @@ const SAMPLE_LETTER_TEXT =
   "Bana evet dediğin an, gökyüzü buydu. Bu mektubu bugün yazıyorum ki yıllar sonra bu sayfayı açtığımızda o geceyi unutmayalım — seni o an ne kadar sevdiğimi hatırlaman için. İyi ki varsın.";
 
 const SAMPLE_OPENING_DATE = new Date("2029-06-21T00:00:00.000Z");
+
+const TRUST_SIGNALS = [
+  {
+    title: "Güvenli Ödeme",
+    body: "PayTR 256-bit SSL ile korunur",
+    path: "M12 2.5l7 3.2v5.3c0 5-3 8.7-7 10.5-4-1.8-7-5.5-7-10.5V5.7l7-3.2z",
+  },
+  {
+    title: "5-7 İş Günü",
+    body: "Üretim + kargo dahil, elden hazırlanır",
+    path: "M3 7.5l9-4 9 4-9 4-9-4zm0 0v9l9 4m0-9v9m9-13v9l-9 4",
+  },
+  {
+    title: "Hediye Kalem",
+    body: "Altın renkli kalem yanında gönderilir",
+    path: "M4 20l1.2-4.2L16.6 4.4a1.5 1.5 0 012.1 0l1.9 1.9a1.5 1.5 0 010 2.1L9.2 19.8 5 21l-1-1z",
+  },
+];
 
 const PROCESS_STEPS = [
   { n: "01", title: "Anınızı girin", body: "Tarih, saat, konum ve isimlerinizi /create'te girin." },
@@ -148,8 +166,11 @@ export default async function JournalProductPage() {
                 </div>
                 <div className="mt-7 flex flex-col items-center gap-3 lg:items-start">
                   <Link href="/create" className={CTA_CLASS}>
-                    Yaşayan Sayfanızı Oluşturun →
+                    Sipariş Vermeye Başlayın →
                   </Link>
+                  <p className="font-mono text-[10px] uppercase tracking-widest text-dim">
+                    /create&apos;te 05. adımda tek tıkla sepete eklenir
+                  </p>
                   <a
                     href="#icindekiler"
                     className="font-mono text-[11px] uppercase tracking-widest text-dim transition-colors hover:text-iris-light"
@@ -165,8 +186,31 @@ export default async function JournalProductPage() {
                   className="pointer-events-none absolute -inset-8 -z-10 hidden rounded-full lg:block"
                   style={{ background: "radial-gradient(60% 60% at 50% 50%, rgba(230,184,119,0.16), transparent 70%)" }}
                 />
-                <NightCoverPage names={source.title} />
+                <JournalTiltCover names={source.title} />
               </div>
+            </div>
+
+            <div className="mx-auto mt-9 grid max-w-3xl grid-cols-1 gap-3 sm:grid-cols-3">
+              {TRUST_SIGNALS.map((item) => (
+                <div
+                  key={item.title}
+                  className="flex items-center gap-3 rounded-xl border border-text/10 bg-text/[0.035] px-4 py-3"
+                >
+                  <svg
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="1.6"
+                    className="h-5 w-5 shrink-0 text-iris-light"
+                  >
+                    <path d={item.path} strokeLinecap="round" strokeLinejoin="round" />
+                  </svg>
+                  <div>
+                    <p className="text-xs font-semibold text-bright">{item.title}</p>
+                    <p className="text-[11px] leading-snug text-dim">{item.body}</p>
+                  </div>
+                </div>
+              ))}
             </div>
           </header>
 
@@ -289,10 +333,13 @@ export default async function JournalProductPage() {
             </div>
           </div>
 
-          <div className="mt-14 flex justify-center">
+          <div className="mt-14 flex flex-col items-center gap-3">
             <Link href="/create" className={CTA_CLASS}>
-              Yaşayan Sayfanızı Oluşturun →
+              Sipariş Vermeye Başlayın →
             </Link>
+            <p className="font-mono text-[10px] uppercase tracking-widest text-dim">
+              299₺&apos;den başlar · Güvenli ödeme · 5-7 iş günü kargo dahil
+            </p>
           </div>
           </JournalThemeProvider>
 

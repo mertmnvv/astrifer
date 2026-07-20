@@ -203,6 +203,10 @@ export function JournalShowcase({ sky, title, memoryPhotos, journalPrice, journa
         <JournalThemeProvider theme={getJournalTheme(paletteId)}>
           <BookFlip pages={pages} onPageChange={setActivePageIndex} />
         </JournalThemeProvider>
+        <div
+          aria-hidden
+          className="mx-auto -mt-2 h-6 w-[85%] max-w-2xl rounded-[100%] bg-black/40 blur-xl"
+        />
       </div>
 
     </div>

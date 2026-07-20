@@ -61,10 +61,10 @@ export function JournalThemeSwatchPicker({ value, onChange, name }: JournalTheme
               </span>
             </span>
             <span className="mt-1.5 block font-mono text-[9px] uppercase tracking-widest text-text leading-tight">
-              {theme.label.split(" + ")[0]}
+              {theme.label}
             </span>
             <span className="block text-[8px] uppercase tracking-wider text-muted mt-0.5">
-              + {theme.label.split(" + ")[1] || ""}
+              + Altın Yaldız
             </span>
           </label>
         );
