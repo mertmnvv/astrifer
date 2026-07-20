@@ -1,3 +1,4 @@
+import { Badge, Card, FIELD_CLASS, FIELD_LABEL_CLASS, PageHeader } from "@/components/admin/ui";
 import { isFirebaseConfigured } from "@/lib/firebase/isConfigured";
 import type { TemplateCategory, TemplateDoc } from "@/types/firestore";
 import { createTemplateAction, toggleTemplateActiveAction } from "./actions";
@@ -14,8 +15,6 @@ const CATEGORY_LABELS: Record<TemplateCategory, string> = {
 };
 
 const CATEGORY_OPTIONS = Object.keys(CATEGORY_LABELS) as TemplateCategory[];
-const FIELD_CLASS = "w-full rounded-md border border-text/[0.14] bg-text/[0.04] px-3 py-2 text-sm text-text";
-const FIELD_LABEL_CLASS = "block font-mono text-[10px] uppercase tracking-widest text-dim";
 
 async function getTemplates(): Promise<TemplateDoc[]> {
   const { getDb } = await import("@/lib/firebase/admin");
@@ -37,58 +36,54 @@ export default async function AdminTemplatesPage() {
 
   return (
     <div className="space-y-10">
-      <div className="space-y-4">
-        <h1 className="font-display text-2xl italic text-bright">Şablonlar</h1>
-        <div className="overflow-x-auto rounded-2xl border border-text/10">
-          <table className="w-full min-w-[700px] text-left text-sm">
-            <thead className="bg-panel font-mono text-[10px] uppercase tracking-widest text-dim">
-              <tr>
-                <th className="px-4 py-3">Slug</th>
-                <th className="px-4 py-3">Ad</th>
-                <th className="px-4 py-3">Kategori</th>
-                <th className="px-4 py-3">Durum</th>
-                <th className="px-4 py-3" />
-              </tr>
-            </thead>
-            <tbody>
-              {templates.map((template) => (
-                <tr key={template.slug} className="border-t border-text/10">
-                  <td className="px-4 py-3 align-top font-mono text-xs text-subtle">{template.slug}</td>
-                  <td className="px-4 py-3 align-top text-text">{template.name}</td>
-                  <td className="px-4 py-3 align-top text-text">{CATEGORY_LABELS[template.category]}</td>
-                  <td className="px-4 py-3 align-top">
-                    <span
-                      className={`rounded-full px-2 py-0.5 font-mono text-[10px] uppercase tracking-widest ${
-                        template.isActive ? "bg-amber/20 text-amber" : "bg-text/10 text-subtle"
-                      }`}
+      <PageHeader title="Şablonlar" description={`Toplam ${templates.length} şablon.`} />
+
+      <div className="overflow-x-auto rounded-2xl border border-text/10 bg-panel shadow-xl">
+        <table className="w-full min-w-[700px] text-left text-sm">
+          <thead className="bg-text/[0.02] border-b border-text/10 font-mono text-[9px] uppercase tracking-widest text-dim">
+            <tr>
+              <th className="px-5 py-4">Slug</th>
+              <th className="px-5 py-4">Ad</th>
+              <th className="px-5 py-4">Kategori</th>
+              <th className="px-5 py-4">Durum</th>
+              <th className="px-5 py-4" />
+            </tr>
+          </thead>
+          <tbody className="divide-y divide-text/[0.06]">
+            {templates.map((template) => (
+              <tr key={template.slug} className="hover:bg-text/[0.01] transition-colors">
+                <td className="px-5 py-4 align-top font-mono text-xs text-subtle">{template.slug}</td>
+                <td className="px-5 py-4 align-top text-text">{template.name}</td>
+                <td className="px-5 py-4 align-top text-text">{CATEGORY_LABELS[template.category]}</td>
+                <td className="px-5 py-4 align-top">
+                  <Badge tone={template.isActive ? "amber" : "neutral"}>
+                    {template.isActive ? "Aktif" : "Pasif"}
+                  </Badge>
+                </td>
+                <td className="px-5 py-4 align-top">
+                  <form action={toggleTemplateActiveAction}>
+                    <input type="hidden" name="slug" value={template.slug} />
+                    <input type="hidden" name="isActive" value={String(template.isActive)} />
+                    <button
+                      type="submit"
+                      className="rounded-full border border-amber/40 px-3 py-1 font-mono text-[10px] uppercase tracking-widest text-amber transition-colors hover:bg-amber hover:text-ink"
                     >
-                      {template.isActive ? "Aktif" : "Pasif"}
-                    </span>
-                  </td>
-                  <td className="px-4 py-3 align-top">
-                    <form action={toggleTemplateActiveAction}>
-                      <input type="hidden" name="slug" value={template.slug} />
-                      <input type="hidden" name="isActive" value={String(template.isActive)} />
-                      <button
-                        type="submit"
-                        className="rounded-full border border-amber/40 px-3 py-1 font-mono text-[10px] uppercase tracking-widest text-amber transition-colors hover:bg-amber hover:text-ink"
-                      >
-                        {template.isActive ? "Pasifleştir" : "Aktifleştir"}
-                      </button>
-                    </form>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+                      {template.isActive ? "Pasifleştir" : "Aktifleştir"}
+                    </button>
+                  </form>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
       </div>
 
       <div className="space-y-4">
         <h2 className="font-display text-xl italic text-bright">Yeni şablon</h2>
+        <Card>
         <form
           action={createTemplateAction}
-          className="grid max-w-xl gap-4 rounded-2xl border border-text/10 bg-text/[0.035] p-6 sm:grid-cols-2"
+          className="grid gap-4 sm:grid-cols-2"
         >
           <div className="space-y-1.5">
             <label htmlFor="slug" className={FIELD_LABEL_CLASS}>
@@ -152,6 +147,7 @@ export default async function AdminTemplatesPage() {
             Şablon ekle
           </button>
         </form>
+        </Card>
       </div>
     </div>
   );

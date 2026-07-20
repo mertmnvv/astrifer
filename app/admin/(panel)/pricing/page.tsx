@@ -1,11 +1,9 @@
+import { Card, FIELD_CLASS, FIELD_LABEL_CLASS, PageHeader } from "@/components/admin/ui";
 import { isFirebaseConfigured } from "@/lib/firebase/isConfigured";
 import { getPricingConfig } from "@/lib/pricingConfig";
 import { savePricingAction } from "./actions";
 
 export const dynamic = "force-dynamic";
-
-const FIELD_CLASS = "w-full rounded-md border border-text/[0.14] bg-text/[0.04] px-3 py-2 text-sm text-text";
-const FIELD_LABEL_CLASS = "block font-mono text-[10px] uppercase tracking-widest text-dim";
 
 export default async function AdminPricingPage() {
   if (!isFirebaseConfigured()) {
@@ -21,14 +19,13 @@ export default async function AdminPricingPage() {
 
   return (
     <div className="space-y-6">
-      <h1 className="font-display text-2xl italic text-bright">Fiyatlar</h1>
-      <p className="text-sm text-subtle">
-        Buradaki değerler kaydedildiği anda tüm site genelinde dinamik olarak yansır.
-      </p>
+      <PageHeader
+        title="Fiyatlar"
+        description="Buradaki değerler kaydedildiği anda tüm site genelinde dinamik olarak yansır."
+      />
 
-      <form action={savePricingAction} className="space-y-8">
-        <div className="space-y-4">
-          <h2 className="font-mono text-xs uppercase tracking-widest text-amber">Deri Defter Fiyatlandırması</h2>
+      <form action={savePricingAction} className="space-y-6">
+        <Card title="Deri Defter Fiyatlandırması">
           <div className="grid gap-4 sm:grid-cols-2">
             <div className="space-y-1.5">
               <label htmlFor="journalOriginalPrice" className={FIELD_LABEL_CLASS}>
@@ -61,10 +58,9 @@ export default async function AdminPricingPage() {
               />
             </div>
           </div>
-        </div>
+        </Card>
 
-        <div className="space-y-4">
-          <h2 className="font-mono text-xs uppercase tracking-widest text-amber">Dijital Sayfa Fiyatlandırması</h2>
+        <Card title="Dijital Sayfa Fiyatlandırması">
           <div className="grid gap-4 sm:grid-cols-2">
             <div className="space-y-1.5">
               <label htmlFor="digitalOriginalPrice" className={FIELD_LABEL_CLASS}>
@@ -97,7 +93,7 @@ export default async function AdminPricingPage() {
               />
             </div>
           </div>
-        </div>
+        </Card>
 
         <button
           type="submit"

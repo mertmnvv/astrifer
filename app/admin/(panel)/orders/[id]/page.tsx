@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { JournalBookPreview } from "@/components/admin/JournalBookPreview";
+import { Badge, Card } from "@/components/admin/ui";
 import { cloudinaryTransform } from "@/lib/cloudinary/transformUrl";
 import { getDb } from "@/lib/firebase/admin";
 import { isFirebaseConfigured } from "@/lib/firebase/isConfigured";
@@ -36,6 +37,16 @@ const ACTION_BUTTON_CLASS =
 const DOWNLOAD_BUTTON_CLASS =
   "rounded-full border border-iris/40 bg-iris/5 px-4 py-2 font-mono text-[10px] uppercase tracking-widest text-iris-light transition-all hover:bg-iris hover:text-white";
 
+const STATUS_BADGE_TONES: Record<OrderDoc["status"], "neutral" | "amber" | "success" | "danger" | "iris"> = {
+  pending: "amber",
+  paid: "iris",
+  failed: "danger",
+  refunded: "danger",
+  fulfilled: "iris",
+  shipped: "success",
+  cancelled: "neutral",
+};
+
 export default async function AdminOrderDetailPage({ params }: { params: { id: string } }) {
   if (!isFirebaseConfigured()) {
     return (
@@ -70,16 +81,18 @@ export default async function AdminOrderDetailPage({ params }: { params: { id: s
         </Link>
       </div>
 
-      <h1 className="font-display text-2xl italic text-bright border-b border-text/10 pb-4">
-        {order.orderNumber ? `Sipariş ${order.orderNumber}` : `Sipariş #${order.id}`}
-      </h1>
+      <div className="flex flex-wrap items-center justify-between gap-3 border-b border-text/10 pb-4">
+        <h1 className="font-display text-2xl italic text-bright">
+          {order.orderNumber ? `Sipariş ${order.orderNumber}` : `Sipariş #${order.id}`}
+        </h1>
+        <Badge tone={STATUS_BADGE_TONES[order.status]}>{STATUS_LABELS[order.status]}</Badge>
+      </div>
 
       <div className="grid gap-6 lg:grid-cols-[minmax(0,22rem)_1fr]">
         <div className="space-y-6">
           {/* ── Sipariş Bilgileri ── */}
-          <div className="rounded-2xl border border-text/10 bg-panel p-5 shadow-lg">
-            <p className="font-mono text-[10px] uppercase tracking-[0.3em] text-dim">Sipariş Bilgileri</p>
-            <div className="mt-2 divide-y divide-text/[0.08]">
+          <Card title="Sipariş Bilgileri">
+            <div className="divide-y divide-text/[0.08]">
               {order.orderNumber && <LedgerRow label="Sipariş No" value={order.orderNumber} />}
               <LedgerRow label="Müşteri" value={order.customerName ?? "—"} />
               <LedgerRow label="E-posta" value={order.customerEmail} />
@@ -97,11 +110,10 @@ export default async function AdminOrderDetailPage({ params }: { params: { id: s
               <LedgerRow label="Tarih" value={formatDate(order.createdAt)} />
               {order.trackingNumber && <LedgerRow label="Takip No" value={order.trackingNumber} />}
             </div>
-          </div>
+          </Card>
 
           {/* ── Durum Güncelleme ── */}
-          <div className="rounded-2xl border border-text/10 bg-panel p-5 shadow-lg">
-            <p className="mb-3 font-mono text-[10px] uppercase tracking-[0.3em] text-dim">Sipariş Durumu</p>
+          <Card title="Sipariş Durumu">
             <form action={updateOrderAction} className="flex flex-col gap-3">
               <input type="hidden" name="orderId" value={order.id} />
               <div>
@@ -137,13 +149,12 @@ export default async function AdminOrderDetailPage({ params }: { params: { id: s
             </form>
 
             <DeleteOrderButton orderId={order.id} />
-          </div>
+          </Card>
 
           {/* ── Müşteri Dosyaları (Fotoğraf/Ses) ── */}
           {starMap && (
-            <div className="rounded-2xl border border-text/10 bg-panel p-5 space-y-5 shadow-lg">
-              <p className="font-mono text-[10px] uppercase tracking-[0.3em] text-dim border-b border-text/5 pb-2">Müşteri Dosyaları</p>
-              
+            <Card title="Müşteri Dosyaları" className="space-y-5">
+
               {/* Fotoğraflar */}
               <div className="space-y-2">
                 <p className="font-mono text-[9px] uppercase tracking-wider text-dim">Yüklenen Fotoğraflar ({photos.length})</p>
@@ -227,7 +238,7 @@ export default async function AdminOrderDetailPage({ params }: { params: { id: s
                   <p className="text-xs text-subtle italic">Müzik eklenmedi.</p>
                 )}
               </div>
-            </div>
+            </Card>
           )}
         </div>
 
@@ -235,8 +246,7 @@ export default async function AdminOrderDetailPage({ params }: { params: { id: s
         <div className="space-y-6">
           {/* Tasarım Detayları */}
           {starMap && (
-            <div className="rounded-2xl border border-text/10 bg-panel p-5 shadow-lg">
-              <p className="font-mono text-[10px] uppercase tracking-[0.3em] text-dim border-b border-text/5 pb-2">Tasarım Detayları</p>
+            <Card title="Tasarım Detayları">
               <div className="divide-y divide-text/[0.08]">
                 <LedgerRow label="Başlık / İsimler" value={starMap.title || "—"} />
                 {starMap.message && (
@@ -266,13 +276,12 @@ export default async function AdminOrderDetailPage({ params }: { params: { id: s
                   Dijital Sayfayı Yeni Sekmede Aç ↗
                 </Link>
               </div>
-            </div>
+            </Card>
           )}
 
           {/* Deri Defter Üretim Bölümü */}
           {showJournal && (
-            <div className="rounded-2xl border border-text/10 bg-panel p-5 shadow-lg">
-              <p className="mb-4 font-mono text-[10px] uppercase tracking-[0.3em] text-dim">Deri Defter — Üretim</p>
+            <Card title="Deri Defter — Üretim">
 
               {!journalStarMap ? (
                 <p className="text-sm text-subtle">Bu siparişe ait harita verisi bulunamadı.</p>
@@ -328,13 +337,12 @@ export default async function AdminOrderDetailPage({ params }: { params: { id: s
                   )}
                 </div>
               </div>
-            </div>
+            </Card>
           )}
 
           {/* Müşteri Sipariş İçi Ürün Detayları */}
           {order.items && order.items.length > 0 && (
-            <div className="rounded-2xl border border-text/10 bg-panel p-5 shadow-lg">
-              <p className="font-mono text-[10px] uppercase tracking-[0.3em] text-dim border-b border-text/5 pb-2">Sipariş Kalemleri ve Mektup</p>
+            <Card title="Sipariş Kalemleri ve Mektup">
               <div className="divide-y divide-text/[0.08]">
                 {order.items.map((item, index) => (
                   <div key={index} className="py-3">
@@ -362,24 +370,21 @@ export default async function AdminOrderDetailPage({ params }: { params: { id: s
                   </div>
                 ))}
               </div>
-            </div>
+            </Card>
           )}
 
           {/* Canlı İframe Önizlemesi */}
           {showDigital && (
-            <div className="rounded-2xl border border-text/10 bg-panel p-5 shadow-lg">
-              <p className="mb-4 font-mono text-[10px] uppercase tracking-[0.3em] text-dim">Canlı Dijital Sayfa Önizlemesi</p>
-              <div className="space-y-4">
-                <div className="aspect-[9/16] w-full max-w-sm overflow-hidden rounded-xl border border-text/10 shadow-2xl shadow-black/50 mx-auto">
-                  <iframe
-                    src={`/s/${digitalSlug}`}
-                    title="Dijital Sayfa önizleme"
-                    sandbox="allow-scripts allow-same-origin"
-                    className="h-full w-full"
-                  />
-                </div>
+            <Card title="Canlı Dijital Sayfa Önizlemesi">
+              <div className="aspect-[9/16] w-full max-w-sm overflow-hidden rounded-xl border border-text/10 shadow-2xl shadow-black/50 mx-auto">
+                <iframe
+                  src={`/s/${digitalSlug}`}
+                  title="Dijital Sayfa önizleme"
+                  sandbox="allow-scripts allow-same-origin"
+                  className="h-full w-full"
+                />
               </div>
-            </div>
+            </Card>
           )}
         </div>
       </div>

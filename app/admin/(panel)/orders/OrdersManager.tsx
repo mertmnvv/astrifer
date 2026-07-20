@@ -2,6 +2,7 @@
 
 import { useState, useMemo } from "react";
 import Link from "next/link";
+import { Badge, EmptyState } from "@/components/admin/ui";
 import { formatTRY } from "@/lib/pricing";
 import type { OrderStatus, PaymentMethod, ProductType } from "@/types/firestore";
 import { updateOrderAction } from "./actions";
@@ -164,9 +165,7 @@ export function OrdersManager({ orders }: OrdersManagerProps) {
 
       {/* Orders List Table */}
       {filteredOrders.length === 0 ? (
-        <div className="rounded-2xl border border-dashed border-text/10 bg-text/[0.01] p-12 text-center">
-          <p className="text-sm text-subtle">Kriterlere uygun sipariş bulunamadı.</p>
-        </div>
+        <EmptyState>Kriterlere uygun sipariş bulunamadı.</EmptyState>
       ) : (
         <div className="overflow-x-auto rounded-2xl border border-text/10 bg-panel shadow-xl">
           <table className="w-full min-w-[1100px] text-left text-sm">
@@ -218,15 +217,9 @@ export function OrdersManager({ orders }: OrdersManagerProps) {
                   </td>
                   <td className="px-5 py-4 align-top">
                     {order.productType === "journal" || order.productType === "bundle" ? (
-                      <span
-                        className={`rounded-full px-2 py-0.5 border font-mono text-[9px] uppercase tracking-wider font-medium ${
-                          order.printPdfPath 
-                            ? "border-emerald-500/30 bg-emerald-500/10 text-emerald-400" 
-                            : "border-amber/20 bg-amber/[0.05] text-amber"
-                        }`}
-                      >
+                      <Badge tone={order.printPdfPath ? "success" : "amber"}>
                         {order.printPdfPath ? "PDF Hazır" : "Bekliyor"}
-                      </span>
+                      </Badge>
                     ) : (
                       <span className="text-xs text-dim">—</span>
                     )}

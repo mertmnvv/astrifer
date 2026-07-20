@@ -1,3 +1,4 @@
+import { PageHeader } from "@/components/admin/ui";
 import { isFirebaseConfigured } from "@/lib/firebase/isConfigured";
 import type { OrderDoc } from "@/types/firestore";
 import { OrdersManager, type SerializableOrder } from "./OrdersManager";
@@ -44,7 +45,7 @@ export default async function AdminOrdersPage() {
 
   return (
     <div className="space-y-6">
-      <h1 className="font-display text-2xl italic text-bright">Siparişler</h1>
+      <PageHeader title="Siparişler" description={`Toplam ${serializableOrders.length} sipariş.`} />
       <OrdersManager orders={serializableOrders} />
     </div>
   );
