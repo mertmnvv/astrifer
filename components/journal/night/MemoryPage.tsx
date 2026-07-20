@@ -8,9 +8,26 @@ import { NightPageShell } from "./NightPageShell";
 export interface MemoryPageProps {
   photo: StarMapPhoto;
   caption: string;
+  /**
+   * 0-3 — picks a themed sample photo to stand in for an unset `photo.url`.
+   * Only pass this from marketing/preview contexts (product page showcase,
+   * /create's live preview) — NEVER from the real print pipeline or the
+   * admin production preview, both of which must show a real order's actual
+   * (possibly still-empty) photo state, not a stranger's stock photo baked
+   * into someone's physical book.
+   */
+  sampleIndex?: number;
   widthPx?: number;
   heightPx?: number;
 }
+
+/** Night/starlit couple moments — marketing/preview-only stand-ins, see `sampleIndex` above. */
+const SAMPLE_MEMORY_PHOTOS = [
+  "https://images.unsplash.com/photo-1514770643069-54183731a981?w=900&auto=format&fit=crop&q=75",
+  "https://images.unsplash.com/photo-1602009178093-743e06d91af4?w=900&auto=format&fit=crop&q=75",
+  "https://images.unsplash.com/photo-1556229868-7b2d4b56b909?w=900&auto=format&fit=crop&q=75",
+  "https://images.unsplash.com/photo-1494403687614-8ca3e13f154f?w=900&auto=format&fit=crop&q=75",
+];
 
 function CornerOrnament({ position, color }: { position: "tl" | "tr" | "bl" | "br"; color: string }) {
   const transforms: Record<typeof position, string> = {
@@ -42,8 +59,9 @@ function CornerOrnament({ position, color }: { position: "tl" | "tr" | "bl" | "b
  * photo in a soft oval vignette (no hard rectangular frame) and a thin gold
  * ornament tick at each corner.
  */
-export function MemoryPage({ photo, caption, widthPx, heightPx }: MemoryPageProps) {
+export function MemoryPage({ photo, caption, sampleIndex, widthPx, heightPx }: MemoryPageProps) {
   const theme = useJournalTheme();
+  const displayUrl = photo.url || (sampleIndex !== undefined ? SAMPLE_MEMORY_PHOTOS[sampleIndex % SAMPLE_MEMORY_PHOTOS.length] : undefined);
   return (
     <NightPageShell widthPx={widthPx} heightPx={heightPx} printReady={true}>
       <div className="flex h-full w-full flex-col items-center justify-center px-[11%] py-[12%]">
@@ -52,16 +70,16 @@ export function MemoryPage({ photo, caption, widthPx, heightPx }: MemoryPageProp
             className="flex h-full w-full items-center justify-center overflow-hidden"
             style={{
               borderRadius: "50%/38%",
-              background: photo.url
+              background: displayUrl
                 ? undefined
                 : `radial-gradient(ellipse at 50% 42%, ${theme.accentMetal}1a 0%, rgba(8,12,34,.55) 78%)`,
               boxShadow: `0 0 0 1px ${theme.accentMetal}59, 0 20px 40px -16px rgba(0,0,0,.6)`,
             }}
           >
-            {photo.url ? (
+            {displayUrl ? (
               // eslint-disable-next-line @next/next/no-img-element
               <img
-                src={cloudinaryTransform(photo.url, widthPx ?? 900)}
+                src={cloudinaryTransform(displayUrl, widthPx ?? 900)}
                 alt={caption}
                 className="h-full w-full object-cover"
               />

@@ -10,7 +10,7 @@ const PRODUCTS: Record<CrossSellProduct, { title: string; description: string; h
   },
   journal: {
     title: "Deri Defter",
-    description: "Kapağında yıldız haritanız, 26 sayfalık kişiye özel bir defter.",
+    description: "Kapağında yıldız haritanız, 27 sayfalık kişiye özel bir defter.",
     href: "/urun/defter",
   },
 };

@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { createPortal } from "react-dom";
 import * as THREE from "three";
 import type { ComputeSkyResult } from "@/lib/astronomy/computeSky";
 import type { SkyPalette } from "@/components/astrolab/palettes";
@@ -70,6 +71,9 @@ export function CelestialGlobe3D({ sky, palette, className = "" }: CelestialGlob
     type: "star" | "body";
     kind?: string;
   } | null>(null);
+  // Gates the star-card portal to after mount — document.body isn't available during SSR.
+  const [portalReady, setPortalReady] = useState(false);
+  useEffect(() => setPortalReady(true), []);
 
   // Hybrid Cinematic Refs
   const interactionTimeoutRef = useRef<NodeJS.Timeout | null>(null);
@@ -671,40 +675,49 @@ export function CelestialGlobe3D({ sky, palette, className = "" }: CelestialGlob
         <span>Döndürmek için sürükleyin</span>
       </div>
 
-      {/* Selected Star Details Card */}
-      {selectedStar && (
-        <div className={`absolute bottom-[max(2rem,env(safe-area-inset-bottom))] left-4 right-4 md:left-1/2 md:right-auto md:-translate-x-1/2 md:w-80 rounded-xl border p-4 shadow-xl backdrop-blur-sm z-30 flex flex-col gap-1.5 text-left animate-fadeIn ${isGravur ? "bg-[#E4DFCD]/95 border-[#241F19]/30 shadow-2xl" : "border-[rgb(var(--accent-rgb)/0.2)] bg-nebula/90"}`}>
-          <button
-            type="button"
-            onClick={() => setSelectedStar(null)}
-            className={`absolute top-2.5 right-2.5 ${isGravur ? "text-[#241F19]/60 hover:text-[#241F19]" : "text-dim hover:text-bright"}`}
-            aria-label="Kapat"
+      {/* Selected Star Details Card — portaled to document.body so it's positioned against
+          the real viewport instead of this component's own box. Any ancestor with a
+          backdrop-blur/transform (several wrap this globe: the compact preview panel, the
+          fullscreen zoom modal) creates a CSS containing block for `fixed` descendants, which
+          on a short mobile box clipped the card's bottom half — a portal sidesteps that
+          entirely regardless of where CelestialGlobe3D is mounted. */}
+      {selectedStar && portalReady &&
+        createPortal(
+          <div
+            className={`fixed bottom-[max(1rem,env(safe-area-inset-bottom))] left-4 right-4 max-h-[60vh] overflow-y-auto md:left-1/2 md:right-auto md:-translate-x-1/2 md:w-80 rounded-xl border p-4 shadow-xl backdrop-blur-sm z-[105] flex flex-col gap-1.5 text-left animate-fadeIn ${isGravur ? "bg-[#E4DFCD]/95 border-[#241F19]/30 shadow-2xl" : "border-[rgb(var(--accent-rgb)/0.2)] bg-nebula/90"}`}
           >
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.5} className="h-4 w-4">
-              <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
-            </svg>
-          </button>
-          <p className={`font-mono text-[8.5px] uppercase tracking-[0.2em] ${isGravur ? "text-[#8A5A3B]" : "text-[rgb(var(--accent-rgb))]"}`}>
-            {selectedStar.type === "body" ? "🪐 Gök Cismi" : "⭐ Yıldız Raporu"}
-          </p>
-          <h4 className={`font-display text-base italic font-medium ${isGravur ? "text-[#241F19] font-gravur-serif" : "text-bright"}`}>
-            {selectedStar.name || "Katalog Yıldızı"}
-          </h4>
-          <div className={`grid grid-cols-2 gap-2 border-t pt-2 text-[10px] font-mono ${isGravur ? "border-[#241F19]/15 text-[#5C5646]" : "border-text/10 text-dim"}`}>
-            <div>
-              <span className={`text-[8px] uppercase tracking-wider block ${isGravur ? "text-[#241F19]/60" : "text-subtle"}`}>Kadir</span>
-              <span className={isGravur ? "text-[#241F19]" : "text-bright"}>{selectedStar.mag.toFixed(2)}</span>
+            <button
+              type="button"
+              onClick={() => setSelectedStar(null)}
+              className={`absolute top-2.5 right-2.5 ${isGravur ? "text-[#241F19]/60 hover:text-[#241F19]" : "text-dim hover:text-bright"}`}
+              aria-label="Kapat"
+            >
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.5} className="h-4 w-4">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+            <p className={`font-mono text-[8.5px] uppercase tracking-[0.2em] ${isGravur ? "text-[#8A5A3B]" : "text-[rgb(var(--accent-rgb))]"}`}>
+              {selectedStar.type === "body" ? "🪐 Gök Cismi" : "⭐ Yıldız Raporu"}
+            </p>
+            <h4 className={`font-display text-base italic font-medium ${isGravur ? "text-[#241F19] font-gravur-serif" : "text-bright"}`}>
+              {selectedStar.name || "Katalog Yıldızı"}
+            </h4>
+            <div className={`grid grid-cols-2 gap-2 border-t pt-2 text-[10px] font-mono ${isGravur ? "border-[#241F19]/15 text-[#5C5646]" : "border-text/10 text-dim"}`}>
+              <div>
+                <span className={`text-[8px] uppercase tracking-wider block ${isGravur ? "text-[#241F19]/60" : "text-subtle"}`}>Kadir</span>
+                <span className={isGravur ? "text-[#241F19]" : "text-bright"}>{selectedStar.mag.toFixed(2)}</span>
+              </div>
+              <div>
+                <span className={`text-[8px] uppercase tracking-wider block ${isGravur ? "text-[#241F19]/60" : "text-subtle"}`}>Yükseklik</span>
+                <span className={isGravur ? "text-[#241F19]" : "text-bright"}>{selectedStar.altitude.toFixed(1)}°</span>
+              </div>
             </div>
-            <div>
-              <span className={`text-[8px] uppercase tracking-wider block ${isGravur ? "text-[#241F19]/60" : "text-subtle"}`}>Yükseklik</span>
-              <span className={isGravur ? "text-[#241F19]" : "text-bright"}>{selectedStar.altitude.toFixed(1)}°</span>
-            </div>
-          </div>
-          <p className={`text-[11px] leading-relaxed italic mt-1.5 ${isGravur ? "text-[#5C5646] font-gravur-serif" : "text-subtle"}`}>
-            {getStarDescription(selectedStar.name, selectedStar.mag, selectedStar.type, selectedStar.kind)}
-          </p>
-        </div>
-      )}
+            <p className={`text-[11px] leading-relaxed italic mt-1.5 ${isGravur ? "text-[#5C5646] font-gravur-serif" : "text-subtle"}`}>
+              {getStarDescription(selectedStar.name, selectedStar.mag, selectedStar.type, selectedStar.kind)}
+            </p>
+          </div>,
+          document.body,
+        )}
     </div>
   );
 }

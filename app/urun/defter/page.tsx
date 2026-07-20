@@ -26,7 +26,7 @@ export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
   title: "Deri Defter — Astrifer",
-  description: "Kapağında adın, içinde o anın gerçek gökyüzü — premium suni deri ciltli, 26 sayfalık kişiye özel bir defter.",
+  description: "Kapağında adın, içinde o anın gerçek gökyüzü — premium suni deri ciltli, 27 sayfalık kişiye özel bir defter.",
 };
 
 
@@ -67,7 +67,7 @@ const MATERIAL_FEATURES = [
   "Premium suni deri, el işçiliği ciltleme",
   "Özel gofre (sıcak baskı) kapak deseni",
   "Altın yaldızlı sayfa kenarı",
-  "15 sayfa boş/çizgili, 26 sayfalık kitap",
+  "15 sayfa düz, çizgisiz yaprak, 27 sayfalık kitap",
   "Birlikte Anılarımız fotoğraf sayfası (4 foto)",
   "Gelecek Mektubu — ileri tarihe mühürlü mektup",
   "Hediye altın renkli kalem",
@@ -149,7 +149,7 @@ export default async function JournalProductPage() {
                 </h1>
                 <div className="mx-auto mt-3 max-w-xl text-sm text-subtle sm:text-base lg:mx-0">
                   <span>
-                    Premium suni deri ciltli, 26 sayfalık kişiye özel bir defter — kapakta gerçek
+                    Premium suni deri ciltli, 27 sayfalık kişiye özel bir defter — kapakta gerçek
                     yıldız haritan, içinde anılarınız ve mühürlü bir gelecek mektubu.{" "}
                   </span>
                   {journalOriginalPrice > journalPrice ? (
@@ -175,7 +175,7 @@ export default async function JournalProductPage() {
                     href="#icindekiler"
                     className="font-mono text-[11px] uppercase tracking-widest text-dim transition-colors hover:text-iris-light"
                   >
-                    26 sayfayı keşfedin ↓
+                    27 sayfayı keşfedin ↓
                   </a>
                 </div>
               </div>
@@ -214,6 +214,30 @@ export default async function JournalProductPage() {
             </div>
           </header>
 
+          <RevealOnScroll>
+            <div className="relative mb-14 overflow-hidden rounded-2xl border border-text/10">
+              <div className="aspect-[16/10] w-full sm:aspect-[21/9]">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src="https://images.unsplash.com/photo-1725301194000-fe2a498b5a7d?w=1600&auto=format&fit=crop&q=70"
+                  alt="Karanlıkta elde tutulan, aydınlanan bir defter"
+                  className="h-full w-full object-cover"
+                  loading="lazy"
+                />
+              </div>
+              <div
+                className="pointer-events-none absolute inset-0"
+                style={{ background: "linear-gradient(0deg, rgba(5,6,13,.95) 6%, rgba(5,6,13,.45) 46%, rgba(5,6,13,.72) 100%)" }}
+              />
+              <div className="absolute inset-x-0 bottom-0 flex flex-col items-center gap-2 px-6 pb-6 text-center sm:pb-9">
+                <p className="font-mono text-[10px] uppercase tracking-[0.3em] text-amber">Gerçek Bir An</p>
+                <p className="max-w-xl font-display text-lg italic text-bright sm:text-2xl">
+                  Karanlıkta bile parlayan, elinizde tuttuğunuz gerçek bir kayıt.
+                </p>
+              </div>
+            </div>
+          </RevealOnScroll>
+
           <div id="icindekiler" className="mb-10">
             <RevealOnScroll>
               <HomeSectionHeading eyebrow="Keşfedin" title="Defterin sayfalarını çevirerek inceleyin." />
@@ -222,6 +246,11 @@ export default async function JournalProductPage() {
               <JournalShowcase
                 sky={sky}
                 title={source.title}
+                eventDateUtc={source.eventDateUtc}
+                timezone={source.timezone}
+                locationName={source.locationName}
+                latitude={source.latitude}
+                longitude={source.longitude}
                 memoryPhotos={memoryPhotos}
                 journalPrice={journalPrice}
                 journalOriginalPrice={journalOriginalPrice}
@@ -238,7 +267,7 @@ export default async function JournalProductPage() {
                 <div className="grid gap-6 sm:grid-cols-2 sm:gap-8">
                   <div className="mx-auto w-full max-w-[240px]">
                     <LazyMount placeholderClassName="aspect-[3/4] w-full">
-                      <BackCoverPage />
+                      <BackCoverPage qrUrl={qrUrl} />
                     </LazyMount>
                   </div>
                   <div className="mx-auto w-full max-w-[240px]">
@@ -250,10 +279,10 @@ export default async function JournalProductPage() {
                   </div>
                 </div>
                 <p className="mt-8 text-sm leading-relaxed text-subtle">
-                  Kitabın arka kapağında mühürlü bir cep var — kendi Gelecek Mektubunuz buraya, kitabın kendi
-                  sayfalarından ayrı ve kapalı olarak yerleştirilir. Belirlediğiniz açılış tarihine kadar kimse
-                  okuyamaz. Krem renkli kart bilerek kitabın gece temasından farklı: bu sayfa kitaba hiç girmiyor,
-                  yalnızca cebe konuyor.
+                  Kitabın arka kapağında hem mühürlü bir cep hem de gerçek, taranabilir bir QR kod var — kendi
+                  Gelecek Mektubunuz cebe, kitabın kendi sayfalarından ayrı ve kapalı olarak yerleştirilir.
+                  Belirlediğiniz açılış tarihine kadar kimse okuyamaz. Krem renkli kart bilerek kitabın gece
+                  temasından farklı: bu sayfa kitaba hiç girmiyor, yalnızca cebe konuyor.
                 </p>
               </AtlasPanel>
             </RevealOnScroll>

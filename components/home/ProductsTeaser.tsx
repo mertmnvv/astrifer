@@ -181,7 +181,7 @@ export function ProductsTeaser({ pricing }: { pricing: PricingConfig }) {
         { text: "Premium suni deri, el işçiliği ciltleme", iconKey: "leather" },
         { text: "Özel gofre (sıcak baskı) kapak deseni", iconKey: "gofre" },
         { text: "Altın yaldızlı sayfa kenarı", iconKey: "gold" },
-        { text: "15 sayfa boş/çizgili, 26 sayfalık kitap", iconKey: "pages" },
+        { text: "15 sayfa boş/çizgili, 27 sayfalık kitap", iconKey: "pages" },
         { text: "Birlikte Anılarımız fotoğraf sayfası (4 foto)", iconKey: "gallery" },
         { text: "Gelecek Mektubu — ileri tarihe mühürlü mektup", iconKey: "letter" },
         { text: "Hediye altın renkli kalem", iconKey: "pen" },

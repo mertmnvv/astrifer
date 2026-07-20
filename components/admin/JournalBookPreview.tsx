@@ -2,10 +2,11 @@ import type { ReactNode } from "react";
 import { JournalThemeProvider } from "@/components/journal/JournalThemeContext";
 import { BackCoverPage } from "@/components/journal/night/BackCoverPage";
 import { BlankPage } from "@/components/journal/night/BlankPage";
+import { DedicationPage } from "@/components/journal/night/DedicationPage";
 import { EssayPage } from "@/components/journal/night/EssayPage";
+import { LetterNoticePage } from "@/components/journal/night/LetterNoticePage";
 import { MemoryPage } from "@/components/journal/night/MemoryPage";
 import { NightCoverPage } from "@/components/journal/night/NightCoverPage";
-import { QrPage } from "@/components/journal/night/QrPage";
 import { StarKeyPage } from "@/components/journal/night/StarKeyPage";
 import { StarMapSpreadPage } from "@/components/journal/night/StarMapSpreadPage";
 import { buildJournalPreviewData, MEMORY_CAPTION_FALLBACK } from "@/lib/journalPreviewData";
@@ -40,7 +41,7 @@ function PageCard({
 
 /**
  * Full, physical-book-order preview of every distinct Deri Defter page kind
- * (13 unique renders standing in for the real 26-page book — the 15 blank
+ * (14 unique renders standing in for the real 27-page book — the 15 blank
  * slots are visually identical, so they're shown once with an "× 15" badge).
  * Renders the same live React components the print pipeline screenshots,
  * unsized (no widthPx/heightPx) so they lay out responsively for on-screen
@@ -56,34 +57,44 @@ export function JournalBookPreview({ starMap }: { starMap: StarMapRecord }) {
           <NightCoverPage names={starMap.title} />
         </PageCard>
         <PageCard label="Sayfa 2 — Yıldız Haritası">
-          <StarMapSpreadPage sky={sky} numberedStars={page1Stars} />
+          <StarMapSpreadPage sky={sky} numberedStars={page1Stars} azimuthFrom={0} azimuthTo={180} />
         </PageCard>
         <PageCard label="Sayfa 3 — Yıldız Haritası">
-          <StarMapSpreadPage sky={sky} numberedStars={page2Stars} />
+          <StarMapSpreadPage sky={sky} numberedStars={page2Stars} azimuthFrom={180} azimuthTo={360} />
         </PageCard>
-        <PageCard label="Sayfa 4 — Yıldız Anahtarı" wide>
+        <PageCard label="Sayfa 4 — Seyir Kaydı">
+          <DedicationPage
+            names={starMap.title}
+            eventDateUtc={starMap.eventDateUtc}
+            timezone={starMap.timezone}
+            locationName={starMap.locationName}
+            latitude={starMap.latitude}
+            longitude={starMap.longitude}
+          />
+        </PageCard>
+        <PageCard label="Sayfa 5 — Yıldız Anahtarı" wide>
           <StarKeyPage numberedStars={[...page1Stars, ...page2Stars]} narrative={narrative} />
         </PageCard>
         {[0, 1, 2, 3].map((index) => {
           const photo = memoryPhotos[index] ?? {};
           const caption = photo.caption ?? MEMORY_CAPTION_FALLBACK[index] ?? "";
           return (
-            <PageCard key={index} label={`Sayfa ${5 + index} — Birlikte Anılarımız`}>
+            <PageCard key={index} label={`Sayfa ${6 + index} — Birlikte Anılarımız`}>
               <MemoryPage photo={photo} caption={caption} />
             </PageCard>
           );
         })}
-        <PageCard label="Sayfa 9 — Günün Anlamı" wide>
+        <PageCard label="Sayfa 10 — Günün Anlamı" wide>
           <EssayPage essay={essay} />
         </PageCard>
-        <PageCard label="Sayfa 10–24 — Boş" badge="× 15">
+        <PageCard label="Sayfa 11–25 — Boş" badge="× 15">
           <BlankPage />
         </PageCard>
-        <PageCard label="Sayfa 25 — QR">
-          <QrPage qrUrl={qrUrl} />
+        <PageCard label="Sayfa 26 — Gelecek Mektubu Notu">
+          <LetterNoticePage />
         </PageCard>
-        <PageCard label="Sayfa 26 — Arka Kapak">
-          <BackCoverPage />
+        <PageCard label="Sayfa 27 — Arka Kapak + QR">
+          <BackCoverPage qrUrl={qrUrl} />
         </PageCard>
       </div>
     </JournalThemeProvider>

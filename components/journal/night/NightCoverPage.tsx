@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { drawLogoThinStar } from "@/components/astrolab/drawLogoThinStar";
+import { drawCompassRing, drawLogoThinStar } from "@/components/astrolab/drawLogoThinStar";
 import { useJournalTheme } from "@/components/journal/JournalThemeContext";
 import { drawNightLeatherTexture } from "./drawNightLeatherTexture";
 import { NightPageShell } from "./NightPageShell";
@@ -49,7 +49,9 @@ export function NightCoverPage({ names, widthPx, heightPx }: NightCoverPageProps
       canvas.style.height = `${height}px`;
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
       drawNightLeatherTexture(ctx, width, height, theme.leather);
-      drawLogoThinStar(ctx, width * 0.5, height * 0.14, Math.min(width, height) * 0.075, theme.accentMetal);
+      const markR = Math.min(width, height) * 0.075;
+      drawCompassRing(ctx, width * 0.5, height * 0.155, markR * 1.55, theme.accentMetal);
+      drawLogoThinStar(ctx, width * 0.5, height * 0.155, markR, theme.accentMetal);
       setReady(true);
       if (!isFixedSize) setPreviewWidth(width);
     };
@@ -79,7 +81,7 @@ export function NightCoverPage({ names, widthPx, heightPx }: NightCoverPageProps
       <div ref={containerRef} className="absolute inset-0">
         <canvas ref={canvasRef} className="absolute inset-0 h-full w-full" />
       </div>
-      <div className="absolute inset-x-0 top-[24%] flex flex-col items-center gap-2 px-2">
+      <div className="absolute inset-x-0 top-[31%] flex flex-col items-center gap-2 px-2">
         <p
           className={`font-mono text-center font-bold uppercase ${isFixedSize ? "text-base tracking-[0.4em]" : ""}`}
           style={{
@@ -89,6 +91,16 @@ export function NightCoverPage({ names, widthPx, heightPx }: NightCoverPageProps
           }}
         >
           Astrifer
+        </p>
+        <p
+          className={`font-mono text-center uppercase opacity-70 ${isFixedSize ? "text-[7px] tracking-[0.3em]" : ""}`}
+          style={{
+            color: theme.accentMetal,
+            fontSize: wordmarkFontSize ? wordmarkFontSize * 0.42 : undefined,
+            letterSpacing: wordmarkFontSize ? wordmarkFontSize * 0.28 : undefined,
+          }}
+        >
+          Seyir Kaydı
         </p>
       </div>
       <div className="absolute inset-x-0 bottom-[18%] flex flex-col items-center gap-2 px-3">

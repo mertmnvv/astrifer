@@ -13,6 +13,7 @@ import { SkyPaletteSwatchPicker } from "@/components/ui/SkyPaletteSwatchPicker";
 import { JournalThemeSwatchPicker } from "@/components/ui/JournalThemeSwatchPicker";
 import { SKY_PALETTES, DEFAULT_SKY_PALETTE } from "@/components/astrolab/palettes";
 import { NightCoverPage } from "@/components/journal/night/NightCoverPage";
+import { DedicationPage } from "@/components/journal/night/DedicationPage";
 import { getJournalTheme, type JournalThemeId, PALETTE_TO_JOURNAL_THEME } from "@/components/journal/night/journalTheme";
 import { JournalThemeProvider } from "@/components/journal/JournalThemeContext";
 import { StarMapSpreadPage } from "@/components/journal/night/StarMapSpreadPage";
@@ -22,7 +23,7 @@ import { EssayPage } from "@/components/journal/night/EssayPage";
 import { BlankPage } from "@/components/journal/night/BlankPage";
 import { getYoutubeId } from "@/components/journal/MusicContext";
 import { BackCoverPage } from "@/components/journal/night/BackCoverPage";
-import { QrPage } from "@/components/journal/night/QrPage";
+import { LetterNoticePage } from "@/components/journal/night/LetterNoticePage";
 import { BookFlip } from "@/components/journal/BookFlip";
 import { pickNumberedStars, splitSkyByAzimuth } from "@/components/journal/starMapSpread";
 import { buildSkyEssay, buildSkyNarrative } from "@/lib/astronomy/skyNarrative";
@@ -441,6 +442,17 @@ export function CreateForm({ templates, pricing }: CreateFormProps) {
     });
   }, [sky]);
 
+  const previewDedication = useMemo(
+    () => ({
+      eventDateUtc: eventDateUtc ?? new Date("2026-07-15T21:00:00.000Z"),
+      timezone: place?.timezone ?? "Europe/Istanbul",
+      locationName: place?.name ?? "İstanbul",
+      latitude: place?.latitude ?? 41.0082,
+      longitude: place?.longitude ?? 28.9784,
+    }),
+    [eventDateUtc, place],
+  );
+
   const previewSlug = slugify(title) || "senin-sayfan";
 
   const buildShareParams = (currentPlace: PlaceResult, currentEventDateUtc: Date) => {
@@ -487,10 +499,20 @@ export function CreateForm({ templates, pricing }: CreateFormProps) {
     return [
       // 0: Cover
       <NightCoverPage key="cover" names={title.trim() || "İsim & İsim"} />,
-      // 1: StarMap Left
-      <StarMapSpreadPage key="map-left" sky={previewSky} numberedStars={page1Stars} />,
+      // 1: StarMap Left — pairs with #2 as one continuous panorama (react-pageflip showCover pairing)
+      <StarMapSpreadPage key="map-left" sky={previewSky} numberedStars={page1Stars} azimuthFrom={0} azimuthTo={180} />,
       // 2: StarMap Right
-      <StarMapSpreadPage key="map-right" sky={previewSky} numberedStars={page2Stars} />,
+      <StarMapSpreadPage key="map-right" sky={previewSky} numberedStars={page2Stars} azimuthFrom={180} azimuthTo={360} />,
+      // 3: Dedication / Seyir Kaydı
+      <DedicationPage
+        key="dedication"
+        names={title.trim() || "İsim & İsim"}
+        eventDateUtc={previewDedication.eventDateUtc}
+        timezone={previewDedication.timezone}
+        locationName={previewDedication.locationName}
+        latitude={previewDedication.latitude}
+        longitude={previewDedication.longitude}
+      />,
       // 3: StarKey Page
       <div key="key" className="h-full w-full bg-void">
         <ScaledPreview designWidth={600} designHeight={800} className="h-full w-full">
@@ -515,12 +537,12 @@ export function CreateForm({ templates, pricing }: CreateFormProps) {
       <BlankPage key="blank-9" />,
       // 10: Blank Page
       <BlankPage key="blank-10" />,
-      // 11: QR Code Page
-      <QrPage key="qr-page" qrUrl={previewHref || "https://astrifer.com/s/preview"} />,
-      // 12: Back Cover
-      <BackCoverPage key="back-cover" />,
+      // 11: Letter Notice
+      <LetterNoticePage key="letter-notice" />,
+      // 12: Back Cover + QR
+      <BackCoverPage key="back-cover" qrUrl={previewHref || "https://astrifer.com/s/preview"} />,
     ];
-  }, [previewSky, title, photos, previewHref]);
+  }, [previewSky, title, photos, previewHref, previewDedication]);
 
   const previewDateLine = useMemo(() => {
     if (!place || !eventDateUtc) return "Tarih ve konum bekleniyor";
@@ -987,7 +1009,7 @@ export function CreateForm({ templates, pricing }: CreateFormProps) {
               <AddOnCheckbox checked={journalEnabled} />
             </div>
             <div className="flex items-center justify-between gap-2">
-              <span className="text-[11px] text-dim">Suni deri · 26 sayfa</span>
+              <span className="text-[11px] text-dim">Suni deri · 27 sayfa</span>
               <span className="font-mono text-xs text-iris-light flex items-center gap-1.5">
                 {pricing.journalOriginalPrice > pricing.journalPrice ? (
                   <>

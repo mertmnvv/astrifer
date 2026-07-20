@@ -283,7 +283,7 @@ export default async function AdminOrderDetailPage({ params }: { params: { id: s
               <div className="mt-6 grid gap-6 border-t border-text/10 pt-5 sm:grid-cols-2">
                 <div className="flex flex-col items-start gap-3">
                   <p className="font-mono text-[9px] uppercase tracking-widest text-dim">
-                    Baskıya Hazır PDF — 26 sayfa, 300 DPI
+                    Baskıya Hazır PDF — 27 sayfa, 300 DPI
                   </p>
                   <form action={renderJournalPrintFilesAction}>
                     <input type="hidden" name="orderId" value={order.id} />
