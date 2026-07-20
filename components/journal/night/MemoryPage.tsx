@@ -1,6 +1,7 @@
 "use client";
 
 import { useJournalTheme } from "@/components/journal/JournalThemeContext";
+import { cloudinaryTransform } from "@/lib/cloudinary/transformUrl";
 import type { StarMapPhoto } from "@/lib/starmaps";
 import { NightPageShell } from "./NightPageShell";
 
@@ -59,7 +60,11 @@ export function MemoryPage({ photo, caption, widthPx, heightPx }: MemoryPageProp
           >
             {photo.url ? (
               // eslint-disable-next-line @next/next/no-img-element
-              <img src={photo.url} alt={caption} className="h-full w-full object-cover" />
+              <img
+                src={cloudinaryTransform(photo.url, widthPx ?? 900)}
+                alt={caption}
+                className="h-full w-full object-cover"
+              />
             ) : (
               <svg viewBox="0 0 24 24" fill="none" stroke={theme.accentMetal} strokeWidth="1.2" className="w-[22%] opacity-50">
                 <path d="M4 16l4.5-6 3.5 4 2.5-3L20 16" strokeLinecap="round" strokeLinejoin="round" />

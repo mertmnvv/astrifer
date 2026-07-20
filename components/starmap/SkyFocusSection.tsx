@@ -1,10 +1,16 @@
 "use client";
 
 import { useState } from "react";
-import { CelestialGlobe3D } from "./CelestialGlobe3D";
+import dynamic from "next/dynamic";
 import type { SkyPalette } from "@/components/astrolab/palettes";
 import { LedgerRule } from "@/components/atlas/LedgerRule";
 import type { ComputeSkyResult } from "@/lib/astronomy/computeSky";
+
+/** Three.js is ~600KB+ min — keep it out of the initial bundle, only fetch client-side once this section mounts. */
+const CelestialGlobe3D = dynamic(
+  () => import("./CelestialGlobe3D").then((mod) => mod.CelestialGlobe3D),
+  { ssr: false, loading: () => <div className="h-full w-full animate-pulse bg-panel/40" /> },
+);
 
 
 export interface SkyFocusSectionProps {

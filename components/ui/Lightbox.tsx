@@ -2,6 +2,7 @@
 
 import { useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import { cloudinaryTransform } from "@/lib/cloudinary/transformUrl";
 
 export interface LightboxProps {
   url: string | null;
@@ -53,7 +54,7 @@ export function Lightbox({ url, caption, onClose }: LightboxProps) {
           >
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
-              src={url}
+              src={cloudinaryTransform(url, 1400)}
               alt={caption ?? "Büyütülmüş fotoğraf"}
               className="max-w-full max-h-[62vh] object-contain rounded-lg"
             />

@@ -1,17 +1,26 @@
 "use client";
 
+import { useEffect, useState } from "react";
+import dynamic from "next/dynamic";
 import Link from "next/link";
 import { motion } from "framer-motion";
 import { StarChart } from "@/components/astrolab/StarChart";
-import { DEFAULT_SKY_PALETTE } from "@/components/astrolab/palettes";
+import { getSkyPalette } from "@/components/astrolab/palettes";
 import { ScrollCue } from "@/components/ui/ScrollCue";
 import { AuroraField } from "@/components/home/AuroraField";
+import { MusicProvider } from "@/components/journal/MusicContext";
 import { usePrefersReducedMotion } from "@/lib/hooks/usePrefersReducedMotion";
 import type { ComputeSkyResult } from "@/lib/astronomy/computeSky";
 
 export interface HeroProps {
   sky: ComputeSkyResult;
 }
+
+/** Three.js is ~600KB+ min — keep it out of the initial bundle and only fetch it once the hero mounts client-side. */
+const CelestialGlobe3D = dynamic(
+  () => import("@/components/starmap/CelestialGlobe3D").then((mod) => mod.CelestialGlobe3D),
+  { ssr: false, loading: () => <div className="h-full w-full animate-pulse rounded-full bg-nebula/60" /> },
+);
 
 const containerVariants = {
   hidden: {},
@@ -23,12 +32,41 @@ const itemVariants = {
   show: { opacity: 1, y: 0, transition: { duration: 0.9, ease: [0.16, 1, 0.3, 1] as const } },
 };
 
-export function Hero({ sky }: HeroProps) {
-  const reducedMotion = usePrefersReducedMotion();
-  const palette = DEFAULT_SKY_PALETTE;
+/** Ticks every second so the hero badge reads as "this instant," not a cached render. */
+function LiveClockBadge() {
+  const [label, setLabel] = useState<string | null>(null);
+
+  useEffect(() => {
+    const format = () =>
+      new Date().toLocaleTimeString("tr-TR", {
+        timeZone: "Europe/Istanbul",
+        hour: "2-digit",
+        minute: "2-digit",
+        second: "2-digit",
+      });
+    setLabel(format());
+    const id = setInterval(() => setLabel(format()), 1000);
+    return () => clearInterval(id);
+  }, []);
 
   return (
-    <section className="relative flex min-h-screen flex-col items-center justify-center overflow-hidden bg-nebula px-4 pb-12 pt-28 text-center sm:px-8 select-none">
+    <div className="pointer-events-none flex flex-col items-center gap-1">
+      <span className="rounded-full border border-iris/25 bg-nebula/70 px-3.5 py-1 font-mono text-[9px] tracking-[0.2em] text-bright backdrop-blur-sm">
+        ŞU AN İSTANBUL GÖKYÜZÜ
+      </span>
+      <span className="font-mono text-[8px] tracking-[0.2em] text-dim tabular-nums">
+        {label ?? "--:--:--"}
+      </span>
+    </div>
+  );
+}
+
+export function Hero({ sky }: HeroProps) {
+  const reducedMotion = usePrefersReducedMotion();
+  const palette = getSkyPalette("derin-mor");
+
+  return (
+    <section className="relative flex min-h-screen flex-col items-center overflow-hidden bg-nebula px-4 pb-14 pt-28 text-center sm:px-8 select-none">
       {/* Ambient drifting nebula clouds */}
       <AuroraField />
 
@@ -36,7 +74,7 @@ export function Hero({ sky }: HeroProps) {
       <div className="absolute inset-0 z-0 opacity-[0.3] pointer-events-none mix-blend-screen">
         <StarChart
           sky={sky}
-          label="Örnek bir zaman kapsülünün arka plan gökyüzü"
+          label="Şu anın gerçek gökyüzü, arka plan dokusu"
           palette={palette}
           showLabels={false}
           className="h-full w-full object-cover"
@@ -44,67 +82,35 @@ export function Hero({ sky }: HeroProps) {
       </div>
 
       {/* Darken edges for text contrast, tinted with nebula colors */}
-      <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_45%,rgba(167,139,250,0.10)_0%,rgba(7,5,15,0.7)_55%,#07050f_100%)] pointer-events-none z-0" />
-
-      {/* Centerpiece: star medallion with a violet-to-rose aurora ring */}
-      <div className="absolute inset-0 flex items-center justify-center pointer-events-none overflow-hidden z-10">
-        <div className="relative flex items-center justify-center w-[300px] h-[300px] sm:w-[480px] sm:h-[480px] lg:w-[560px] lg:h-[560px]">
-          <div className="absolute inset-0 rounded-full bg-[conic-gradient(from_90deg,rgba(167,139,250,0.18),rgba(244,114,182,0.14),rgba(96,165,250,0.14),rgba(167,139,250,0.18))] blur-3xl animate-aurora-drift-slow" />
-
-          <div className="absolute w-[220px] h-[220px] sm:w-[340px] sm:h-[340px] lg:w-[400px] lg:h-[400px] rounded-full overflow-hidden border border-iris/25 shadow-[0_0_70px_rgba(167,139,250,0.15)] pointer-events-auto bg-nebula/90">
-            <StarChart
-              sky={sky}
-              label="Örnek gökyüzü haritası"
-              palette={palette}
-              showLabels={false}
-              interactive={true}
-              showControls={false}
-              className="h-full w-full opacity-70 scale-[1.03]"
-            />
-          </div>
-
-          <div className="absolute w-full h-full flex items-center justify-center">
-            <svg viewBox="0 0 100 100" className="w-[300px] h-[300px] sm:w-[480px] sm:h-[480px] lg:w-[560px] lg:h-[560px]">
-              <circle cx="50" cy="50" r="49" fill="none" stroke="rgba(167,139,250,0.2)" strokeWidth="0.4" strokeDasharray="1.5 2.5" />
-              <circle cx="50" cy="50" r="47.8" fill="none" stroke="rgba(244,114,182,0.1)" strokeWidth="0.2" />
-              <circle cx="50" cy="50" r="46" fill="none" stroke="rgba(96,165,250,0.12)" strokeWidth="0.4" strokeDasharray="0.3 6" />
-            </svg>
-          </div>
-        </div>
-      </div>
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_20%,rgba(167,139,250,0.10)_0%,rgba(7,5,15,0.7)_55%,#07050f_100%)] pointer-events-none z-0" />
 
       {/* Floating astronomical coordinates */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none hidden sm:block z-10">
-        <div className="absolute left-[8%] top-[22%] font-mono text-[9px] tracking-[0.25em] text-dim select-none">
+        <div className="absolute left-[6%] top-[18%] font-mono text-[9px] tracking-[0.25em] text-dim select-none">
           RA 14h 15m 39.7s <br />
           DEC +19° 10′ 56″
         </div>
-        <div className="absolute right-[8%] top-[25%] font-mono text-[9px] tracking-[0.25em] text-dim text-right select-none">
+        <div className="absolute right-[6%] top-[18%] font-mono text-[9px] tracking-[0.25em] text-dim text-right select-none">
           ALT +42.15° <br />
           AZ 198.34° (SSW)
         </div>
-        <div className="absolute left-[10%] bottom-[20%] font-mono text-[9px] tracking-[0.25em] text-dim select-none">
+        <div className="absolute left-[7%] bottom-[8%] font-mono text-[9px] tracking-[0.25em] text-dim select-none">
           LAT 41.0082° N <br />
           LON 28.9784° E
         </div>
-        <div className="absolute right-[10%] bottom-[22%] font-mono text-[9px] tracking-[0.25em] text-dim text-right select-none">
+        <div className="absolute right-[7%] bottom-[8%] font-mono text-[9px] tracking-[0.25em] text-dim text-right select-none">
           JD 2461238.29 <br />
           EPOCH J2000.0
         </div>
       </div>
 
-      {/* Glassmorphic overlay content card */}
+      {/* Text block — sits above the globe, never overlaps it */}
       <motion.div
         variants={containerVariants}
         initial={reducedMotion ? "show" : "hidden"}
         animate="show"
-        className="relative z-20 w-full max-w-[92%] sm:max-w-[440px] lg:max-w-[480px] rounded-3xl border border-iris/20 bg-nebula/50 px-6 py-8 sm:px-10 sm:py-10 shadow-[0_50px_100px_-20px_rgba(0,0,0,0.85)] backdrop-blur-xl flex flex-col items-center group hover:border-iris/35 transition-colors duration-500"
+        className="relative z-20 flex w-full max-w-xl flex-col items-center"
       >
-        <div className="absolute top-3.5 left-3.5 w-3.5 h-3.5 border-t border-l border-iris/35 pointer-events-none" />
-        <div className="absolute top-3.5 right-3.5 w-3.5 h-3.5 border-t border-r border-flare/35 pointer-events-none" />
-        <div className="absolute bottom-3.5 left-3.5 w-3.5 h-3.5 border-b border-l border-flare/35 pointer-events-none" />
-        <div className="absolute bottom-3.5 right-3.5 w-3.5 h-3.5 border-b border-r border-iris/35 pointer-events-none" />
-
         <motion.div
           variants={itemVariants}
           className="rounded-full border border-iris/25 bg-iris/[0.06] px-4 py-1 flex items-center justify-center gap-1.5 shadow-sm"
@@ -117,14 +123,14 @@ export function Hero({ sky }: HeroProps) {
 
         <motion.h1
           variants={itemVariants}
-          className="mt-6 font-display text-3xl font-light italic leading-tight text-bright sm:text-4xl lg:text-[44px]"
+          className="mt-6 font-display text-3xl font-light italic leading-tight text-bright sm:text-4xl lg:text-[46px]"
         >
           O anın gerçek gökyüzü,<br className="hidden sm:block" /> sonsuza dek saklanacak bir hediye.
         </motion.h1>
 
         <motion.p
           variants={itemVariants}
-          className="mt-5 text-xs sm:text-[13px] leading-relaxed text-muted max-w-sm"
+          className="mt-5 text-xs sm:text-sm leading-relaxed text-muted max-w-md"
         >
           Doğum, ilk buluşma ya da evlilik teklifi... O anın gerçek astronomik gökyüzünü hesaplayıp kalıcı bir dijital sayfaya ve dilerseniz el yapımı suni deri bir deftere dönüştürün.
         </motion.p>
@@ -154,10 +160,46 @@ export function Hero({ sky }: HeroProps) {
         >
           299₺&apos;den başlayan fiyatlarla · Güvenli ödeme (PayTR)
         </motion.p>
+      </motion.div>
 
-        <motion.div variants={itemVariants} className="mt-6 flex items-center justify-center">
-          <ScrollCue />
-        </motion.div>
+      {/* Centerpiece: interactive 3D celestial globe, always the live sky —
+          its own row below the text, so nothing ever covers it. */}
+      <motion.div
+        variants={itemVariants}
+        initial={reducedMotion ? "show" : "hidden"}
+        animate="show"
+        className="relative z-20 mt-10 sm:mt-12 flex items-center justify-center"
+      >
+        <div className="relative flex items-center justify-center w-[280px] h-[280px] sm:w-[380px] sm:h-[380px] lg:w-[440px] lg:h-[440px]">
+          <div className="absolute inset-0 rounded-full bg-[conic-gradient(from_90deg,rgba(167,139,250,0.18),rgba(244,114,182,0.14),rgba(96,165,250,0.14),rgba(167,139,250,0.18))] blur-3xl animate-aurora-drift-slow" />
+
+          <div className="absolute w-[260px] h-[260px] sm:w-[350px] sm:h-[350px] lg:w-[400px] lg:h-[400px] rounded-full overflow-hidden border border-iris/25 shadow-[0_0_70px_rgba(167,139,250,0.15)] bg-nebula/90">
+            <MusicProvider src={null}>
+              <CelestialGlobe3D sky={sky} palette={palette} className="h-full w-full" />
+            </MusicProvider>
+          </div>
+
+          <div className="absolute w-full h-full flex items-center justify-center pointer-events-none">
+            <svg viewBox="0 0 100 100" className="w-full h-full">
+              <circle cx="50" cy="50" r="49" fill="none" stroke="rgba(167,139,250,0.2)" strokeWidth="0.4" strokeDasharray="1.5 2.5" />
+              <circle cx="50" cy="50" r="47.8" fill="none" stroke="rgba(244,114,182,0.1)" strokeWidth="0.2" />
+              <circle cx="50" cy="50" r="46" fill="none" stroke="rgba(96,165,250,0.12)" strokeWidth="0.4" strokeDasharray="0.3 6" />
+            </svg>
+          </div>
+
+          <div className="absolute -bottom-7 left-1/2 -translate-x-1/2">
+            <LiveClockBadge />
+          </div>
+        </div>
+      </motion.div>
+
+      <motion.div
+        variants={itemVariants}
+        initial={reducedMotion ? "show" : "hidden"}
+        animate="show"
+        className="relative z-20 mt-14 flex items-center justify-center"
+      >
+        <ScrollCue />
       </motion.div>
     </section>
   );

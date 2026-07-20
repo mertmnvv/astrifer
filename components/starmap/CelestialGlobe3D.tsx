@@ -144,7 +144,7 @@ export function CelestialGlobe3D({ sky, palette, className = "" }: CelestialGlob
 
     // 3. Renderer setup
     const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
-    renderer.setPixelRatio(window.devicePixelRatio);
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.75));
     renderer.setSize(width, height);
     container.appendChild(renderer.domElement);
     rendererRef.current = renderer;

@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import { cloudinaryTransform } from "@/lib/cloudinary/transformUrl";
 import { AuroraHeader } from "@/components/home/AuroraHeader";
 import { AuroraFooter } from "@/components/home/AuroraFooter";
 import { AuroraField } from "@/components/home/AuroraField";
@@ -414,7 +415,7 @@ export default function DigitalProductClient({ pricing }: { pricing: PricingConf
                         <div className="w-full aspect-square bg-[#eceae1] overflow-hidden rounded-sm relative">
                           {/* eslint-disable-next-line @next/next/no-img-element */}
                           <img
-                            src={foundingEntry?.photos[0]?.url}
+                            src={foundingEntry?.photos[0]?.url ? cloudinaryTransform(foundingEntry.photos[0].url, 400) : undefined}
                             alt="Örnek anı"
                             className="w-full h-full object-cover"
                           />
@@ -444,7 +445,7 @@ export default function DigitalProductClient({ pricing }: { pricing: PricingConf
                           <div className="w-full aspect-square bg-[#eceae1] overflow-hidden rounded-sm relative">
                             {/* eslint-disable-next-line @next/next/no-img-element */}
                             <img
-                              src={latestTimelineEntry?.photos[0]?.url}
+                              src={latestTimelineEntry?.photos[0]?.url ? cloudinaryTransform(latestTimelineEntry.photos[0].url, 400) : undefined}
                               alt="Eklenen anı"
                               className="w-full h-full object-cover"
                             />

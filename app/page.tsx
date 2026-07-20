@@ -46,8 +46,10 @@ function StructuredData({ siteUrl }: { siteUrl: string }) {
 }
 
 export default async function HomePage() {
+  // Hero always shows the real sky for this exact moment, not the demo date —
+  // it's the live proof that the astronomy is real, not decorative.
   const sky = computeSky({
-    date: DEMO_STAR_MAP.eventDateUtc,
+    date: new Date(),
     latitude: DEMO_STAR_MAP.latitude,
     longitude: DEMO_STAR_MAP.longitude,
   });

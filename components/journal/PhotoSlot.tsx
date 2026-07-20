@@ -1,3 +1,4 @@
+import { cloudinaryTransform } from "@/lib/cloudinary/transformUrl";
 import type { StarMapPhoto } from "@/lib/starmaps";
 
 export interface PhotoSlotProps {
@@ -29,7 +30,7 @@ export function PhotoSlot({ photo, rotateDeg, isPreviewMode = false, onImageClic
         {photo.url ? (
           // eslint-disable-next-line @next/next/no-img-element
           <img
-            src={photo.url}
+            src={cloudinaryTransform(photo.url, 500)}
             alt={photo.caption ?? "Anı fotoğrafı"}
             className="h-auto w-full object-contain cursor-zoom-in hover:opacity-95 transition-opacity"
             onClick={() => onImageClick?.(photo.url!, photo.caption ?? "")}

@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { JournalBookPreview } from "@/components/admin/JournalBookPreview";
+import { cloudinaryTransform } from "@/lib/cloudinary/transformUrl";
 import { getDb } from "@/lib/firebase/admin";
 import { isFirebaseConfigured } from "@/lib/firebase/isConfigured";
 import { formatTRY } from "@/lib/pricing";
@@ -156,7 +157,7 @@ export default async function AdminOrderDetailPage({ params }: { params: { id: s
                           {photo.url ? (
                             // eslint-disable-next-line @next/next/no-img-element
                             <img
-                              src={photo.url}
+                              src={cloudinaryTransform(photo.url, 500)}
                               alt={photo.caption || `Fotoğraf ${idx + 1}`}
                               className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
                             />
