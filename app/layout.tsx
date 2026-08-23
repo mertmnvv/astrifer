@@ -1,11 +1,11 @@
 import type { Metadata } from "next";
-import { Instrument_Serif, JetBrains_Mono, Hanken_Grotesk, Spectral, EB_Garamond, Cormorant_SC } from "next/font/google";
+import { Cormorant_Garamond, JetBrains_Mono, Manrope, Spectral, EB_Garamond, Cormorant_SC } from "next/font/google";
 import { GoogleAnalytics } from "@/components/analytics/GoogleAnalytics";
 import "./globals.css";
 
-const displayFont = Instrument_Serif({
+const displayFont = Cormorant_Garamond({
   subsets: ["latin", "latin-ext"],
-  weight: "400",
+  weight: ["500", "600"],
   style: ["normal", "italic"],
   variable: "--font-display",
   display: "swap",
@@ -18,9 +18,9 @@ const monoFont = JetBrains_Mono({
   display: "swap",
 });
 
-const bodyFont = Hanken_Grotesk({
+const bodyFont = Manrope({
   subsets: ["latin", "latin-ext"],
-  weight: ["300", "400", "500", "600"],
+  weight: ["400", "500", "600", "700"],
   variable: "--font-body",
   display: "swap",
 });

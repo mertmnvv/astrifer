@@ -52,9 +52,9 @@ export default async function CreatePage() {
       <main className="archive-shell min-h-screen px-4 pb-16 pt-12 sm:px-8 sm:pb-24 sm:pt-16">
         <div className="mx-auto max-w-6xl">
           <div className="mb-10 max-w-3xl sm:mb-14">
-            <p className="archive-kicker text-[#c79a52]">Astrifer arşiv oluşturucu · V2</p>
-            <h1 className="mt-4 font-display text-4xl leading-tight text-white sm:text-6xl">Önce anınızı anlatın.<br /><em className="text-[#c79a52]">Gökyüzünü biz çıkaralım.</em></h1>
-            <p className="mt-5 max-w-2xl text-sm leading-6 text-[#aeb5ba]">Bilgileriniz kaybolmaz; her adımda geri dönebilir, satın almadan önce gerçek sayfanızı yeni sekmede inceleyebilirsiniz.</p>
+            <p className="archive-kicker text-[#5eead4]">Astrifer gece oluşturucu</p>
+            <h1 className="archive-display-balanced mt-5 text-5xl leading-[0.92] text-white sm:text-7xl">Önce anınızı anlatın.<br /><em className="font-medium text-[#79f3df]">Gökyüzünü biz canlandıralım.</em></h1>
+            <p className="mt-6 max-w-2xl text-sm leading-7 text-[#9fb4ca]">Bilgileriniz kaybolmaz; her adımda geri dönebilir, satın almadan önce gerçek 3D sayfanızı yeni sekmede inceleyebilirsiniz.</p>
           </div>
           <CreateFormV2 templates={templates} pricing={pricing} />
         </div>

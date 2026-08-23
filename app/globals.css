@@ -6,13 +6,16 @@
   --font-display: serif;
   --font-mono: monospace;
   --font-body: sans-serif;
-  --archive-ink: #0b1118;
-  --archive-ink-soft: #111b25;
-  --archive-paper: #f2eee4;
-  --archive-paper-dim: #d8d1c2;
-  --archive-brass: #c79a52;
-  --archive-rust: #a64d3d;
-  --archive-line: rgba(242, 238, 228, 0.16);
+  --archive-ink: #020711;
+  --archive-ink-soft: #071426;
+  --archive-paper: #eaf4ff;
+  --archive-paper-dim: #9fb4ca;
+  --archive-brass: #5eead4;
+  --archive-rust: #9a8cf0;
+  --archive-line: rgba(157, 210, 255, 0.16);
+  --night-cobalt: #1d5f9e;
+  --night-violet: #9a8cf0;
+  --night-aurora: #5eead4;
 }
 
 html {
@@ -23,23 +26,72 @@ body {
   background: #0b0810;
 }
 
-/* Astrifer V2 — “Gökyüzü Arşivi”. Aurora/neon yerine baskı, katalog ve
-   gözlemevi estetiğini birleştiren sakin ve ürün-odaklı yüzeyler. */
+/* Astrifer Night Archive — gerçek gece fotoğrafçılığı, gözlemevi arayüzü
+   ve kontrollü kutup ışığı renklerini birleştiren sinematik ürün dili. */
 .archive-shell {
   min-height: 100vh;
   color: var(--archive-paper);
   background-color: var(--archive-ink);
   background-image:
-    linear-gradient(rgba(242, 238, 228, 0.035) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(242, 238, 228, 0.035) 1px, transparent 1px);
-  background-size: 48px 48px;
+    linear-gradient(180deg, rgba(2, 7, 17, 0.2), rgba(2, 7, 17, 0.92) 72%, #020711),
+    radial-gradient(circle at 75% 12%, rgba(29, 95, 158, 0.16), transparent 34%),
+    url("/images/astrifer-night-cosmos-v1.png");
+  background-attachment: fixed;
+  background-position: center top;
+  background-repeat: no-repeat;
+  background-size: cover;
+}
+
+.archive-shell .font-display {
+  letter-spacing: -0.018em;
+}
+
+.archive-display-balanced {
+  font-family: var(--font-display), serif;
+  font-weight: 600;
+  letter-spacing: -0.025em;
+  text-wrap: balance;
+}
+
+.archive-globe-frame {
+  position: relative;
+  border: 1px solid rgba(199, 154, 82, 0.34);
+  background: #050910;
+  box-shadow: 0 35px 100px rgba(0, 0, 0, 0.42), inset 0 0 0 1px rgba(255, 255, 255, 0.035);
+}
+
+.archive-globe-frame::before,
+.archive-globe-frame::after {
+  position: absolute;
+  z-index: 2;
+  width: 34px;
+  height: 34px;
+  content: "";
+  pointer-events: none;
+}
+
+.archive-globe-frame::before {
+  top: -1px;
+  left: -1px;
+  border-top: 2px solid var(--archive-brass);
+  border-left: 2px solid var(--archive-brass);
+}
+
+.archive-globe-frame::after {
+  right: -1px;
+  bottom: -1px;
+  border-right: 2px solid var(--archive-brass);
+  border-bottom: 2px solid var(--archive-brass);
 }
 
 .archive-paper {
-  color: #19212a;
-  background-color: var(--archive-paper);
-  background-image: radial-gradient(rgba(25, 33, 42, 0.08) 0.7px, transparent 0.7px);
-  background-size: 6px 6px;
+  color: var(--archive-paper);
+  background-color: rgba(5, 15, 31, 0.94);
+  background-image:
+    linear-gradient(rgba(157, 210, 255, 0.035) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(157, 210, 255, 0.035) 1px, transparent 1px);
+  background-size: 44px 44px;
+  border-block: 1px solid rgba(157, 210, 255, 0.1);
 }
 
 .archive-kicker {
@@ -51,9 +103,10 @@ body {
 }
 
 .archive-frame {
-  border: 1px solid var(--archive-line);
-  background: rgba(17, 27, 37, 0.82);
-  box-shadow: 0 22px 70px rgba(0, 0, 0, 0.24);
+  border: 1px solid rgba(94, 234, 212, 0.18);
+  background: linear-gradient(145deg, rgba(8, 26, 51, 0.88), rgba(3, 10, 24, 0.94));
+  box-shadow: 0 26px 90px rgba(0, 4, 15, 0.48), inset 0 1px rgba(255, 255, 255, 0.025);
+  backdrop-filter: blur(18px);
 }
 
 .archive-button-primary,
@@ -74,7 +127,8 @@ body {
 .archive-button-primary {
   border: 1px solid var(--archive-brass);
   color: var(--archive-ink);
-  background: var(--archive-brass);
+  background: linear-gradient(135deg, #79f3df, #45cdbf);
+  box-shadow: 0 12px 35px rgba(94, 234, 212, 0.14);
 }
 
 .archive-button-secondary {
@@ -90,7 +144,18 @@ body {
 
 .archive-button-secondary:hover {
   border-color: var(--archive-paper);
-  background: rgba(242, 238, 228, 0.06);
+  background: rgba(94, 234, 212, 0.07);
+}
+
+.night-surface {
+  border: 1px solid rgba(157, 210, 255, 0.13);
+  background: linear-gradient(150deg, rgba(9, 28, 55, 0.9), rgba(4, 12, 28, 0.92));
+  box-shadow: 0 24px 70px rgba(0, 4, 16, 0.3);
+}
+
+.night-glow-text {
+  color: #79f3df;
+  text-shadow: 0 0 28px rgba(94, 234, 212, 0.2);
 }
 
 .create-v2 .bg-nebula,

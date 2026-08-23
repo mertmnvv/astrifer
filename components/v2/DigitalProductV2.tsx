@@ -1,6 +1,6 @@
 /* eslint-disable @next/next/no-img-element */
 import Link from "next/link";
-import { StarChart } from "@/components/astrolab/StarChart";
+import { CelestialGlobe3D } from "@/components/starmap/CelestialGlobe3D";
 import { getSkyPalette } from "@/components/astrolab/palettes";
 import { computeSky } from "@/lib/astronomy/computeSky";
 import { formatTRY } from "@/lib/pricing";
@@ -16,46 +16,16 @@ export function DigitalProductV2({ pricing }: { pricing: PricingConfig }) {
 
   return (
     <main>
-      <section className="mx-auto grid max-w-7xl gap-12 px-4 py-16 sm:px-8 lg:grid-cols-[0.8fr_1.2fr] lg:items-center">
-        <div>
-          <p className="archive-kicker text-[#c79a52]">Astrifer Dijital Sayfa</p>
-          <h1 className="mt-5 font-display text-5xl leading-none sm:text-7xl">Bir gecenin yaşayan arşivi.</h1>
-          <p className="mt-6 max-w-xl text-base leading-7 text-[#aeb5ba]">Gerçek yıldız haritası, kişisel mesaj, fotoğraflar ve ses tek bir kalıcı bağlantıda. Uygulama indirmeden her telefonda açılır.</p>
-          <div className="mt-8 flex items-end gap-4"><strong className="font-display text-5xl text-white">{formatTRY(pricing.digitalPrice)}</strong>{pricing.digitalOriginalPrice > pricing.digitalPrice && <span className="mb-1 text-sm text-[#7d878e] line-through">{formatTRY(pricing.digitalOriginalPrice)}</span>}</div>
-          <p className="mt-2 archive-kicker text-[#7d878e]">Tek ödeme · abonelik yok · kalıcı bağlantı</p>
-          <div className="mt-8 flex flex-col gap-3 sm:flex-row"><Link href="/create" className="archive-button-primary">Sayfamı oluştur</Link><Link href={`/urun/dijital/ornek/${demo.paletteId}`} className="archive-button-secondary">Tam örneği aç</Link></div>
-        </div>
-        <div className="archive-frame p-3 sm:p-5">
-          <div className="flex items-center justify-between border-b border-white/10 pb-3 archive-kicker text-[#7d878e]"><span>Gerçek ürün görünümü</span><span>Mobil + masaüstü</span></div>
-          <div className="relative mt-3 aspect-[5/4] overflow-hidden bg-[#050910]">
-            <StarChart sky={sky} palette={palette} showLabels label="Dijital ürün örneği" className="absolute inset-0 h-full w-full" />
-            <div className="absolute inset-x-0 top-7 text-center"><p className="archive-kicker text-[#c79a52]">{record.locationName}</p><h2 className="mt-2 font-display text-4xl italic text-white">{record.title}</h2></div>
-          </div>
-        </div>
+      <section className="mx-auto grid min-h-[calc(100svh-65px)] max-w-[1500px] items-center gap-12 px-4 py-14 sm:px-8 lg:grid-cols-[0.72fr_1.28fr]">
+        <div><p className="archive-kicker text-[#5eead4]">Astrifer Dijital Sayfa</p><h1 className="archive-display-balanced mt-6 text-6xl leading-[0.88] text-white sm:text-8xl">Bir gecenin yaşayan portalı.</h1><p className="mt-7 max-w-xl text-base leading-8 text-[#b3c6da]">Gerçek yıldızlar, kişisel mesaj, fotoğraflar ve ses; döndürülebilen 3D bir göğün altında tek bir kalıcı bağlantıda yaşar.</p><div className="mt-8 flex items-end gap-4"><strong className="font-display text-6xl text-white">{formatTRY(pricing.digitalPrice)}</strong>{pricing.digitalOriginalPrice > pricing.digitalPrice && <span className="mb-2 text-sm text-[#7890a8] line-through">{formatTRY(pricing.digitalOriginalPrice)}</span>}</div><p className="mt-2 archive-kicker text-[#7890a8]">Tek ödeme · abonelik yok · kalıcı bağlantı</p><div className="mt-9 flex flex-col gap-3 sm:flex-row"><Link href="/create" className="archive-button-primary">Sayfamı oluştur</Link><Link href={`/urun/dijital/ornek/${demo.paletteId}`} className="archive-button-secondary">Tam 3D örneği aç</Link></div></div>
+        <div><div className="archive-globe-frame p-2 sm:p-3"><CelestialGlobe3D sky={sky} palette={palette} label="Dijital ürün 3D örneği" className="aspect-square min-h-[430px] sm:aspect-[6/5] lg:min-h-[630px]" /></div><div className="flex justify-between border-x border-b border-[#9dd2ff]/10 bg-[#030b19]/90 px-4 py-4 archive-kicker text-[#7890a8]"><span>{record.title}</span><span className="text-[#5eead4]">Gerçek ürün görünümü</span></div></div>
       </section>
 
-      <section className="archive-paper px-4 py-20 sm:px-8">
-        <div className="mx-auto max-w-7xl">
-          <p className="archive-kicker text-[#8b6331]">Sayfanın içinde</p>
-          <h2 className="mt-4 max-w-3xl font-display text-5xl leading-tight">Sadece harita değil; tamamlanmış bir hediye deneyimi.</h2>
-          <div className="mt-12 grid gap-px bg-[#19212a]/20 sm:grid-cols-2 lg:grid-cols-4">
-            {[["01", "Açılış", "İsimleriniz, anın tarihi ve konumu."], ["02", "Gerçek gökyüzü", "Ay, gezegenler ve isimlendirilmiş yıldızlar."], ["03", "Kişisel içerik", "4 fotoğraf, mesaj, video, ses veya müzik."], ["04", "Yaşayan zaman", "Her 6 ayda yeni bir anı ekleme alanı."]].map(([n, title, body]) => (
-              <div key={n} className="min-h-56 bg-[#f2eee4] p-6"><span className="archive-kicker text-[#a64d3d]">{n}</span><h3 className="mt-10 font-display text-3xl">{title}</h3><p className="mt-3 text-sm leading-6 text-[#59636c]">{body}</p></div>
-            ))}
-          </div>
-        </div>
-      </section>
+      <section className="archive-paper px-4 py-24 sm:px-8"><div className="mx-auto max-w-7xl"><p className="archive-kicker text-[#5eead4]">Sayfanın içinde</p><h2 className="archive-display-balanced mt-5 max-w-4xl text-5xl leading-[0.95] text-white sm:text-7xl">Düz bir harita değil; tamamlanmış bir gece deneyimi.</h2><div className="mt-14 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">{[["01","Sinematik açılış","İsimler, tarih ve konum gece sahnesinin içinde belirir."],["02","Canlı 3D gök","Yıldızları döndürün, yakınlaştırın ve gerçek adlarıyla seçin."],["03","Kişisel hikâye","Fotoğraflar, mesaj, video, ses veya müzikle size dönüşür."],["04","Yaşayan zaman","Her altı ayda eklenen yeni anlarla sayfa büyümeye devam eder."]].map(([n,title,body])=><div key={n} className="night-surface min-h-64 p-6"><span className="archive-kicker text-[#5eead4]">{n}</span><h3 className="mt-12 font-display text-3xl font-semibold text-white">{title}</h3><p className="mt-4 text-sm leading-7 text-[#9fb4ca]">{body}</p></div>)}</div></div></section>
 
-      <section className="px-4 py-20 sm:px-8">
-        <div className="mx-auto grid max-w-7xl gap-10 lg:grid-cols-[0.7fr_1.3fr]">
-          <div><p className="archive-kicker text-[#c79a52]">Anılar görünür kalır</p><h2 className="mt-4 font-display text-5xl">Galeri gibi değil, hikâye gibi.</h2><p className="mt-5 text-sm leading-6 text-[#aeb5ba]">Fotoğraflar gökyüzünün altında, tarihleri ve notlarıyla gösterilir. Bu yüzden sayfa hazır bir şablon değil, size ait bir kayıt gibi hissedilir.</p></div>
-          <div className="grid grid-cols-2 gap-3">
-            {first?.photos.slice(0, 4).map((photo, index) => photo.url && <div key={photo.url} className="archive-paper p-2">{/* eslint-disable-next-line @next/next/no-img-element */}<img src={photo.url} alt={`Örnek anı ${index + 1}`} className="aspect-square w-full object-cover" /></div>)}
-          </div>
-        </div>
-      </section>
+      <section className="px-4 py-24 sm:px-8"><div className="mx-auto grid max-w-7xl gap-12 lg:grid-cols-[0.68fr_1.32fr]"><div><p className="archive-kicker text-[#9a8cf0]">Anılar görünür kalır</p><h2 className="archive-display-balanced mt-5 text-5xl leading-[0.95] text-white sm:text-7xl">Galeri gibi değil, hikâye gibi.</h2><p className="mt-6 text-sm leading-7 text-[#9fb4ca]">Fotoğraflar tarihler, notlar ve o anın göğüyle birlikte gösterilir. Şablon hissi vermez; size ait bir gece kaydı gibi akar.</p></div><div className="grid auto-rows-[14rem] grid-cols-2 gap-3">{first?.photos.slice(0,4).map((photo,index)=>photo.url&&<div key={photo.url} className={`relative overflow-hidden border border-[#9dd2ff]/10 ${index===0?"row-span-2":""}`}><img src={photo.url} alt={`Örnek anı ${index+1}`} className="h-full w-full object-cover"/><div className="absolute inset-0 bg-gradient-to-t from-[#020711]/80 to-transparent"/><span className="absolute bottom-4 right-4 archive-kicker text-[#5eead4]">0{index+1}</span></div>)}</div></div></section>
 
-      <section className="archive-paper px-4 py-20 text-center sm:px-8"><div className="mx-auto max-w-3xl"><p className="archive-kicker text-[#8b6331]">Satın almadan önce görün</p><h2 className="mt-4 font-display text-6xl">Kendi gecenizi ücretsiz çıkarın.</h2><p className="mx-auto mt-5 max-w-xl text-[#59636c]">Önizleme için ödeme gerekmez. Bilgilerinizi girin, sayfanızın tamamını görün ve sonra karar verin.</p><Link href="/create" className="archive-button-primary mt-8">Önizlemeyi başlat</Link></div></section>
+      <section className="archive-paper px-4 py-24 text-center sm:px-8"><div className="mx-auto max-w-4xl"><p className="archive-kicker text-[#5eead4]">Satın almadan önce görün</p><h2 className="archive-display-balanced mt-5 text-6xl leading-[0.9] text-white sm:text-8xl">Kendi gecenizi ücretsiz açın.</h2><p className="mx-auto mt-6 max-w-2xl text-base leading-7 text-[#9fb4ca]">Önizleme için ödeme gerekmez. Bilgilerinizi girin, 3D sayfanızın tamamını görün ve sonra karar verin.</p><Link href="/create" className="archive-button-primary mt-9">3D önizlemeyi başlat</Link></div></section>
     </main>
   );
 }
