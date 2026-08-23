@@ -34,6 +34,7 @@ import { BUILTIN_PLACES, type PlaceResult } from "@/lib/geocode/cities";
 import { zonedTimeToUtc, utcToZonedTime } from "@/lib/geocode/timezone";
 import { addToCart } from "@/lib/cart";
 import { getCreateDraft, setCreateDraft, clearCreateDraft } from "@/lib/createDraft";
+import { setLastCreatedPage } from "@/lib/lastCreatedPage";
 import { formatTRY } from "@/lib/pricing";
 import type { PricingConfig } from "@/lib/pricingConfig";
 import { slugify } from "@/lib/slug";
@@ -696,6 +697,7 @@ export function CreateForm({ templates, pricing }: CreateFormProps) {
         summary: [previewDateLine],
         slug,
       });
+      setLastCreatedPage({ slug, title, locationName: place.name });
 
       if (journalEnabled) {
         addToCart({

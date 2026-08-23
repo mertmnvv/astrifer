@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { CrossSell } from "@/components/CrossSell";
 import { StarChart } from "@/components/astrolab/StarChart";
 import { StarKeyLegend } from "@/components/astrolab/StarKeyLegend";
 import { getSkyPalette } from "@/components/astrolab/palettes";
@@ -168,6 +169,11 @@ export function StarMapViewV2({ starMap, isPreview = false, isOwner = false, ste
             <Link href={isPreview ? returnHref : "/create"} className="archive-button-primary mt-8">{isPreview ? "Düzenlemeye dön" : "Kendi sayfanı oluştur"}</Link>
           </div>
         </section>
+        {!isPreview && isOwner && (
+          <div className="mx-auto w-full max-w-5xl px-4 pb-20 sm:px-8">
+            <CrossSell exclude={["digital"]} />
+          </div>
+        )}
       </main>
     </div>
   );
