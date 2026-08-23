@@ -18,7 +18,7 @@ export interface NightCoverPageProps {
  * The logo is canvas-drawn (drawLogoThinStar) directly over the leather
  * texture canvas so both share one draw pass; names/wordmark are plain
  * HTML text overlaid on top, same layering approach as the site's other
- * canvas-texture components (see CoverPanel.tsx).
+ * canvas-texture components.
  */
 export function NightCoverPage({ names, widthPx, heightPx }: NightCoverPageProps) {
   const theme = useJournalTheme();

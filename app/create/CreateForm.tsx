@@ -21,7 +21,7 @@ import { StarKeyPage } from "@/components/journal/night/StarKeyPage";
 import { MemoryPage } from "@/components/journal/night/MemoryPage";
 import { EssayPage } from "@/components/journal/night/EssayPage";
 import { BlankPage } from "@/components/journal/night/BlankPage";
-import { getYoutubeId } from "@/components/journal/MusicContext";
+import { getYoutubeId } from "@/lib/youtube";
 import { BackCoverPage } from "@/components/journal/night/BackCoverPage";
 import { LetterNoticePage } from "@/components/journal/night/LetterNoticePage";
 import { BookFlip } from "@/components/journal/BookFlip";
@@ -252,7 +252,7 @@ export function CreateForm({ templates, pricing }: CreateFormProps) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [templateSlug]);
 
-  // "Düzenlemeye dön" from the digital-page preview (see StarMapView.tsx)
+  // "Düzenlemeye dön" from the digital-page preview (see StarMapViewV2.tsx)
   // carries every field back as query params so editing continues from the
   // existing draft instead of starting a blank form. Reads window.location
   // directly (not useSearchParams()) so /create can stay statically

@@ -18,7 +18,7 @@ export function generateMetadata({ params }: { params: { palette: string } }): M
 }
 
 /**
- * Marketing-only "gerçek deneyim" demo — renders the exact StarMapView a
+ * Marketing-only "gerçek deneyim" demo — renders the exact StarMapViewV2 a
  * paying customer's finished /s/[slug] page would (no preview banner, no
  * owner controls), populated with a full timeline and real music, so
  * /urun/dijital can link out to something indistinguishable from the real

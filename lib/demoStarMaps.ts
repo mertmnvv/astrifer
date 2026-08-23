@@ -3,7 +3,7 @@ import type { StarMapRecord } from "@/lib/starmaps";
 /**
  * Full "gerçek deneyim" demo pages for /urun/dijital — one finished,
  * fully-populated StarMapRecord per sky palette so visitors can open the
- * *real* StarMapView (same component /s/[slug] renders) instead of a static
+ * *real* StarMapViewV2 (same component /s/[slug] renders) instead of a static
  * mockup. Photos are deterministic Picsum placeholders (seeded per palette,
  * always resolve — no risk of a dead third-party photo id), music is a
  * shared pair of real YouTube tracks alternated across palettes.

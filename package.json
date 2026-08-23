@@ -12,7 +12,6 @@
   "dependencies": {
     "@aws-sdk/client-s3": "^3.1088.0",
     "@aws-sdk/s3-request-presigner": "^3.1088.0",
-    "@distube/ytdl-core": "^4.16.12",
     "@sparticuz/chromium": "^149.0.0",
     "astronomy-engine": "^2.1.19",
     "cloudinary": "^2.10.0",
@@ -27,7 +26,6 @@
     "react-dom": "^18",
     "react-pageflip": "^2.0.3",
     "server-only": "^0.0.1",
-    "three": "^0.185.1",
     "tz-lookup": "^6.1.25",
     "zod": "^4.4.3"
   },
@@ -36,7 +34,6 @@
     "@types/qrcode": "^1.5.6",
     "@types/react": "^18",
     "@types/react-dom": "^18",
-    "@types/three": "^0.185.1",
     "eslint": "^8",
     "eslint-config-next": "14.2.35",
     "postcss": "^8",
