@@ -1,12 +1,12 @@
-# 🌌 Astrifer — Gökyüzü Zaman Kapsülü
+# 🌌 Hatırname — Gökyüzü Zaman Kapsülü
 
-> **Astrifer**, hayatınızın en anlamlı anlarını donduran, kişiye özel astronomik gökyüzü haritası ve yaşayan bir zaman kapsülü projesidir. Kullanıcının girdiği konum, tarih ve saat verilerine göre o anın gerçek gökyüzünü hesaplar; bunu kalıcı bir **dijital paylaşım sayfası** ve el yapımı, şık bir fiziksel **Deri Defter** ürünü olarak sunar.
+> **Hatırname**, hayatınızın en anlamlı anlarını donduran, kişiye özel astronomik gökyüzü haritası ve yaşayan bir zaman kapsülü projesidir. Kullanıcının girdiği konum, tarih ve saat verilerine göre o anın gerçek gökyüzünü hesaplar; bunu kalıcı bir **dijital paylaşım sayfası** ve el yapımı, şık bir fiziksel **Deri Defter** ürünü olarak sunar.
 
 ---
 
 ## 🛠 Teknoloji Yığını (Tech Stack)
 
-Astrifer modern, performansı yüksek ve güvenli web teknolojileri üzerine inşa edilmiştir:
+Hatırname modern, performansı yüksek ve güvenli web teknolojileri üzerine inşa edilmiştir:
 
 * **Çatı:** Next.js 14 (App Router), TypeScript, Tailwind CSS
 * **Astronomi Motoru:** [`astronomy-engine`](https://github.com/cosinekitty/astronomy) — Gerçek efemeris verileriyle hatasız gökyüzü, takımyıldız ve gezegen hesaplamaları

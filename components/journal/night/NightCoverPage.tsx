@@ -14,7 +14,7 @@ export interface NightCoverPageProps {
 
 /**
  * Journal cover — dark navy-black vegan-leather texture, thin-line-star
- * logo, "Astrifer" wordmark, and the couple's names, all styled gold-foil.
+ * logo, "Hatırname" wordmark, and the couple's names, all styled gold-foil.
  * The logo is canvas-drawn (drawLogoThinStar) directly over the leather
  * texture canvas so both share one draw pass; names/wordmark are plain
  * HTML text overlaid on top, same layering approach as the site's other
@@ -90,7 +90,7 @@ export function NightCoverPage({ names, widthPx, heightPx }: NightCoverPageProps
             letterSpacing: wordmarkFontSize ? wordmarkFontSize * 0.3 : undefined,
           }}
         >
-          Astrifer
+          Hatırname
         </p>
         <p
           className={`font-mono text-center uppercase opacity-70 ${isFixedSize ? "text-[7px] tracking-[0.3em]" : ""}`}
@@ -100,7 +100,7 @@ export function NightCoverPage({ names, widthPx, heightPx }: NightCoverPageProps
             letterSpacing: wordmarkFontSize ? wordmarkFontSize * 0.28 : undefined,
           }}
         >
-          Seyir Kaydı
+          Gökyüzü Cildi
         </p>
       </div>
       <div className="absolute inset-x-0 bottom-[18%] flex flex-col items-center gap-2 px-3">

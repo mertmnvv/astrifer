@@ -34,7 +34,7 @@ export function MobileNav({
   return (
     <div className="lg:hidden">
       <div className="flex items-center justify-between gap-4 px-4 py-3 sm:px-6 sm:py-4">
-        <span className="shrink-0 font-mono text-xs uppercase tracking-[0.3em] text-iris-light">Astrifer Admin</span>
+        <span className="shrink-0 font-mono text-xs uppercase tracking-[0.3em] text-iris-light">Hatırname Admin</span>
         <button
           type="button"
           onClick={() => setOpen((v) => !v)}

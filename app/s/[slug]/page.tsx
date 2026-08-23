@@ -2,7 +2,6 @@ import type { Metadata } from "next";
 import { cookies } from "next/headers";
 import { notFound } from "next/navigation";
 import { StarMapViewV2 } from "@/components/v2/StarMapViewV2";
-import { ArchiveHeader } from "@/components/v2/ArchiveChrome";
 import { getStarMapBySlug } from "@/lib/starmaps";
 import { ownerCookieName, verifyOwnerToken } from "@/lib/starmapOwnerToken";
 
@@ -24,10 +23,10 @@ export async function generateMetadata({
 
   const description = starMap.message ?? `${starMap.locationName} üzerindeki gerçek gökyüzü.`;
   return {
-    title: `${starMap.title} — Astrifer`,
+    title: `${starMap.title} — Hatırname`,
     description,
     openGraph: {
-      title: `${starMap.title} — Astrifer`,
+      title: `${starMap.title} — Hatırname`,
       description,
       url: `${siteUrl()}/s/${starMap.slug}`,
       type: "website",
@@ -49,10 +48,5 @@ export default async function SharedStarMapPage({
   const ownerToken = cookies().get(ownerCookieName(params.slug))?.value;
   const isOwner = await verifyOwnerToken(params.slug, ownerToken);
 
-  return (
-    <>
-      <ArchiveHeader compact />
-      <StarMapViewV2 starMap={starMap} isOwner={isOwner} />
-    </>
-  );
+  return <StarMapViewV2 starMap={starMap} isOwner={isOwner} />;
 }

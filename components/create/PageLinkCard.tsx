@@ -33,7 +33,7 @@ export function PageLinkCard({ host, slug, className }: PageLinkCardProps) {
     if (typeof navigator !== "undefined" && navigator.share) {
       try {
         await navigator.share({
-          title: "Astrifer — Dijital Sayfa",
+          title: "Hatırname — Dijital Sayfa",
           text: "Seninle bu anı paylaşmak istedim ✨",
           url: pageUrl,
         });

@@ -25,7 +25,7 @@ export function SiteHeader() {
       <motion.div style={{ opacity: borderOpacity }} className="absolute inset-x-0 bottom-0 h-px bg-text/10" />
       <div className="mx-auto max-w-6xl px-4 sm:px-8">
         <div className="flex items-center justify-between py-3 sm:py-4">
-          <Link href="/" className="flex items-center" aria-label="Astrifer anasayfa">
+          <Link href="/" className="flex items-center" aria-label="Hatırname anasayfa">
             <Logo size={22} className="sm:hidden" />
             <Logo size={26} className="hidden sm:inline-block" />
           </Link>

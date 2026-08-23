@@ -48,7 +48,7 @@ const cormorantSC = Cormorant_SC({
   display: "swap",
 });
 
-const SITE_TITLE = "Astrifer — Kişiye Özel Yıldız Haritası ve Gökyüzü Hediyesi";
+const SITE_TITLE = "Hatırname — Kişiye Özel Canlı Gökyüzü ve Gökyüzü Cildi";
 const SITE_DESCRIPTION =
   "Doğduğunuz, tanıştığınız ya da hayatınızı değiştiren o anın gökyüzünü, gerçek astronomik verilerle kişiye özel bir hediyeye dönüştürün. Kalıcı dijital sayfa ve el yapımı deri defter.";
 
@@ -56,7 +56,7 @@ export const metadata: Metadata = {
   metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL ?? "https://astrifer.com"),
   title: {
     default: SITE_TITLE,
-    template: "%s | Astrifer",
+    template: "%s | Hatırname",
   },
   description: SITE_DESCRIPTION,
   keywords: [
@@ -79,7 +79,7 @@ export const metadata: Metadata = {
     type: "website",
     locale: "tr_TR",
     url: "/",
-    siteName: "Astrifer",
+    siteName: "Hatırname",
     title: SITE_TITLE,
     description: SITE_DESCRIPTION,
   },

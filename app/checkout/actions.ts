@@ -117,7 +117,7 @@ export async function getCheckoutPaymentTokenAction(
   // 4. Address format: required by PayTR (defaulting to placeholder for digital-only purchases)
   const userAddress = parsed.data.shippingAddress
     ? `${parsed.data.shippingAddress.address} ${parsed.data.shippingAddress.district}/${parsed.data.shippingAddress.city}`
-    : "Dijital Teslimat, Astrifer";
+    : "Dijital Teslimat, Hatırname";
 
   const paytrUserName = parsed.data.shippingAddress?.name || parsed.data.customerName;
 

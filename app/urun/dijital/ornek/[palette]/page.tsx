@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { StarMapViewV2 } from "@/components/v2/StarMapViewV2";
-import { ArchiveHeader, ArchiveFooter } from "@/components/v2/ArchiveChrome";
 import { getDemoStarMap, DIGITAL_DEMO_SHOWCASES } from "@/lib/demoStarMaps";
 
 export function generateStaticParams() {
@@ -12,7 +11,7 @@ export function generateMetadata({ params }: { params: { palette: string } }): M
   const demo = getDemoStarMap(params.palette);
   if (!demo) return {};
   return {
-    title: `${demo.moodTitle} Teması Örneği — Astrifer Dijital Sayfa`,
+    title: `${demo.moodTitle} Teması Örneği — Hatırname Dijital Sayfa`,
     description: demo.moodDescription,
   };
 }
@@ -28,11 +27,5 @@ export default function DigitalDemoPage({ params }: { params: { palette: string 
   const demo = getDemoStarMap(params.palette);
   if (!demo) notFound();
 
-  return (
-    <>
-      <ArchiveHeader compact />
-      <StarMapViewV2 starMap={demo.starMap} isPreview={false} isOwner={false} />
-      <ArchiveFooter />
-    </>
-  );
+  return <StarMapViewV2 starMap={demo.starMap} isPreview={false} isOwner={false} />;
 }

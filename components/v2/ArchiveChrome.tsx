@@ -6,7 +6,7 @@ export function ArchiveHeader({ compact = false }: { compact?: boolean }) {
   return (
     <header className="sticky top-0 z-50 border-b border-[#9dd2ff]/10 bg-[#020711]/90 backdrop-blur-2xl">
       <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-3 sm:px-8">
-        <Link href="/" aria-label="Astrifer ana sayfa" className="flex items-center gap-3">
+        <Link href="/" aria-label="Hatırname ana sayfa" className="flex items-center gap-3">
           <Logo size={24} />
           <span className="hidden border-l border-[#9dd2ff]/15 pl-3 archive-kicker text-[#9fb4ca] sm:block">
             Kişisel gökyüzü arşivi

@@ -42,7 +42,7 @@ const PAGE_DESCRIPTIONS: Record<number, PageDescription> = {
   0: {
     title: "Kişiye Özel Kapak",
     subtitle: "Suni Deri & Altın Yaldız Sıcak Baskı",
-    body: "Defterinizin kapağında Astrifer'in minimal ince-çizgi yıldız logosu ve seçtiğiniz isimler yer alır. Premium suni deri cilt üzerine gofre (sıcak yaldız baskı) tekniğiyle tamamen el işçiliğiyle üretilir."
+    body: "Gökyüzü Cildi'nin kapağında kişisel yörünge kabartması, seçtiğiniz isimler ve koordinatlar yer alır. Premium vegan deri üzerine sıcak metalik baskıyla özel olarak üretilir."
   },
   1: {
     title: "Panoramik Yıldız Haritası (Sol)",
@@ -206,7 +206,7 @@ export function JournalShowcase({
         <div className="mt-8 pt-4 border-t border-text/5 flex items-center justify-between flex-wrap gap-2">
           <span className="text-[10px] font-mono text-dim">Yüksek kaliteli dokulu kâğıt</span>
           <span className="text-xs font-bold text-amber font-mono flex items-center gap-1.5 flex-wrap">
-            Astrifer Defter ·{" "}
+            Hatırname Gökyüzü Cildi ·{" "}
             {journalOriginalPrice && journalOriginalPrice > journalPrice ? (
               <>
                 <span className="line-through text-dim">{formatTRY(journalOriginalPrice)}</span>

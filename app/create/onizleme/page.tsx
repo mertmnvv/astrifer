@@ -1,6 +1,5 @@
 import { notFound } from "next/navigation";
 import { StarMapViewV2 } from "@/components/v2/StarMapViewV2";
-import { ArchiveHeader, ArchiveFooter } from "@/components/v2/ArchiveChrome";
 import { DEFAULT_SKY_PALETTE } from "@/components/astrolab/palettes";
 import type { StarMapRecord } from "@/lib/starmaps";
 
@@ -38,7 +37,7 @@ export default async function CreatePreviewPage({
     latitude: Number(lat),
     longitude: Number(lon),
     locationName: location,
-    musicUrl: null,
+    musicUrl: get("music") ?? null,
     voiceNoteUrl: get("voice") ?? null,
     videoUrl: get("video") ?? null,
     palette: get("palette") ?? DEFAULT_SKY_PALETTE.id,
@@ -60,15 +59,11 @@ export default async function CreatePreviewPage({
   const furthestStep = get("furthestStep");
 
   return (
-    <>
-      <ArchiveHeader compact />
-      <StarMapViewV2
-        starMap={starMap}
-        isPreview
-        step={step ? Number(step) : undefined}
-        furthestStep={furthestStep ? Number(furthestStep) : undefined}
-      />
-      <ArchiveFooter />
-    </>
+    <StarMapViewV2
+      starMap={starMap}
+      isPreview
+      step={step ? Number(step) : undefined}
+      furthestStep={furthestStep ? Number(furthestStep) : undefined}
+    />
   );
 }

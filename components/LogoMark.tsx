@@ -12,7 +12,7 @@ export interface LogoMarkProps {
 }
 
 /**
- * Icon-only Astrifer symbol: a slowly-rotating crosshair/compass, without the
+ * Icon-only Hatırname symbol: a slowly-rotating crosshair/compass, without the
  * wordmark. For contexts too small (or too busy) for legible text —
  * favicons, book-cover faces, tiny thumbnails.
  */

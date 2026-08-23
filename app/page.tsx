@@ -11,7 +11,7 @@ function StructuredData({ siteUrl }: { siteUrl: string }) {
   const organizationJsonLd = {
     "@context": "https://schema.org",
     "@type": "Organization",
-    name: "Astrifer",
+    name: "Hatırname",
     url: siteUrl,
     email: "destek@astrifer.net",
   };
@@ -55,7 +55,7 @@ export default async function HomePage() {
     itemListElement: [
       {
         "@type": "Product",
-        name: "Astrifer Dijital Sayfa",
+        name: "Hatırname Dijital Sayfa",
         description: "Gerçek astronomik verilerle hesaplanmış, kişiye özel kalıcı bir dijital yıldız haritası sayfası.",
         offers: {
           "@type": "Offer",
@@ -66,7 +66,7 @@ export default async function HomePage() {
       },
       {
         "@type": "Product",
-        name: "Astrifer Deri Defter",
+        name: "Hatırname Deri Defter",
         description: "Kişiye özel yıldız haritanızı içeren, suni deri kaplı, el yapımı fiziksel defter.",
         offers: {
           "@type": "Offer",

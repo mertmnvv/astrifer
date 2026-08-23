@@ -36,7 +36,7 @@ export default function OgImage() {
             letterSpacing: "-0.02em",
           }}
         >
-          Astrifer
+          Hatırname
         </div>
         <div
           style={{

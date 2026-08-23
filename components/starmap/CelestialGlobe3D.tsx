@@ -22,6 +22,8 @@ interface CelestialGlobe3DProps {
   palette: SkyPalette;
   className?: string;
   label?: string;
+  memoryMoments?: Array<{ url?: string | null; caption?: string | null }>;
+  musicReactive?: boolean;
 }
 
 interface SelectedObject {
@@ -31,6 +33,7 @@ interface SelectedObject {
   altitude: number;
   azimuth: number;
   magnitude: number;
+  memory?: { url?: string | null; caption?: string | null };
 }
 
 function toVector(azimuth: number, altitude: number, radius = 4.5) {
@@ -61,9 +64,11 @@ function makeGlowTexture() {
   return texture;
 }
 
-export function CelestialGlobe3D({ sky, palette, className = "", label = "Etkileşimli 3D gökyüzü" }: CelestialGlobe3DProps) {
+export function CelestialGlobe3D({ sky, palette, className = "", label = "Etkileşimli 3D gökyüzü", memoryMoments = [], musicReactive = false }: CelestialGlobe3DProps) {
   const hostRef = useRef<HTMLDivElement>(null);
+  const tourNextRef = useRef<() => void>(() => undefined);
   const [selected, setSelected] = useState<SelectedObject | null>(null);
+  const [tourPosition, setTourPosition] = useState(0);
   const [webGlFailed, setWebGlFailed] = useState(false);
 
   useEffect(() => {
@@ -206,6 +211,32 @@ export function CelestialGlobe3D({ sky, palette, className = "", label = "Etkile
     let velocityX = 0;
     let velocityY = 0;
     const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const tourObjects = [...brightObjects]
+      .sort((a, b) => a.mag - b.mag)
+      .slice(0, Math.max(6, memoryMoments.length));
+    let tourIndex = 0;
+
+    const selectObject = (object: SkyObjectPoint, index = objects.indexOf(object)) => {
+      const memoryIndex = tourObjects.indexOf(object);
+      setSelected({
+        name: object.name,
+        kind: object.kind,
+        constellation: object.constellation,
+        altitude: object.altitude,
+        azimuth: object.azimuth,
+        magnitude: object.mag,
+        memory: memoryIndex >= 0 ? memoryMoments[memoryIndex] : memoryMoments[index],
+      });
+    };
+
+    tourNextRef.current = () => {
+      if (!tourObjects.length) return;
+      const object = tourObjects[tourIndex % tourObjects.length];
+      selectObject(object);
+      tourIndex = (tourIndex + 1) % tourObjects.length;
+      setTourPosition(tourIndex || tourObjects.length);
+      velocityY = 0.035;
+    };
 
     const resize = () => {
       const width = Math.max(host.clientWidth, 1);
@@ -247,14 +278,8 @@ export function CelestialGlobe3D({ sky, palette, className = "", label = "Etkile
       raycaster.setFromCamera(pointer, camera);
       const hit = raycaster.intersectObject(starPoints, false)[0];
       const object = typeof hit?.index === "number" ? objects[hit.index] : null;
-      setSelected(object ? {
-        name: object.name,
-        kind: object.kind,
-        constellation: object.constellation,
-        altitude: object.altitude,
-        azimuth: object.azimuth,
-        magnitude: object.mag,
-      } : null);
+      if (object) selectObject(object, hit.index);
+      else setSelected(null);
     };
     const onWheel = (event: WheelEvent) => {
       event.preventDefault();
@@ -277,7 +302,11 @@ export function CelestialGlobe3D({ sky, palette, className = "", label = "Etkile
         globe.rotation.x = THREE.MathUtils.clamp(globe.rotation.x + velocityX, -1.15, 1.15);
         globe.rotation.y += velocityY + (reduceMotion ? 0 : 0.00065);
       }
-      starMaterial.opacity = reduceMotion ? 0.96 : 0.88 + Math.sin(elapsed * 1.4) * 0.08;
+      const musicPulse = musicReactive && !reduceMotion
+        ? (Math.sin(elapsed * 3.1) + Math.sin(elapsed * 6.2) * 0.45 + 1.45) / 2.9
+        : 0;
+      starMaterial.size = 0.2 + musicPulse * 0.075;
+      starMaterial.opacity = reduceMotion ? 0.96 : 0.86 + Math.sin(elapsed * 1.4) * 0.07 + musicPulse * 0.07;
       renderer.render(scene, camera);
     };
     render();
@@ -300,24 +329,37 @@ export function CelestialGlobe3D({ sky, palette, className = "", label = "Etkile
       glowTexture.dispose();
       renderer.dispose();
       renderer.domElement.remove();
+      tourNextRef.current = () => undefined;
     };
-  }, [palette, sky]);
+  }, [memoryMoments, musicReactive, palette, sky]);
 
   return (
     <div className={`relative isolate overflow-hidden bg-[#050910] ${className}`} aria-label={label}>
       <div ref={hostRef} className="absolute inset-0" />
-      <div className="pointer-events-none absolute inset-x-0 top-0 flex items-center justify-between p-4 sm:p-5">
+      <div className="pointer-events-none absolute inset-x-0 top-0 flex items-center justify-between gap-3 p-4 sm:p-5">
         <span className="archive-kicker text-[#5eead4]">Canlı 3D gök küresi</span>
-        <span className="hidden archive-kicker text-[#7890a8] sm:inline">Sürükle · Yakınlaştır · Seç</span>
+        <div className="pointer-events-auto flex items-center gap-2">
+          <span className="hidden archive-kicker text-[#7890a8] lg:inline">Sürükle · Yakınlaştır · Seç</span>
+          <button type="button" onClick={() => tourNextRef.current()} className="border border-[#5eead4]/35 bg-[#020711]/80 px-3 py-2 archive-kicker text-[#5eead4] backdrop-blur transition hover:bg-[#5eead4]/10">
+            Rehberli tur {tourPosition ? `· ${tourPosition}` : ""}
+          </button>
+        </div>
       </div>
       <div className="pointer-events-none absolute bottom-4 left-4 right-4 flex items-end justify-between gap-4 sm:bottom-5 sm:left-5 sm:right-5">
         <div className="archive-kicker leading-5 text-[#7890a8]">Ufuk üstü ve altı<br />gerçek konumlarıyla</div>
         {selected && (
-          <div className="pointer-events-auto max-w-[240px] border border-[#5eead4]/45 bg-[#020711]/95 p-4 text-right shadow-2xl backdrop-blur">
+          <div className="pointer-events-auto max-w-[260px] border border-[#5eead4]/45 bg-[#020711]/95 p-4 text-right shadow-2xl backdrop-blur">
             <button type="button" onClick={() => setSelected(null)} className="absolute right-2 top-1 text-[#7890a8]" aria-label="Seçimi kapat">×</button>
             <p className="archive-kicker text-[#5eead4]">{selected.kind === "star" ? selected.constellation : "Gök cismi"}</p>
             <p className="mt-2 font-display text-2xl text-white">{selected.name}</p>
             <p className="mt-2 font-mono text-[10px] leading-5 text-[#9fb4ca]">ALT {selected.altitude.toFixed(1)}° · AZ {selected.azimuth.toFixed(1)}°<br />MAG {selected.magnitude.toFixed(2)}</p>
+            {selected.memory?.url && (
+              <div className="mt-3 overflow-hidden border border-white/10 text-left">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img src={selected.memory.url} alt={selected.memory.caption ?? `${selected.name} yıldızına bağlı anı`} className="h-24 w-full object-cover" />
+                <p className="bg-[#071426] px-3 py-2 text-xs text-[#d9e8f5]">{selected.memory.caption ?? "Bu yıldıza bağlı anı"}</p>
+              </div>
+            )}
           </div>
         )}
       </div>

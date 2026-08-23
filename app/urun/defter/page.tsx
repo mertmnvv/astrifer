@@ -11,7 +11,7 @@ import { ownerCookieName, verifyOwnerToken } from "@/lib/starmapOwnerToken";
 export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
-  title: "Deri Defter — Astrifer",
+  title: "Deri Defter — Hatırname",
   description: "Gerçek gökyüzünüzü içeren 26 sayfalık, premium vegan/suni deri kaplı kişisel zaman kapsülü.",
 };
 

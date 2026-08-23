@@ -29,7 +29,7 @@ export async function GET(request: NextRequest) {
       {
         signal: controller.signal,
         headers: {
-          "User-Agent": "Astrifer/0.1 (astrifer.com; contact@astrifer.com)",
+          "User-Agent": "Hatırname/0.1 (astrifer.com; contact@astrifer.com)",
           "Accept-Language": "tr,en",
         },
       },

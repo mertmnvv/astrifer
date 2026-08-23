@@ -3,7 +3,7 @@ import { logoutAction } from "@/app/admin/actions";
 import { MobileNav } from "@/components/admin/MobileNav";
 
 export const metadata = {
-  title: "Astrifer Admin",
+  title: "Hatırname Admin",
   robots: { index: false, follow: false },
 };
 
@@ -60,7 +60,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
       {/* Sidebar (desktop) */}
       <aside className="hidden w-60 shrink-0 border-r border-text/10 bg-panel lg:flex lg:flex-col">
         <div className="border-b border-text/10 px-6 py-5">
-          <span className="font-mono text-xs uppercase tracking-[0.3em] text-iris-light">Astrifer</span>
+          <span className="font-mono text-xs uppercase tracking-[0.3em] text-iris-light">Hatırname</span>
           <p className="mt-0.5 font-mono text-[9px] uppercase tracking-[0.2em] text-dim">Admin Paneli</p>
         </div>
         <nav className="flex-1 space-y-1 px-3 py-5">

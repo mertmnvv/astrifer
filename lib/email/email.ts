@@ -93,7 +93,7 @@ export async function sendOrderPaidCustomerEmail(params: {
       <div style="max-width: 600px; margin: 0 auto; background-color: #0f0b18; border: 1px solid #1f1a2e; border-radius: 16px; overflow: hidden; margin-top: 40px; margin-bottom: 40px; box-shadow: 0 10px 30px rgba(0,0,0,0.5);">
         <!-- Header -->
         <div style="background-color: #0b0810; padding: 30px; text-align: center; border-bottom: 1px solid #2d263f;">
-          <h1 style="margin: 0; font-family: serif; font-size: 26px; font-style: italic; color: #fbbf24; letter-spacing: 0.1em;">Astrifer</h1>
+          <h1 style="margin: 0; font-family: serif; font-size: 26px; font-style: italic; color: #fbbf24; letter-spacing: 0.1em;">Hatırname</h1>
         </div>
         
         <!-- Body -->
@@ -137,7 +137,7 @@ export async function sendOrderPaidCustomerEmail(params: {
         
         <!-- Footer -->
         <div style="background-color: #0b0810; padding: 20px 30px; text-align: center; border-top: 1px solid #2d263f;">
-          <p style="margin: 0; font-family: monospace; font-size: 10px; text-transform: uppercase; letter-spacing: 0.15em; color: #6b7280;">© ${new Date().getFullYear()} Astrifer · Yıldızları Yanında Taşı</p>
+          <p style="margin: 0; font-family: monospace; font-size: 10px; text-transform: uppercase; letter-spacing: 0.15em; color: #6b7280;">© ${new Date().getFullYear()} Hatırname · Yıldızları Yanında Taşı</p>
         </div>
       </div>
     </body>

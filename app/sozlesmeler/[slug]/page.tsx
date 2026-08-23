@@ -30,7 +30,7 @@ const SOZLESME_CONTENTS: Record<string, SozlesmeData> = {
     lastUpdated: "16 Temmuz 2026",
     contentHtml: `
       <h3>1. Veri Sorumlusu</h3>
-      <p>Astrifer olarak, 6698 sayılı Kişisel Verilerin Korunması Kanunu ("KVKK") uyarınca, veri sorumlusu sıfatıyla kişisel verilerinizi aşağıda açıklanan amaçlar ve sınırlar çerçevesinde işlemekteyiz.</p>
+      <p>Hatırname olarak, 6698 sayılı Kişisel Verilerin Korunması Kanunu ("KVKK") uyarınca, veri sorumlusu sıfatıyla kişisel verilerinizi aşağıda açıklanan amaçlar ve sınırlar çerçevesinde işlemekteyiz.</p>
 
       <h3>2. İşlenen Kişisel Verileriniz ve Toplanma Yöntemi</h3>
       <p>Sipariş işlemleri, kişiselleştirilmiş yıldız haritası oluşturulması ve teslimat süreçlerinin yürütülmesi amacıyla aşağıdaki verileriniz tamamen veya kısmen otomatik yollarla toplanmaktadır:</p>
@@ -67,13 +67,13 @@ const SOZLESME_CONTENTS: Record<string, SozlesmeData> = {
     lastUpdated: "16 Temmuz 2026",
     contentHtml: `
       <h3>1. Taraflar</h3>
-      <p>İşbu Kullanım Koşulları, astrifer.net internet sitesine ("Site") erişim sağlayan ve Site üzerinden alışveriş yapan tüm kullanıcılar ("Kullanıcı") ile Site'nin sahibi ve yöneticisi olan Astrifer ("Şirket") arasında akdedilmiştir.</p>
+      <p>İşbu Kullanım Koşulları, astrifer.net internet sitesine ("Site") erişim sağlayan ve Site üzerinden alışveriş yapan tüm kullanıcılar ("Kullanıcı") ile Site'nin sahibi ve yöneticisi olan Hatırname ("Şirket") arasında akdedilmiştir.</p>
 
       <h3>2. Hizmetin Tanımı</h3>
       <p>Şirket, Site üzerinden kullanıcıların girdikleri astronomik parametrelere (tarih, saat, konum) göre kişiselleştirilmiş dijital yıldız haritası oluşturmalarına, bu haritaya medya (fotoğraf, ses kaydı) yüklemelerine ve ilgili haritanın basılı olduğu Deri Defter ürününü sipariş etmelerine olanak tanıyan bir e-ticaret platformu sunmaktadır.</p>
 
       <h3>3. Fikri Mülkiyet Hakları</h3>
-      <p>Site'nin arayüzü, kullanılan özgün kodlar, grafik tasarımları, markalar, logolar ve "Astrifer" adı altındaki tüm tescilli fikri mülkiyet hakları Şirket'e aittir. Kullanıcı, Site içeriğini kopyalayamaz, çoğaltamaz veya izinsiz ticari amaçla kullanamaz.</p>
+      <p>Site'nin arayüzü, kullanılan özgün kodlar, grafik tasarımları, markalar, logolar ve "Hatırname" adı altındaki tüm tescilli fikri mülkiyet hakları Şirket'e aittir. Kullanıcı, Site içeriğini kopyalayamaz, çoğaltamaz veya izinsiz ticari amaçla kullanamaz.</p>
 
       <h3>4. Yükümlülükler ve İçerik Kuralları</h3>
       <p>Kullanıcı, zaman kapsüllerine yüklediği fotoğrafların, metinlerin ve ses kayıtlarının yasalara, ahlaka ve üçüncü kişilerin fikri mülkiyet/kişilik haklarına uygun olduğunu taahhüt eder. Yasa dışı veya telif hakkı ihlali barındıran içeriklerden tamamen Kullanıcı sorumludur.</p>
@@ -88,7 +88,7 @@ const SOZLESME_CONTENTS: Record<string, SozlesmeData> = {
     lastUpdated: "16 Temmuz 2026",
     contentHtml: `
       <h3>1. Taraflar</h3>
-      <p><strong>Satıcı:</strong> Astrifer (E-Posta: destek@astrifer.net)<br />
+      <p><strong>Satıcı:</strong> Hatırname (E-Posta: destek@astrifer.net)<br />
       <strong>Alıcı:</strong> astrifer.net üzerinden sipariş formunu doldurarak ödeme yapan kullanıcı.</p>
 
       <h3>2. Sözleşmenin Konusu</h3>
@@ -108,7 +108,7 @@ const SOZLESME_CONTENTS: Record<string, SozlesmeData> = {
     lastUpdated: "16 Temmuz 2026",
     contentHtml: `
       <h3>1. Satıcı Bilgileri</h3>
-      <p><strong>Ad/Unvan:</strong> Astrifer<br />
+      <p><strong>Ad/Unvan:</strong> Hatırname<br />
       <strong>E-Posta:</strong> destek@astrifer.net<br />
       <strong>Hizmet Sunulan Web Adresi:</strong> astrifer.net</p>
 

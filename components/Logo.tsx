@@ -8,7 +8,7 @@ export interface LogoProps {
 }
 
 /**
- * Full lockup: the gradient "Astrifer" wordmark with the rotating crosshair
+ * Full lockup: the gradient "Hatırname" wordmark with the rotating crosshair
  * accent sitting on its shoulder, top-right. Used in header/footer. For
  * cover/gate faces (share-page gate, journal cover), use `LogoMark
  * variant="compass"` alone instead — those already carry their own title.
@@ -19,7 +19,7 @@ export function Logo({ size = 27, className }: LogoProps) {
   return (
     <span
       role="img"
-      aria-label="Astrifer"
+      aria-label="Hatırname"
       className={`relative inline-block leading-none ${className ?? ""}`}
     >
       <LogoWordmark size={size} />

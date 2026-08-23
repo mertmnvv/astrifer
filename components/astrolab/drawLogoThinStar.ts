@@ -1,5 +1,5 @@
 /**
- * Astrifer's thin-line, unfilled 8-point star mark with a small center dot
+ * Hatırname's thin-line, unfilled 8-point star mark with a small center dot
  * — the journal's print mark. Kept as a standalone canvas function (not
  * merged into the site-wide LogoMark SVG component) since it's used from
  * print-target canvases as well as React previews.

@@ -1,7 +1,7 @@
 import { loginAction } from "./actions";
 
 export const metadata = {
-  title: "Admin Girişi — Astrifer",
+  title: "Admin Girişi — Hatırname",
   robots: { index: false, follow: false },
 };
 
@@ -15,7 +15,7 @@ export default function AdminLoginPage({
 
   return (
     <main className="flex min-h-screen flex-col items-center justify-center gap-6 bg-void px-6 py-16">
-      <p className="font-mono text-xs uppercase tracking-[0.3em] text-amber">Astrifer Admin</p>
+      <p className="font-mono text-xs uppercase tracking-[0.3em] text-amber">Hatırname Admin</p>
       <form
         action={loginAction}
         className="w-full max-w-xs space-y-4 rounded-2xl border border-text/10 bg-text/[0.035] p-6"

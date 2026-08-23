@@ -37,7 +37,7 @@ export function SiteFooter() {
 
         <div className="text-center sm:text-right flex flex-col items-center sm:items-end gap-1">
           <span className="font-mono text-[9.5px] uppercase tracking-widest text-faint">
-            © {new Date().getFullYear()} Astrifer
+            © {new Date().getFullYear()} Hatırname
           </span>
         </div>
 
