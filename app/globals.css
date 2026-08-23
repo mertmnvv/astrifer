@@ -6,6 +6,13 @@
   --font-display: serif;
   --font-mono: monospace;
   --font-body: sans-serif;
+  --archive-ink: #0b1118;
+  --archive-ink-soft: #111b25;
+  --archive-paper: #f2eee4;
+  --archive-paper-dim: #d8d1c2;
+  --archive-brass: #c79a52;
+  --archive-rust: #a64d3d;
+  --archive-line: rgba(242, 238, 228, 0.16);
 }
 
 html {
@@ -14,6 +21,100 @@ html {
 
 body {
   background: #0b0810;
+}
+
+/* Astrifer V2 — “Gökyüzü Arşivi”. Aurora/neon yerine baskı, katalog ve
+   gözlemevi estetiğini birleştiren sakin ve ürün-odaklı yüzeyler. */
+.archive-shell {
+  min-height: 100vh;
+  color: var(--archive-paper);
+  background-color: var(--archive-ink);
+  background-image:
+    linear-gradient(rgba(242, 238, 228, 0.035) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(242, 238, 228, 0.035) 1px, transparent 1px);
+  background-size: 48px 48px;
+}
+
+.archive-paper {
+  color: #19212a;
+  background-color: var(--archive-paper);
+  background-image: radial-gradient(rgba(25, 33, 42, 0.08) 0.7px, transparent 0.7px);
+  background-size: 6px 6px;
+}
+
+.archive-kicker {
+  font-family: var(--font-mono), monospace;
+  font-size: 0.65rem;
+  line-height: 1.2;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+}
+
+.archive-frame {
+  border: 1px solid var(--archive-line);
+  background: rgba(17, 27, 37, 0.82);
+  box-shadow: 0 22px 70px rgba(0, 0, 0, 0.24);
+}
+
+.archive-button-primary,
+.archive-button-secondary {
+  display: inline-flex;
+  min-height: 48px;
+  align-items: center;
+  justify-content: center;
+  padding: 0.75rem 1.25rem;
+  font-family: var(--font-mono), monospace;
+  font-size: 0.68rem;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  transition: background-color 180ms ease, color 180ms ease, border-color 180ms ease, transform 180ms ease;
+}
+
+.archive-button-primary {
+  border: 1px solid var(--archive-brass);
+  color: var(--archive-ink);
+  background: var(--archive-brass);
+}
+
+.archive-button-secondary {
+  border: 1px solid rgba(242, 238, 228, 0.28);
+  color: var(--archive-paper);
+  background: transparent;
+}
+
+.archive-button-primary:hover,
+.archive-button-secondary:hover {
+  transform: translateY(-2px);
+}
+
+.archive-button-secondary:hover {
+  border-color: var(--archive-paper);
+  background: rgba(242, 238, 228, 0.06);
+}
+
+.create-v2 .bg-nebula,
+.create-v2 .bg-panel\/40,
+.create-v2 .bg-panel\/30 {
+  background-color: var(--archive-ink-soft) !important;
+}
+
+.create-v2 .text-iris-light,
+.create-v2 .text-iris,
+.create-v2 .text-flare-light {
+  color: var(--archive-brass) !important;
+}
+
+.create-v2 .border-iris\/40,
+.create-v2 .border-iris-light,
+.create-v2 .border-iris\/25 {
+  border-color: rgba(199, 154, 82, 0.55) !important;
+}
+
+.create-v2 .from-iris,
+.create-v2 .to-flare {
+  --tw-gradient-from: var(--archive-brass) var(--tw-gradient-from-position) !important;
+  --tw-gradient-to: #9d7137 var(--tw-gradient-to-position) !important;
 }
 
 @layer utilities {

@@ -1,8 +1,7 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
-import { StarMapView } from "@/components/starmap/StarMapView";
-import { AuroraHeader } from "@/components/home/AuroraHeader";
-import { AuroraFooter } from "@/components/home/AuroraFooter";
+import { StarMapViewV2 } from "@/components/v2/StarMapViewV2";
+import { ArchiveHeader, ArchiveFooter } from "@/components/v2/ArchiveChrome";
 import { getDemoStarMap, DIGITAL_DEMO_SHOWCASES } from "@/lib/demoStarMaps";
 
 export function generateStaticParams() {
@@ -31,13 +30,9 @@ export default function DigitalDemoPage({ params }: { params: { palette: string 
 
   return (
     <>
-      <AuroraHeader
-        links={[{ href: "/urun/dijital", label: "Dijital Sayfa" }]}
-        cta={{ href: "/create", label: "Kendi Sayfanı Oluştur" }}
-        showCart={false}
-      />
-      <StarMapView starMap={demo.starMap} isPreview={false} isOwner={false} />
-      <AuroraFooter />
+      <ArchiveHeader compact />
+      <StarMapViewV2 starMap={demo.starMap} isPreview={false} isOwner={false} />
+      <ArchiveFooter />
     </>
   );
 }

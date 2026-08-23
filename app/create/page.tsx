@@ -1,13 +1,10 @@
 import type { Metadata } from "next";
-import { CreateForm } from "./CreateForm";
+import { CreateFormV2 } from "./CreateFormV2";
 import { FALLBACK_TEMPLATES, type TemplateOption } from "@/lib/templates";
 import { isFirebaseConfigured } from "@/lib/firebase/isConfigured";
 import { getPricingConfig } from "@/lib/pricingConfig";
 import type { TemplateDoc } from "@/types/firestore";
-import { AuroraHeader } from "@/components/home/AuroraHeader";
-import { AuroraFooter } from "@/components/home/AuroraFooter";
-import { AuroraField } from "@/components/home/AuroraField";
-import { RevealOnScroll } from "@/components/ui/RevealOnScroll";
+import { ArchiveHeader, ArchiveFooter } from "@/components/v2/ArchiveChrome";
 
 export const metadata: Metadata = {
   title: "Haritanı Oluştur — Astrifer",
@@ -51,22 +48,18 @@ export default async function CreatePage() {
 
   return (
     <>
-      <AuroraHeader links={[{ href: "/", label: "Ana Sayfa" }]} cta={null} />
-      <main className="relative min-h-screen px-4 pb-16 pt-28 sm:px-8 sm:pb-24 sm:pt-36">
-        <AuroraField />
+      <ArchiveHeader compact />
+      <main className="archive-shell min-h-screen px-4 pb-16 pt-12 sm:px-8 sm:pb-24 sm:pt-16">
         <div className="mx-auto max-w-6xl">
-          <RevealOnScroll className="mb-10 flex flex-col items-center text-center sm:mb-14">
-            <p className="font-mono text-[11px] uppercase tracking-[0.34em] text-iris-light">Zaman Kapsülü Oluştur</p>
-            <h1 className="mt-3.5 font-display text-3xl italic leading-tight text-bright sm:text-5xl">
-              O anı seçin, gökyüzünü çizelim.
-            </h1>
-          </RevealOnScroll>
-          <RevealOnScroll delayMs={120}>
-            <CreateForm templates={templates} pricing={pricing} />
-          </RevealOnScroll>
+          <div className="mb-10 max-w-3xl sm:mb-14">
+            <p className="archive-kicker text-[#c79a52]">Astrifer arşiv oluşturucu · V2</p>
+            <h1 className="mt-4 font-display text-4xl leading-tight text-white sm:text-6xl">Önce anınızı anlatın.<br /><em className="text-[#c79a52]">Gökyüzünü biz çıkaralım.</em></h1>
+            <p className="mt-5 max-w-2xl text-sm leading-6 text-[#aeb5ba]">Bilgileriniz kaybolmaz; her adımda geri dönebilir, satın almadan önce gerçek sayfanızı yeni sekmede inceleyebilirsiniz.</p>
+          </div>
+          <CreateFormV2 templates={templates} pricing={pricing} />
         </div>
       </main>
-      <AuroraFooter />
+      <ArchiveFooter />
     </>
   );
 }

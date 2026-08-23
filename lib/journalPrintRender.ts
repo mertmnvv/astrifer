@@ -19,7 +19,6 @@ export const JOURNAL_PAGE_KINDS = [
   "memory-3",
   "memory-4",
   "essay",
-  "letter-notice",
   "blank",
   "back-cover",
 ] as const;
@@ -27,7 +26,7 @@ export const JOURNAL_PAGE_KINDS = [
 export type JournalPageKind = (typeof JOURNAL_PAGE_KINDS)[number];
 
 /**
- * The physical 27-page order — "blank" appears 15 times but is
+ * The physical 26-page order — "blank" appears 15 times but is
  * rendered/uploaded only once (see renderJournalPrintFiles).
  *
  * `starmap-1`/`starmap-2` must land right after the cover as an (odd, even)
@@ -49,7 +48,6 @@ export const JOURNAL_PAGE_ORDER: JournalPageKind[] = [
   "memory-4",
   "essay",
   ...(Array(15).fill("blank") as JournalPageKind[]),
-  "letter-notice",
   "back-cover",
 ];
 
@@ -65,7 +63,7 @@ export interface JournalManifestEntry {
 
 export interface RenderJournalPrintFilesResult {
   manifest: JournalManifestEntry[];
-  /** Storage path of the single, full-bleed 27-page PDF assembled from the manifest — the file handed to the print shop. */
+  /** Storage path of the single, full-bleed 26-page PDF assembled from the manifest — the file handed to the print shop. */
   pdfStoragePath: string;
 }
 
@@ -73,10 +71,10 @@ export interface RenderJournalPrintFilesResult {
  * Renders every distinct journal page kind exactly once (not all 27 physical
  * slots — the 15 "blank" pages are identical, so rendering/uploading 15
  * copies would be pure waste) and uploads each to the locked-down
- * `starmaps-print/` Storage prefix (see storage.rules). The 27-entry
+ * `starmaps-print/` Storage prefix (see storage.rules). The 26-entry
  * manifest then just repeats the "blank" storage path for every blank slot.
  * The same in-memory buffers are also assembled into a single print-ready
- * PDF (lib/journalPrintPdf.ts) covering all 27 physical pages in order.
+ * PDF (lib/journalPrintPdf.ts) covering all 26 physical pages in order.
  */
 export async function renderJournalPrintFiles(slug: string): Promise<RenderJournalPrintFilesResult> {
   const { widthPx, heightPx } = computeJournalPagePixelSize();
@@ -132,7 +130,7 @@ export interface RenderLetterInsertResult {
 
 /**
  * Renders the sealed letter insert as its OWN, separate print file — never
- * part of the 27-page manifest above. Takes the letter's text/opening date
+ * part of the 26-page manifest above. Takes the letter's text/opening date
  * directly (they live on the order, not the shared star map record) rather
  * than reading them back out of Firestore. Uploaded as a single-page PDF
  * (not a raw PNG) so the print shop always receives the same file format

@@ -3,7 +3,6 @@ import { BackCoverPage } from "@/components/journal/night/BackCoverPage";
 import { BlankPage } from "@/components/journal/night/BlankPage";
 import { DedicationPage } from "@/components/journal/night/DedicationPage";
 import { EssayPage } from "@/components/journal/night/EssayPage";
-import { LetterNoticePage } from "@/components/journal/night/LetterNoticePage";
 import { MemoryPage } from "@/components/journal/night/MemoryPage";
 import { NightCoverPage } from "@/components/journal/night/NightCoverPage";
 import { StarKeyPage } from "@/components/journal/night/StarKeyPage";
@@ -86,9 +85,6 @@ export default async function JournalPrintPage({
     }
     case "essay":
       content = <EssayPage essay={essay} {...shared} />;
-      break;
-    case "letter-notice":
-      content = <LetterNoticePage {...shared} />;
       break;
     case "blank":
       content = <BlankPage {...shared} />;

@@ -110,7 +110,7 @@ export interface OrderDoc {
   /** Journal-only: the date the sealed letter insert is meant to be opened. */
   journalLetterOpeningDate: Timestamp | null;
   /**
-   * Journal-only: ordered manifest of all 26 rendered page Storage paths
+   * Journal-only: ordered manifest of all 26 rendered page R2 object keys
    * (see lib/journalPrintRender.ts) — the 15 blank-page slots repeat the
    * same path rather than storing 15 redundant renders. Never a direct URL.
    */

@@ -1,7 +1,6 @@
 import { notFound } from "next/navigation";
-import { StarMapView } from "@/components/starmap/StarMapView";
-import { AuroraHeader } from "@/components/home/AuroraHeader";
-import { AuroraFooter } from "@/components/home/AuroraFooter";
+import { StarMapViewV2 } from "@/components/v2/StarMapViewV2";
+import { ArchiveHeader, ArchiveFooter } from "@/components/v2/ArchiveChrome";
 import { DEFAULT_SKY_PALETTE } from "@/components/astrolab/palettes";
 import type { StarMapRecord } from "@/lib/starmaps";
 
@@ -62,18 +61,14 @@ export default async function CreatePreviewPage({
 
   return (
     <>
-      <AuroraHeader
-        links={[{ href: "/", label: "Ana Sayfa" }]}
-        cta={{ href: "/create", label: "Düzenlemeye Dön" }}
-        showCart={false}
-      />
-      <StarMapView
+      <ArchiveHeader compact />
+      <StarMapViewV2
         starMap={starMap}
         isPreview
         step={step ? Number(step) : undefined}
         furthestStep={furthestStep ? Number(furthestStep) : undefined}
       />
-      <AuroraFooter />
+      <ArchiveFooter />
     </>
   );
 }

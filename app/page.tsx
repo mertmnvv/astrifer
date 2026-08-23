@@ -1,16 +1,8 @@
 import { computeSky } from "@/lib/astronomy/computeSky";
 import { DEMO_STAR_MAP } from "@/lib/starmaps";
-import { AuroraHeader } from "@/components/home/AuroraHeader";
-import { AuroraFooter } from "@/components/home/AuroraFooter";
-import { Hero } from "@/components/home/Hero";
-import { FeatureShowcase } from "@/components/home/FeatureShowcase";
-import { ConceptSection } from "@/components/home/ConceptSection";
-import { HowItWorks } from "@/components/home/HowItWorks";
-import { ProductsTeaser } from "@/components/home/ProductsTeaser";
-import { Testimonials } from "@/components/home/Testimonials";
-import { Faq } from "@/components/home/Faq";
+import { ArchiveHeader, ArchiveFooter } from "@/components/v2/ArchiveChrome";
+import { HomeV2 } from "@/components/v2/HomeV2";
 import { FAQ_ITEMS } from "@/components/home/faqData";
-import { FinalCta } from "@/components/home/FinalCta";
 import { getPricingConfig } from "@/lib/pricingConfig";
 
 export const dynamic = "force-dynamic";
@@ -90,19 +82,10 @@ export default async function HomePage() {
     <>
       <StructuredData siteUrl={siteUrl} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(productsJsonLd) }} />
-      <div className="bg-nebula">
-        <AuroraHeader />
-        <main>
-          <Hero sky={sky} />
-          <FeatureShowcase />
-          <ConceptSection />
-          <HowItWorks />
-          <ProductsTeaser pricing={pricing} />
-          <Testimonials />
-          <Faq />
-          <FinalCta />
-        </main>
-        <AuroraFooter />
+      <div className="archive-shell">
+        <ArchiveHeader />
+        <HomeV2 sky={sky} pricing={pricing} />
+        <ArchiveFooter />
       </div>
     </>
   );

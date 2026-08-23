@@ -11,7 +11,6 @@ import { MemoryPage } from "@/components/journal/night/MemoryPage";
 import { EssayPage } from "@/components/journal/night/EssayPage";
 import { BlankPage } from "@/components/journal/night/BlankPage";
 import { BackCoverPage } from "@/components/journal/night/BackCoverPage";
-import { LetterNoticePage } from "@/components/journal/night/LetterNoticePage";
 import { BookFlip } from "@/components/journal/BookFlip";
 import { pickNumberedStars, splitSkyByAzimuth } from "@/components/journal/starMapSpread";
 import { buildSkyEssay, buildSkyNarrative } from "@/lib/astronomy/skyNarrative";
@@ -101,11 +100,6 @@ const PAGE_DESCRIPTIONS: Record<number, PageDescription> = {
     body: "Defterin son kısımlarında yer alan, duygularınızı ve planlarınızı kalıcı kılmak için kullanabileceğiniz düz sayfalar."
   },
   12: {
-    title: "Gelecek Mektubu Notu",
-    subtitle: "Mühürlü Cebe Bir İşaret",
-    body: "Arka kapaktan hemen önceki bu sayfa, geleceğe yazdığınız mektubun kitabın içinde değil arka kapaktaki mühürlü cepte beklediğini not düşer."
-  },
-  13: {
     title: "Arka Kapak & QR Kod",
     subtitle: "Mühürlü Cep + Dijital Bağlantı",
     body: "Kitabın arka kapağında hem gofraj dikişli mühürlü mektup cebi hem de dijital sayfanıza ve ses kaydınıza ulaştıran gerçek, taranabilir QR kod bir arada yer alır."
@@ -177,9 +171,7 @@ export function JournalShowcase({
       <BlankPage key="blank-pre-letter" />,
       // 11: Blank Page (Left)
       <BlankPage key="blank-post-letter" />,
-      // 12: Letter Notice (Right)
-      <LetterNoticePage key="letter-notice" />,
-      // 13: Back Cover + QR (Left)
+      // 12: Back Cover + QR (Left) — Gelecek Mektubu kitabın dışında, ayrı mühürlü baskı ekidir.
       <BackCoverPage key="back-cover" qrUrl="https://astrifer.com/s/preview" />,
     ];
   }, [sky, title, eventDateUtc, timezone, locationName, latitude, longitude, memoryPhotos]);
@@ -196,7 +188,7 @@ export function JournalShowcase({
         <div className="space-y-4">
           <div>
             <span className="font-mono text-[9px] uppercase tracking-[0.25em] text-amber font-bold">
-              Defterin İçi · Sayfa {activePageIndex === 0 ? "Kapak" : `${activePageIndex} / 13`}
+              Defterin İçi · {activePageIndex === 0 ? "Kapak" : `Temsili Sayfa ${activePageIndex} / ${pages.length - 1}`}
             </span>
             <h3 className="font-display italic text-2xl text-bright mt-1.5 transition-all duration-300">
               {activeDescription.title}
